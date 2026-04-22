@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Glycemic Load Guide icon">
+  <defs>
+    <linearGradient id="bg" x1="72" y1="48" x2="440" y2="460" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2f8f62" />
+      <stop offset="1" stop-color="#0f6a60" />
+    </linearGradient>
+    <linearGradient id="glow" x1="156" y1="140" x2="356" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#eff8f0" stop-opacity="0.3" />
+      <stop offset="1" stop-color="#eff8f0" stop-opacity="0.05" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="124" fill="url(#bg)" />
+  <circle cx="256" cy="256" r="160" fill="url(#glow)" />
+  <circle cx="256" cy="256" r="158" fill="none" stroke="#eaf4ec" stroke-opacity="0.32" stroke-width="10" />
+  <circle cx="256" cy="236" r="66" fill="#f7fbf7" />
+  <path d="M256 154c-23 0-42 18-42 42 0 33 29 63 42 74 13-11 42-41 42-74 0-24-19-42-42-42Z" fill="#f0f7f0" />
+  <path d="M256 154c-5 22-9 45-9 66 0 19 2 40 7 63" fill="none" stroke="#2f8f62" stroke-width="14" stroke-linecap="round" />
+  <path d="M334 181c-29 6-56 23-74 48 28 5 54 1 78-12 10-5 18-13 24-21-6-8-15-12-28-15Z" fill="#e9f4ea" />
+  <path d="M178 334c27 0 55-4 80-15 19 12 39 18 62 18" fill="none" stroke="#f7fbf7" stroke-width="18" stroke-linecap="round" />
+  <path d="M188 336c18 28 38 44 62 51 24-7 45-23 61-50" fill="none" stroke="#f7fbf7" stroke-width="16" stroke-linecap="round" />
+  <circle cx="170" cy="155" r="16" fill="#e4f1e7" />
+  <circle cx="344" cy="160" r="12" fill="#cfe7d3" />
+</svg>

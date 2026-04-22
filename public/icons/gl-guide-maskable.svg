@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Glycemic Load Guide maskable icon">
+  <rect width="512" height="512" fill="#eef5ef" />
+  <circle cx="256" cy="256" r="174" fill="#2f8f62" />
+  <circle cx="256" cy="256" r="150" fill="none" stroke="#eff8f0" stroke-opacity="0.2" stroke-width="12" />
+  <circle cx="256" cy="236" r="62" fill="#f8fcf8" />
+  <path d="M256 156c-22 0-40 17-40 40 0 30 27 59 40 69 13-10 40-39 40-69 0-23-18-40-40-40Z" fill="#eef7ee" />
+  <path d="M256 156c-4 20-8 42-8 61 0 18 2 38 6 59" fill="none" stroke="#2f8f62" stroke-width="13" stroke-linecap="round" />
+  <path d="M328 183c-27 5-52 21-69 43 25 5 49 1 72-11 10-5 18-12 24-19-6-7-14-12-27-13Z" fill="#edf6ee" />
+  <path d="M178 335c26 0 52-4 76-14 18 11 38 17 60 17" fill="none" stroke="#f8fcf8" stroke-width="17" stroke-linecap="round" />
+  <path d="M188 337c17 26 36 42 58 48 23-6 43-21 58-47" fill="none" stroke="#f8fcf8" stroke-width="15" stroke-linecap="round" />
+</svg>

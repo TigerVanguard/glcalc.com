@@ -1,6 +1,7 @@
 {
   "name": "gl-calc",
   "version": "0.0.1",
+  "type": "module",
   "dependencies": {
     "react": "17.0.1",
     "react-dom": "17.0.1",
@@ -8,25 +9,16 @@
     "semantic-ui-react": "2.0.1"
   },
   "devDependencies": {
-    "parcel-bundler": "1.12.4",
-    "parcel-plugin-pwa-manifest": "3.0.10"
+    "@playwright/test": "^1.49.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.8"
   },
   "scripts": {
-    "start": "parcel public/index.html",
-    "build": "parcel build public/index.html"
-  },
-  "pwaManifest": {
-    "name": "Glycemic Load Calculator",
-    "shortName": "GL Calc",
-    "theme": "#ffffff",
-    "generateIconOptions": {
-      "baseIcon": "./public/pizza.png",
-      "sizes": [
-        192,
-        384,
-        512
-      ],
-      "genFavicons": true
-    }
+    "dev": "vite",
+    "build": "vite build",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
+    "check": "npm run test:unit && npm run test:e2e && npm run build"
   }
 }

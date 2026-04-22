@@ -1,0 +1,194 @@
+{
+  "run_id": "glcalc-20260422-225048-shanghai",
+  "project": "glcalc.com",
+  "status": "PASS",
+  "started_at": "2026-04-22T22:50:18.0000000+08:00",
+  "completed_at": "2026-04-22T22:50:48.8997850+08:00",
+  "summary": {
+    "passed": 24,
+    "failed": 0,
+    "blocked": 0
+  },
+  "environment": {
+    "app_url": "http://127.0.0.1:4173/",
+    "node_version": "v24.11.1",
+    "browser": "Playwright 1.59.1 / Chromium",
+    "mode": "local verification"
+  },
+  "commands": [
+    {
+      "name": "unit-tests",
+      "command": "npm run test:unit",
+      "status": "passed",
+      "exit_code": 0,
+      "output_summary": "Vitest passed 3 files and 13 tests."
+    },
+    {
+      "name": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "exit_code": 0,
+      "output_summary": "Vite production build completed successfully."
+    },
+    {
+      "name": "e2e-tests",
+      "command": "npm run test:e2e",
+      "status": "passed",
+      "exit_code": 0,
+      "output_summary": "Playwright passed 8 browser tests, including PWA metadata verification."
+    }
+  ],
+  "cases": [
+    {
+      "id": "CALC-001",
+      "status": "passed",
+      "priority_if_broken": "P0",
+      "notes": "Verified via the search-to-result browser flow and calculation output."
+    },
+    {
+      "id": "CALC-002",
+      "status": "passed",
+      "priority_if_broken": "P0",
+      "notes": "Covered by unit tests for gram-based carbohydrate and GL calculation."
+    },
+    {
+      "id": "CALC-003",
+      "status": "passed",
+      "priority_if_broken": "P0",
+      "notes": "Covered by unit tests and the ounce-serving browser smoke test."
+    },
+    {
+      "id": "CALC-004",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Verified by unit threshold-label coverage."
+    },
+    {
+      "id": "CALC-005",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Verified by unit threshold-label coverage."
+    },
+    {
+      "id": "SEARCH-001",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Exact food search and selection were exercised in Playwright."
+    },
+    {
+      "id": "SEARCH-002",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Partial-token matching behavior is covered by matcher unit tests and search UI flow."
+    },
+    {
+      "id": "SEARCH-003",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Search refinement behavior is covered by the current matcher and browser search smoke."
+    },
+    {
+      "id": "SEARCH-004",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Search reset state remained stable during browser verification."
+    },
+    {
+      "id": "BAR-001",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Valid barcode lookup succeeded and returned confirmation candidates."
+    },
+    {
+      "id": "BAR-002",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Candidate confirmation produced a valid GL result."
+    },
+    {
+      "id": "BAR-003",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Invalid and unknown barcode recovery states were exercised in Playwright."
+    },
+    {
+      "id": "BAR-004",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Fallback behavior remains recoverable when barcode lookup does not find a strong GI match."
+    },
+    {
+      "id": "PHOTO-001",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Recognizable photo upload returned candidate foods."
+    },
+    {
+      "id": "PHOTO-002",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Photo candidate confirmation produced a valid GL result."
+    },
+    {
+      "id": "PHOTO-003",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Unrecognized photo recovery state was exercised in Playwright."
+    },
+    {
+      "id": "PHOTO-004",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Photo replacement and cancel-style cleanup remained stable in the current browser flow."
+    },
+    {
+      "id": "ERR-001",
+      "status": "passed",
+      "priority_if_broken": "P1",
+      "notes": "Provider-failure paths return recoverable errors instead of hanging."
+    },
+    {
+      "id": "ERR-002",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Empty or incomplete inputs remain safely handled by the current UI."
+    },
+    {
+      "id": "ERR-003",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Loading-state error recovery was validated by the photo-provider failure test."
+    },
+    {
+      "id": "UI-001",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Desktop browser smoke run kept the main result area usable."
+    },
+    {
+      "id": "UI-002",
+      "status": "passed",
+      "priority_if_broken": "P2",
+      "notes": "Browser verification covered a mobile-usable layout path."
+    },
+    {
+      "id": "UI-003",
+      "status": "passed",
+      "priority_if_broken": "P3",
+      "notes": "Footer and attribution did not block interaction in the verified browser shell."
+    },
+    {
+      "id": "REG-001",
+      "status": "passed",
+      "priority_if_broken": "P0",
+      "notes": "Ounce serving carbohydrate display stayed aligned with the GL calculation basis."
+    }
+  ],
+  "issues": [],
+  "notes": [
+    "The required verification commands all passed with no blockers.",
+    "PWA metadata was verified in-browser: manifest link, theme color, Apple web app meta, apple touch icon, and install icons for 192, 512, and maskable.",
+    "Barcode and photo flows were exercised against the deterministic fallback paths defined in the current MVP environment.",
+    "No open issues remain after the final verification round."
+  ]
+}

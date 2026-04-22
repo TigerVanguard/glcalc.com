@@ -14,7 +14,11 @@ const workercode = () => {
 
       const results = foods
         .filter((food) => food.toLowerCase().includes(query))
-        .map((food) => ({ title: food, gi: glycemicIndex[food].gi }));
+        .map((food) => ({
+          title: food,
+          gi: glycemicIndex[food].gi,
+          carbsPer100g: glycemicIndex[food].carbs_per_100g,
+        }));
 
       const maxResults = 25;
       if (results.length > maxResults) {
@@ -40,4 +44,4 @@ code = code.substring(code.indexOf("{") + 1, code.lastIndexOf("}"));
 const blob = new Blob([code], { type: "application/javascript" });
 const workerScript = URL.createObjectURL(blob);
 
-module.exports = workerScript;
+export default workerScript;
