@@ -7,8 +7,9 @@ const unknownPhoto = path.resolve("tests/fixtures/photo-unknown.svg");
 test("loads the app shell", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page).toHaveTitle("Glycemic Load Guide");
-  await expect(page.getByRole("heading", { name: "Glycemic Load Guide" })).toBeVisible();
+  await expect(page).toHaveTitle("Glycemic Load Calculator | GI and GL Food Search");
+  await expect(page.getByRole("heading", { name: "Glycemic Load Calculator", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Calculate glycemic load from GI and serving size" })).toBeVisible();
 });
 
 test("searches for a food and calculates carbs and glycemic load from an ounce serving", async ({
@@ -17,7 +18,7 @@ test("searches for a food and calculates carbs and glycemic load from an ounce s
   await page.goto("/");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
-  await page.getByRole("button", { name: "Blueberries GI 45 · Low" }).click();
+  await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
   await page.getByRole("spinbutton", { name: "Serving size" }).fill("2");
   await page.getByRole("combobox", { name: "Unit" }).selectOption("oz");
 

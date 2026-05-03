@@ -6,24 +6,153 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PDPYWE3JR5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      if (window.location.hostname === "glcalc.vercel.app") {
+        gtag("config", "G-PDPYWE3JR5");
+      }
+    </script>
     <meta name="theme-color" content="#e8f2ea" />
-    <meta name="application-name" content="GL Guide" />
-    <meta name="apple-mobile-web-app-title" content="GL Guide" />
+    <meta name="application-name" content="Glycemic Load Calculator" />
+    <meta name="apple-mobile-web-app-title" content="GL Calc" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta
       name="description"
-      content="Glycemic Load Guide is a mobile-friendly nutrition utility for checking glycemic load by search, barcode, or photo."
+      content="Calculate glycemic load from a food's glycemic index, carbohydrates, and serving size. Search foods, look up barcodes, or identify a food photo."
     />
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://glcalc.vercel.app/" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="icon" href="/icons/gl-guide-icon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="GL Calc" />
+    <meta property="og:url" content="https://glcalc.vercel.app/" />
+    <meta property="og:title" content="Glycemic Load Calculator | GI and GL Food Search" />
+    <meta
+      property="og:description"
+      content="Estimate glycemic load for common foods by combining GI, carbohydrate content, and serving size in grams or ounces."
+    />
+    <meta property="og:image" content="https://glcalc.vercel.app/icons/icon-512.png" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Glycemic Load Calculator | GI and GL Food Search" />
+    <meta
+      name="twitter:description"
+      content="Estimate glycemic load for common foods by combining GI, carbohydrate content, and serving size."
+    />
     <meta name="format-detection" content="telephone=no" />
-    <title>Glycemic Load Guide</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://glcalc.vercel.app/#website",
+            "url": "https://glcalc.vercel.app/",
+            "name": "GL Calc",
+            "description": "A glycemic load calculator and food search utility.",
+            "inLanguage": "en"
+          },
+          {
+            "@type": "WebApplication",
+            "@id": "https://glcalc.vercel.app/#app",
+            "name": "Glycemic Load Calculator",
+            "url": "https://glcalc.vercel.app/",
+            "applicationCategory": "HealthApplication",
+            "operatingSystem": "Any",
+            "isAccessibleForFree": true,
+            "description": "Calculate glycemic load from glycemic index, carbohydrate content, and serving size.",
+            "featureList": [
+              "Food glycemic index search",
+              "Glycemic load calculation",
+              "Serving size conversion between grams and ounces",
+              "Packaged food barcode lookup",
+              "Food photo identification"
+            ],
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            }
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://glcalc.vercel.app/#faq",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "What is glycemic load?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Glycemic load estimates how much a serving of food may raise blood glucose by combining the food's glycemic index with the available carbohydrates in that serving."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How is glycemic load calculated?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The calculator uses the formula glycemic load equals glycemic index multiplied by grams of available carbohydrates in the serving, divided by 100."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is glycemic load the same as glycemic index?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Glycemic index describes the carbohydrate quality of a food, while glycemic load also accounts for how much carbohydrate is in the serving you plan to eat."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <title>Glycemic Load Calculator | GI and GL Food Search</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main class="app-shell">
+        <header class="hero panel hero--app">
+          <p class="eyebrow">Glycemic index and serving-size calculator</p>
+          <h1>Glycemic Load Calculator</h1>
+          <p class="hero__copy">
+            Estimate glycemic load for common foods by combining glycemic index,
+            carbohydrates per serving, and serving size in grams or ounces.
+          </p>
+        </header>
+
+        <section class="panel seo-panel">
+          <h2>Calculate glycemic load from GI and serving size</h2>
+          <p>
+            Glycemic load is calculated as glycemic index multiplied by the
+            grams of available carbohydrates in your serving, divided by 100.
+            Use the interactive app to search foods, check GI values, convert
+            serving sizes, and compare low, medium, and high glycemic load
+            estimates.
+          </p>
+        </section>
+
+        <noscript>
+          <section class="panel seo-panel">
+            <h2>JavaScript is required for the interactive calculator</h2>
+            <p>
+              The calculator needs JavaScript to search the food database,
+              identify photos, and run glycemic load calculations in the
+              browser.
+            </p>
+          </section>
+        </noscript>
+      </main>
+    </div>
     <script type="module" src="/src/index.jsx"></script>
   </body>
 </html>

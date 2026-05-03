@@ -13,7 +13,7 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   await expect(appleCapable).toHaveAttribute("content", "yes");
 
   const appleTitle = page.locator('meta[name="apple-mobile-web-app-title"]');
-  await expect(appleTitle).toHaveAttribute("content", "GL Guide");
+  await expect(appleTitle).toHaveAttribute("content", "GL Calc");
 
   const appleTouchIcon = page.locator('link[rel="apple-touch-icon"]');
   await expect(appleTouchIcon).toHaveAttribute("href", "/icons/apple-touch-icon.png");
@@ -22,8 +22,8 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   expect(manifest.ok()).toBeTruthy();
 
   const manifestJson = await manifest.json();
-  expect(manifestJson.name).toBe("Glycemic Load Guide");
-  expect(manifestJson.short_name).toBe("GL Guide");
+  expect(manifestJson.name).toBe("Glycemic Load Calculator");
+  expect(manifestJson.short_name).toBe("GL Calc");
   expect(manifestJson.icons).toEqual(
     expect.arrayContaining([
       expect.objectContaining({ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }),

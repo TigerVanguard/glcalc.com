@@ -1,1 +1,1 @@
-Glycemic Load Calculator https://glcalc.com
+Glycemic Load Calculator https://glcalc.vercel.app/

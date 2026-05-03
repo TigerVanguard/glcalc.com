@@ -91,7 +91,7 @@ export default function FoodSearch({ onSelect }) {
               >
                 <span className="search-result__title">{result.title}</span>
                 <span className={`pill pill--${getGiLabel(Number(result.gi)).toLowerCase()}`}>
-                  GI {result.gi} · {getGiLabel(Number(result.gi))}
+                  GI {result.gi} - {getGiLabel(Number(result.gi))}
                 </span>
               </button>
             </li>

@@ -1,7 +1,7 @@
 {
-  "name": "Glycemic Load Guide",
-  "short_name": "GL Guide",
-  "description": "A mobile-friendly nutrition utility for checking glycemic load by search, barcode, or photo.",
+  "name": "Glycemic Load Calculator",
+  "short_name": "GL Calc",
+  "description": "Calculate glycemic load from food GI, carbohydrates, and serving size by search, barcode, or photo.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
