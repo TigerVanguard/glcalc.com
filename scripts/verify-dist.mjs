@@ -3,7 +3,9 @@
 // ⑨ forbidden-copy scan, ⑩ SKIPPED marker, GA4 gate removal, sitemap/robots;
 // extended in ticket 06 with ⑤ internal-link counts + nav presence and
 // ⑦ the 5-item footer disclaimer; extended in ticket 07 with the ④ converter
-// row: "18.018" formula string + static reference table content).
+// row: "18.018" formula string + static reference table content; extended in
+// ticket 08 with the ④ a1c-to-eag row: "28.7"/"Nathan" + static ADA table +
+// the D4 negative scan of the calculator panel).
 //
 // Still out of scope (later tickets): ④ formula strings for the other tool
 // pages, ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
@@ -64,8 +66,9 @@ const PAGES = [
     pageTitle: "A1C Calculator – Convert A1C to eAG",
     description:
       "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
-    jsonLdTypes: ["WebApplication"],
+    jsonLdTypes: ["FAQPage", "WebApplication"],
     webAppName: "A1C to eAG Calculator",
+    hasFaq: true,
   },
   {
     route: "/blood-sugar-converter",
@@ -334,6 +337,45 @@ for (const page of PAGES) {
     }
   }
 
+  // T3-④ (ticket 08 — a1c-to-eag row): formula strings + Nathan 2008 source +
+  // applicability copy, the STATIC ADA reference table, and the red-line-D4
+  // negative scan: the calculator panel (input + notices + result cards) must
+  // never contain normal/prediabetes/diabetes — those words are allowed ONLY
+  // as static educational prose (reference table / FAQ), never bound to the
+  // user's result (ADA: diagnosis requires an NGSP-certified lab test).
+  if (route === "/a1c-to-eag-calculator") {
+    const body = root.querySelector("body");
+    const bodyText = body?.text ?? "";
+    check(bodyText.includes("28.7"), 'T3-④ a1c page body contains formula string "28.7"');
+    check(bodyText.includes("Nathan"), 'T3-④ a1c page body cites "Nathan" (Diabetes Care 2008)');
+    check(bodyText.includes("507"), "T3-④ a1c page states the ADAG sample size (507)");
+    check(bodyText.includes("15.7"), "T3-④ a1c page states the ADAG error SD (15.7 mg/dL)");
+
+    const refTables = root.querySelectorAll(".a1c-reference-table");
+    check(refTables.length === 1, `T3-④ exactly one .a1c-reference-table (found ${refTables.length})`);
+    const refRows = refTables[0]?.querySelectorAll("tbody tr") ?? [];
+    check(refRows.length === 3, `T3-④ ADA reference table has 3 static rows (found ${refRows.length})`);
+    const refText = refTables[0]?.text ?? "";
+    for (const category of ["Normal", "Prediabetes", "Diabetes"]) {
+      check(refText.includes(category), `T3-④ ADA reference table lists "${category}" (static education)`);
+    }
+    const refHtml = refTables[0]?.innerHTML ?? "";
+    check(
+      !refHtml.includes("aria-current") && !/class="[^"]*(active|current|highlight)/i.test(refHtml),
+      "T3-④ D4: reference table has no highlight class / aria-current marker",
+    );
+
+    const panels = root.querySelectorAll(".a1c-calculator-panel");
+    check(panels.length === 1, `T3-④ exactly one .a1c-calculator-panel (found ${panels.length})`);
+    const panelText = (panels[0]?.text ?? "").toLowerCase();
+    for (const verdict of ["normal", "prediabetes", "diabetes"]) {
+      check(
+        !panelText.includes(verdict),
+        `T3-④ D4: calculator panel (result/notice area) contains no "${verdict}"`,
+      );
+    }
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -433,5 +475,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );

@@ -7,8 +7,8 @@
 // format* output IS the display contract.
 
 import { describe, expect, it } from "vitest";
-import { mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
-import { formatMgdl, formatMmol, parsePositiveNumber } from "../../src/lib/display.js";
+import { eag, eagMmol, mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
+import { formatEag, formatMgdl, formatMmol, parsePositiveNumber } from "../../src/lib/display.js";
 
 describe("formatMmol (1 decimal, half-up)", () => {
   it("renders mgdlToMmol(100) = 5.5500… as 5.6", () => {
@@ -35,6 +35,35 @@ describe("formatMgdl (integer, half-up)", () => {
 
   it("round-trips a whole mg/dL value unchanged", () => {
     expect(formatMgdl(mmolToMgdl(mgdlToMmol(126)))).toBe("126");
+  });
+});
+
+describe("formatEag (1 decimal, half-up, float-noise snapped — ticket 08)", () => {
+  it("renders eag(7.0) = 154.2 as 154.2 (T1 golden value)", () => {
+    expect(formatEag(eag(7.0))).toBe("154.2");
+  });
+
+  it("renders eag(6.5) = 139.85 as 139.9 despite the raw float being 139.84999…", () => {
+    // The §8 T1 float trap: raw eag(6.5) is 139.84999999999997, so a naive
+    // Math.round(x*10)/10 (and (139.85).toFixed(1)) both yield "139.8".
+    // formatEag's 12-significant-digit snap recovers the half-up "139.9".
+    expect(eag(6.5)).toBeCloseTo(139.85, 2);
+    expect(formatEag(eag(6.5))).toBe("139.9");
+  });
+
+  it("renders eagMmol(7.0) = 8.54 as 8.5", () => {
+    expect(formatEag(eagMmol(7.0))).toBe("8.5");
+  });
+
+  it("rounds exact halves up: eag(3.5) = 53.75 → 53.8, eagMmol(3.5) = 2.975 → 3.0", () => {
+    expect(formatEag(eag(3.5))).toBe("53.8");
+    expect(formatEag(eagMmol(3.5))).toBe("3.0");
+  });
+
+  it("keeps exactly one decimal, padding with zero", () => {
+    expect(formatEag(eag(6.0))).toBe("125.5");
+    expect(formatEag(eagMmol(6.0))).toBe("7.0");
+    expect(formatEag(154)).toBe("154.0");
   });
 });
 

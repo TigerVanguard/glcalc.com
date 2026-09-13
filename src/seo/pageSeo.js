@@ -17,6 +17,7 @@
 import { SITE_ORIGIN, BRAND } from "../site.config.js";
 import { GL_FAQS } from "../data/glFaq.js";
 import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
+import { A1C_TO_EAG_FAQS } from "../data/a1cToEagFaq.js";
 
 export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
 
@@ -71,8 +72,9 @@ const glPage = toolPage(
 );
 // FAQPage only where the page shows a visible FAQ (§5B.2-3): the GL page
 // (src/data/glFaq.js — the old index.html @graph FAQPage semantics converge
-// here) and, since ticket 07, the converter page
-// (src/data/bloodSugarConverterFaq.js).
+// here), since ticket 07 the converter page
+// (src/data/bloodSugarConverterFaq.js), and since ticket 08 the a1c-to-eag
+// page (src/data/a1cToEagFaq.js).
 glPage.jsonLd.push(faqPage(GL_FAQS));
 
 const converterPage = toolPage(
@@ -82,6 +84,14 @@ const converterPage = toolPage(
   "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
 );
 converterPage.jsonLd.push(faqPage(BLOOD_SUGAR_CONVERTER_FAQS));
+
+const a1cToEagPage = toolPage(
+  "/a1c-to-eag-calculator",
+  "A1C Calculator – Convert A1C to eAG",
+  "A1C to eAG Calculator",
+  "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
+);
+a1cToEagPage.jsonLd.push(faqPage(A1C_TO_EAG_FAQS));
 
 export const PAGE_SEO = {
   "/": {
@@ -105,12 +115,7 @@ export const PAGE_SEO = {
     "GMI Calculator (Glucose Management Indicator)",
     "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
   ),
-  "/a1c-to-eag-calculator": toolPage(
-    "/a1c-to-eag-calculator",
-    "A1C Calculator – Convert A1C to eAG",
-    "A1C to eAG Calculator",
-    "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
-  ),
+  "/a1c-to-eag-calculator": a1cToEagPage,
   "/blood-sugar-converter": converterPage,
   "/glucose-to-a1c-estimator": toolPage(
     "/glucose-to-a1c-estimator",

@@ -86,6 +86,33 @@ test("converter page shows formula, reference table, and FAQ without JavaScript"
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });
 
+// Ticket 08 (Spec §8 T4-2 / T3-④ runtime mirror): the a1c-to-eag page's
+// static content — the ADAG formula + Nathan 2008 citation, the applicability
+// limits (507 participants, SD ≈ 15.7 mg/dL), the STATIC ADA reference table,
+// and the FAQ — is served in the prerendered HTML and usable with JavaScript
+// disabled (file-level test.use({ javaScriptEnabled: false }) above applies).
+test("a1c page shows formula, applicability limits, reference table, and FAQ without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/a1c-to-eag-calculator");
+  const main = page.locator("main");
+  await expect(main).toContainText("eAG (mg/dL) = 28.7 × A1C − 46.7");
+  await expect(main).toContainText("Nathan");
+  await expect(main).toContainText("507 participants");
+  await expect(main).toContainText("15.7 mg/dL");
+
+  const rows = page.locator(".a1c-reference-table tbody tr");
+  await expect(rows).toHaveCount(3);
+  await expect(rows.nth(0)).toContainText("Below 5.7%");
+  await expect(rows.nth(1)).toContainText("5.7% – 6.4%");
+  await expect(rows.nth(2)).toContainText("6.5% or above");
+
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(3);
+  await faqEntries.first().locator("summary").click();
+  await expect(faqEntries.first().locator("p")).toBeVisible();
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

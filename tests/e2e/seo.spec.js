@@ -83,8 +83,13 @@ for (const { path, title, canonical, jsonLdTypes } of SPOT_CHECKS) {
 }
 
 // Pages with a visible FAQ block — and therefore the ONLY pages allowed a
-// FAQPage node (§5B.2-3): GL (ticket 04) and the converter (ticket 07).
-const FAQ_ROUTES = new Set(["/glycemic-load-calculator", "/blood-sugar-converter"]);
+// FAQPage node (§5B.2-3): GL (ticket 04), the converter (ticket 07), and
+// a1c-to-eag (ticket 08).
+const FAQ_ROUTES = new Set([
+  "/glycemic-load-calculator",
+  "/blood-sugar-converter",
+  "/a1c-to-eag-calculator",
+]);
 
 test("FAQPage JSON-LD appears exactly on the pages with a visible FAQ", async ({ request }) => {
   for (const path of ALL_ROUTES) {

@@ -24,7 +24,7 @@ export default defineConfig({
     },
     {
       name: "app",
-      testMatch: /(app|pwa|converter)\.spec\.js/,
+      testMatch: /(app|pwa|converter|a1c)\.spec\.js/,
       use: { baseURL: appBaseURL },
     },
   ],
