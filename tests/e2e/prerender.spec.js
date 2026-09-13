@@ -139,6 +139,31 @@ test("estimator page shows formula, approximation copy, and FAQ without JavaScri
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });
 
+// Ticket 10 (Spec §8 T4-2 / T3-④ runtime mirror): the GMI page's static
+// content — the Bergenstal 2018 formula, the mandated GMI-vs-A1C explainer
+// (±0.5 percentage-point differences are common / a mismatch is not a data
+// error / GMI cannot replace a lab A1C), and the FAQ — is served in the
+// prerendered HTML and usable with JavaScript disabled. The prerendered
+// calculator panel must NOT contain any percentage value (empty input →
+// placeholder only; a static % would be a hardcoded result).
+test("gmi page shows formula, difference copy, and FAQ without JavaScript", async ({ page }) => {
+  await page.goto("/gmi-calculator");
+  const main = page.locator("main");
+  await expect(main).toContainText("GMI (%) = 3.31 + 0.02392 × mean glucose (mg/dL)");
+  await expect(main).toContainText("Bergenstal");
+  await expect(main).toContainText("±0.5");
+  await expect(main).toContainText("not a data error");
+  await expect(main).toContainText("cannot replace a laboratory A1C");
+
+  const panelText = await page.locator(".gmi-panel").textContent();
+  expect(panelText).not.toMatch(/\d(\.\d+)?\s*%/);
+
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(4);
+  await faqEntries.first().locator("summary").click();
+  await expect(faqEntries.first().locator("p")).toBeVisible();
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

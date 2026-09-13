@@ -7,10 +7,11 @@
 // format* output IS the display contract.
 
 import { describe, expect, it } from "vitest";
-import { a1cRange, eag, eagMmol, mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
+import { a1cRange, eag, eagMmol, gmi, mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
 import {
   formatA1cRange,
   formatEag,
+  formatGmi,
   formatMgdl,
   formatMmol,
   parsePositiveNumber,
@@ -70,6 +71,41 @@ describe("formatEag (1 decimal, half-up, float-noise snapped — ticket 08)", ()
     expect(formatEag(eag(6.0))).toBe("125.5");
     expect(formatEag(eagMmol(6.0))).toBe("7.0");
     expect(formatEag(154)).toBe("154.0");
+  });
+});
+
+describe("formatGmi (1 decimal, half-up, float-noise snapped — ticket 10)", () => {
+  it("renders gmi(150) = 6.898 as 6.9 (§8 T1 golden value)", () => {
+    expect(gmi(150)).toBeCloseTo(6.898, 3);
+    expect(formatGmi(gmi(150))).toBe("6.9");
+  });
+
+  it("carries gmi(154) = 6.99368 across the integer: 7.0", () => {
+    // Raw JS value is 6.9936799999999995 — the 12-significant-digit snap
+    // keeps that noise from mattering, and half-up carries .99368 to 7.0.
+    expect(formatGmi(gmi(154))).toBe("7.0");
+  });
+
+  it("converts 8.3 mmol/L through mmolToMgdl before gmi: 149.5494 → 6.9", () => {
+    // 8.3 × 18.018 = 149.5494 mg/dL → 3.31 + 0.02392 × 149.5494 =
+    // 6.887221648 → "6.9". Feeding 8.3 straight into gmi would give "3.5" —
+    // the discriminator that mmol input really is converted first.
+    expect(mmolToMgdl(8.3)).toBeCloseTo(149.5494, 4);
+    expect(formatGmi(gmi(mmolToMgdl(8.3)))).toBe("6.9");
+    expect(formatGmi(gmi(8.3))).toBe("3.5");
+  });
+
+  it("rounds exact halves up: 6.25 → 6.3", () => {
+    expect(formatGmi(6.25)).toBe("6.3");
+  });
+
+  it("snaps float noise: gmi(125) = 6.300000000000001 → 6.3", () => {
+    expect(formatGmi(gmi(125))).toBe("6.3");
+  });
+
+  it("keeps exactly one decimal, padding with zero", () => {
+    expect(formatGmi(7)).toBe("7.0");
+    expect(formatGmi(gmi(700))).toBe("20.1");
   });
 });
 

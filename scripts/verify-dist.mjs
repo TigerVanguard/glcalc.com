@@ -8,10 +8,12 @@
 // the D4 negative scan of the calculator panel; extended in ticket 09 with the
 // ④ estimator row: "28.7" + backwards formula + approximation copy, plus the
 // negative scans — no prerendered single-point %, no "ADAG formula" label on
-// the backwards equation, no diagnostic verdicts in the panel).
+// the backwards equation, no diagnostic verdicts in the panel; extended in
+// ticket 10 with the ④ gmi row: "0.02392"/"Bergenstal" + the ±0.5 difference
+// explainer + the .gmi-panel negative scans).
 //
-// Still out of scope (later tickets): ④ formula strings for the other tool
-// pages, ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
+// Still out of scope (later tickets): ④ GL formula string on the GL page,
+// ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
@@ -61,8 +63,9 @@ const PAGES = [
     pageTitle: "GMI Calculator – Glucose Management Indicator",
     description:
       "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
-    jsonLdTypes: ["WebApplication"],
+    jsonLdTypes: ["FAQPage", "WebApplication"],
     webAppName: "GMI Calculator (Glucose Management Indicator)",
+    hasFaq: true,
   },
   {
     route: "/a1c-to-eag-calculator",
@@ -441,6 +444,44 @@ for (const page of PAGES) {
     );
   }
 
+  // T3-④ (ticket 10 — GMI row): the Bergenstal 2018 formula (constant
+  // 0.02392) and the mandated GMI-vs-A1C explainer (±0.5 percentage-point
+  // difference is common / a mismatch is not a data error / GMI cannot
+  // replace a lab A1C) must be prerendered. Panel red lines mirror the other
+  // tool pages: no diagnostic verdicts inside .gmi-panel ("Diabetes Care"
+  // citations must live outside it), and no percentage may be prerendered in
+  // the panel — the prerendered input is empty, so any % in there would be a
+  // hardcoded result.
+  if (route === "/gmi-calculator") {
+    const bodyText = root.querySelector("body")?.text ?? "";
+    check(bodyText.includes("0.02392"), 'T3-④ gmi page body contains formula constant "0.02392"');
+    check(bodyText.includes("3.31"), 'T3-④ gmi page body contains formula intercept "3.31"');
+    check(bodyText.includes("Bergenstal"), 'T3-④ gmi page cites "Bergenstal" (Diabetes Care 2018)');
+    check(bodyText.includes("±0.5"), "T3-④ gmi page carries the ±0.5 percentage-point difference copy");
+    check(
+      bodyText.includes("not a data error"),
+      'T3-④ gmi page states a GMI/A1C mismatch is "not a data error"',
+    );
+    check(
+      bodyText.includes("cannot replace a laboratory A1C"),
+      'T3-④ gmi page states GMI "cannot replace a laboratory A1C"',
+    );
+
+    const panels = root.querySelectorAll(".gmi-panel");
+    check(panels.length === 1, `T3-④ exactly one .gmi-panel (found ${panels.length})`);
+    const panelText = panels[0]?.text ?? "";
+    check(
+      !/\d(\.\d+)?\s*%/.test(panelText),
+      "T3-④ no percentage value prerendered in the gmi panel (no hardcoded result)",
+    );
+    for (const verdict of ["normal", "prediabetes", "diabetes"]) {
+      check(
+        !panelText.toLowerCase().includes(verdict),
+        `T3-④ D4: gmi panel contains no "${verdict}"`,
+      );
+    }
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -540,5 +581,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );

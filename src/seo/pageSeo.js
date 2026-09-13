@@ -19,6 +19,7 @@ import { GL_FAQS } from "../data/glFaq.js";
 import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
 import { A1C_TO_EAG_FAQS } from "../data/a1cToEagFaq.js";
 import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
+import { GMI_FAQS } from "../data/gmiFaq.js";
 
 export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
 
@@ -104,6 +105,16 @@ const glucoseToA1cPage = toolPage(
 // allowed per §5B.2-3.
 glucoseToA1cPage.jsonLd.push(faqPage(GLUCOSE_TO_A1C_FAQS));
 
+const gmiPage = toolPage(
+  "/gmi-calculator",
+  "GMI Calculator – Glucose Management Indicator",
+  "GMI Calculator (Glucose Management Indicator)",
+  "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
+);
+// Visible FAQ added by ticket 10 (src/data/gmiFaq.js) → FAQPage allowed per
+// §5B.2-3.
+gmiPage.jsonLd.push(faqPage(GMI_FAQS));
+
 export const PAGE_SEO = {
   "/": {
     pageTitle: "Free Blood Sugar & Glycemic Calculators",
@@ -120,12 +131,7 @@ export const PAGE_SEO = {
     "Glycemic Index Calculator",
     "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
   ),
-  "/gmi-calculator": toolPage(
-    "/gmi-calculator",
-    "GMI Calculator – Glucose Management Indicator",
-    "GMI Calculator (Glucose Management Indicator)",
-    "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
-  ),
+  "/gmi-calculator": gmiPage,
   "/a1c-to-eag-calculator": a1cToEagPage,
   "/blood-sugar-converter": converterPage,
   "/glucose-to-a1c-estimator": glucoseToA1cPage,

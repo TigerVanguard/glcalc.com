@@ -34,6 +34,24 @@ export function formatEag(raw) {
   return (Math.round(scaled) / 10).toFixed(1);
 }
 
+// GMI display rule (ticket 10, Spec §5 gmi row / §5A.2 gmi / §8 T1): one
+// decimal, %, half-up. Reuses formatEag's float-noise defense: the ×10-scaled
+// value is snapped to 12 significant digits before Math.round, so binary noise
+// on either side of a .x5 boundary cannot flip the half-up result (raw
+// gmi(125) is 6.300000000000001; an exact half like a raw 6.25 must go UP to
+// "6.3", which (6.25).toFixed(1) banker's-style would get right here but the
+// snap keeps the rule uniform with formatEag). Golden values (§8 T1 + ticket
+// 10 e2e):
+//   gmi(150)              = 6.898              → "6.9"
+//   gmi(154)              = 6.9936799999999995 → "7.0"  (carry across 7)
+//   gmi(mmolToMgdl(8.3)),
+//     8.3 mmol/L = 149.5494 mg/dL
+//                         = 6.887221648        → "6.9"
+export function formatGmi(raw) {
+  const scaled = Number((Number(raw) * 10).toPrecision(12));
+  return (Math.round(scaled) / 10).toFixed(1);
+}
+
 // Estimated-A1C range display (ticket 09, Spec §5A.2 estimator / §1 D4).
 // formulas.a1cRange already performs the ONE spec-mandated rounding inside
 // formulas.js (each endpoint half-up to 0.1%), so this helper only fixes the
