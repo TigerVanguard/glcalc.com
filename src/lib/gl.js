@@ -1,3 +1,5 @@
+import { gl, glBand, giBand } from "./formulas.js";
+
 const OZ_TO_GRAMS = 28.349523125;
 
 export function normalizeServingToGrams(serving, unit = "g") {
@@ -19,31 +21,16 @@ export function calculateCarbs({ carbsPer100g, serving, unit = "g" }) {
 
 export function calculateGl({ gi, carbsPer100g, serving, unit = "g" }) {
   const carbs = calculateCarbs({ carbsPer100g, serving, unit });
-  const gl = (Number(gi) * carbs) / 100;
 
-  return Math.round(gl * 100) / 100;
+  // Formula lives in formulas.js (single source of truth); display rounding
+  // to 2 decimals is this module's existing behavior and is preserved.
+  return Math.round(gl(gi, carbs) * 100) / 100;
 }
 
 export function getGiLabel(gi) {
-  if (gi <= 55) {
-    return "Low";
-  }
-
-  if (gi < 70) {
-    return "Medium";
-  }
-
-  return "High";
+  return giBand(gi);
 }
 
-export function getGlLabel(gl) {
-  if (gl <= 10) {
-    return "Low";
-  }
-
-  if (gl < 20) {
-    return "Medium";
-  }
-
-  return "High";
+export function getGlLabel(glValue) {
+  return glBand(glValue);
 }

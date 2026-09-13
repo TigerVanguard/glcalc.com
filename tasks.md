@@ -27,7 +27,7 @@
 
 - [ ] `src/site.config.js`：SITE_ORIGIN + BRAND 常量 ｜开始: ｜完成: ｜证据:
 - [ ] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: ｜完成: ｜证据:
-- [ ] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）｜开始: ｜完成: ｜证据:
+- [x] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）（ticket 01）｜开始: 2026-09-13 00:45 ｜完成: 2026-09-13 01:05 ｜证据: 独立验证 PASS（第 1 轮）：验证者亲跑 `npm run test:unit` 4 文件 33/33 绿；逐行复算 eag(6.5)=139.85、gmi(150)=6.898、a1cRange(126)=[5.5,6.6]、18.018 换算；断言全容差式；gl.js 委托保真、无越界改动
 - [ ] 共享组件：NumberField / UnitToggle / ResultCard / ToolPageLayout / ToolFooter ｜开始: ｜完成: ｜证据:
 - [ ] 每路由独立 head：落地 §5B.1 逐页定稿 title/description 文案 + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
 - [ ] JSON-LD 按 §5B.2 分页配置（工具页 WebApplication、FAQPage 逐字一致、/about AboutPage+Organization、禁 MedicalWebPage）｜开始: ｜完成: ｜证据:
@@ -47,7 +47,7 @@
 - [ ] `/a1c-to-eag-calculator`（参考区间不匹配用户输入，红线 D4）｜开始: ｜完成: ｜证据:
 - [ ] `/blood-sugar-converter`（双向绑定）｜开始: ｜完成: ｜证据:
 - [ ] `/glucose-to-a1c-estimator`（只输出区间，端点各自舍入 0.1%）｜开始: ｜完成: ｜证据:
-- [ ] 【第 2 批三页开工前】若有选词/盘面工具：对 a1c-calculator.net 做竞品精评并更新 §5 决策；无工具则标注跳过（Spec §5 竞品情报）｜开始: ｜完成: ｜证据:
+- [x] 【第 2 批三页开工前】竞品精评（ticket 16）｜完成: 2026-09-13 ｜证据: 跳过——执行环境无选词/盘面工具，按 ticket 16 无工具分支登记，不臆造数据；08/09/10 按 Spec 现有规格执行
 - [ ] `/about`（DiOGenes 来源 + 公式出处 + MIT 署名 + 联系方式）｜开始: ｜完成: ｜证据:
 - [ ] 现有 app.spec.js 入口 URL 迁移（仅改 goto 目标，断言不变）｜开始: ｜完成: ｜证据:
 
