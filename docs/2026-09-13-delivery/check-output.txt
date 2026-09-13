@@ -1,0 +1,709 @@
+
+> gl-calc@0.0.1 check
+> npm run test:unit && npm run build && npm run verify-dist && npm run test:e2e
+
+
+> gl-calc@0.0.1 test:unit
+> vitest run
+
+
+ RUN  v2.1.9 C:/Users/dangkang/Desktop/glcalc.com
+
+ ✓ tests/unit/formulas.test.js (20 tests) 14ms
+ ✓ tests/unit/display.test.js (24 tests) 11ms
+ ✓ tests/unit/gl.test.js (6 tests) 5ms
+ ✓ tests/unit/foodMatch.test.js (4 tests) 6ms
+ ✓ tests/unit/gi-data.test.js (14 tests) 72ms
+ ✓ tests/unit/gl-static-table.test.js (3 tests) 12ms
+ ✓ tests/unit/photoIdentify.test.js (3 tests) 103ms
+
+ Test Files  7 passed (7)
+      Tests  74 passed (74)
+   Start at  08:54:29
+   Duration  2.09s (transform 1.34s, setup 0ms, collect 3.40s, tests 224ms, environment 2ms, prepare 2.02s)
+
+
+> gl-calc@0.0.1 build
+> vite build && node scripts/prerender.mjs
+
+vite v5.4.21 building for production...
+transforming...
+✓ 73 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   3.40 kB │ gzip:   1.47 kB
+dist/assets/index-D-4BLJ0I.css   17.10 kB │ gzip:   4.30 kB
+dist/assets/index-CVtHEI1q.js   512.25 kB │ gzip: 140.81 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 2.70s
+[prerender] internal SPA-fallback server at http://127.0.0.1:52748
+[prerender] rendered /
+[prerender] rendered /glycemic-load-calculator
+[prerender] rendered /glycemic-index-calculator
+[prerender] rendered /gmi-calculator
+[prerender] rendered /a1c-to-eag-calculator
+[prerender] rendered /blood-sugar-converter
+[prerender] rendered /glucose-to-a1c-estimator
+[prerender] rendered /about
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\glycemic-load-calculator\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\glycemic-index-calculator\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\gmi-calculator\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\a1c-to-eag-calculator\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\blood-sugar-converter\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\glucose-to-a1c-estimator\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\about\index.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\404.html
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\sitemap.xml (8 URLs)
+[prerender] wrote C:\Users\dangkang\Desktop\glcalc.com\dist\robots.txt
+[prerender] done: 8 routes + 404.html + sitemap.xml + robots.txt
+
+> gl-calc@0.0.1 verify-dist
+> node scripts/verify-dist.mjs
+
+[verify-dist] /
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("Free Blood Sugar & Glycemic Calculators")
+  PASS  T3-① <title> verbatim: "Free Blood Sugar & Glycemic Calculators | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/" (got "https://glcalc.vercel.app/")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [WebApplication, WebSite] (got [WebApplication, WebSite])
+  PASS  T3-⑧ WebApplication.name = page H1 ("Free Blood Sugar & Glycemic Calculators")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ no FAQPage (no visible FAQ)
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ home has ≥7 in-body internal links outside nav/footer (found 7)
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /glycemic-load-calculator
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\glycemic-load-calculator\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("Glycemic Load Calculator")
+  PASS  T3-① <title> verbatim: "Glycemic Load Calculator – GL by Food & Serving | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/glycemic-load-calculator" (got "https://glcalc.vercel.app/glycemic-load-calculator")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("Glycemic Load Calculator")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "What is glycemic load?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "What is glycemic load?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How is glycemic load calculated?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How is glycemic load calculated?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Is glycemic load the same as glycemic index?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Is glycemic load the same as glycemic index?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Can this replace medical advice?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Can this replace medical advice?"
+  PASS  T3-⑧ FAQ question visible verbatim: "What counts as a low, medium, or high glycemic load?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "What counts as a low, medium, or high glycemic load?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 2)
+  PASS  T3-⑤ related-tools link targets a known route (/glycemic-index-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/glycemic-index-calculator)
+  PASS  T3-⑤ related-tools link targets a known route (/blood-sugar-converter)
+  PASS  T3-⑤ related-tools link is not a self-link (/blood-sugar-converter)
+  PASS  T3-④ GL page contains the GL formula string ("÷ 100" or "/ 100")
+  PASS  T3-④ exactly one .gl-static-table (found 1)
+  PASS  T3-④ GL static table has exactly 27 rows (found 27)
+  PASS  T3-④ GL static table row: Rye bread → 1 slice (30 g) → GL 12.5 (Medium)
+  PASS  T3-④ GL static table row: Watermelon → 1 slice (120 g) → GL 7.4 (Low)
+  PASS  T3-④ §6.1 N/A display string never appears inside the GL static table
+  PASS  T3-④ no encoding-suspect entry (egg white) inside the GL static table
+  PASS  T3-④ GL band boundary semantics: "≤ 10" (Low) prerendered
+  PASS  T3-④ GL band boundary semantics: "≥ 20" (High) prerendered
+  PASS  T3-④ GL page covers the British spelling "glycaemic"
+  PASS  T3-④ GL page names the data source "DiOGenes"
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /glycemic-index-calculator
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\glycemic-index-calculator\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("Glycemic Index Calculator")
+  PASS  T3-① <title> verbatim: "Glycemic Index Calculator – Look Up Food GI | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/glycemic-index-calculator" (got "https://glcalc.vercel.app/glycemic-index-calculator")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("Glycemic Index Calculator")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "Why do some foods show GI: N/A instead of a number?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Why do some foods show GI: N/A instead of a number?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How is the glycemic index different from the glycemic load?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How is the glycemic index different from the glycemic load?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Where do these GI values come from?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Where do these GI values come from?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Is a low-GI food automatically a good choice?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Is a low-GI food automatically a good choice?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 2)
+  PASS  T3-⑤ related-tools link targets a known route (/glycemic-load-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/glycemic-load-calculator)
+  PASS  T3-⑤ related-tools link targets a known route (/blood-sugar-converter)
+  PASS  T3-⑤ related-tools link is not a self-link (/blood-sugar-converter)
+  PASS  T3-④ exactly one .gi-static-table (found 1)
+  PASS  T3-④ GI static table has exactly 27 rows (found 27)
+  PASS  T3-④ GI static table row: Rye bread → GI 89 / High / 47 g carbs
+  PASS  T3-④ GI static table row: Apple → GI 38 / Low / 11.1 g carbs
+  PASS  T3-④ §6.1 N/A display string never appears inside the static table
+  PASS  T3-④ gi page names the data source "DiOGenes"
+  PASS  T3-④ gi page carries the provenance copy ("category-level" assignments)
+  PASS  T3-④ gi page states values are "not individually measured"
+  PASS  T3-④ gi page carries the GI vs GL difference section
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /gmi-calculator
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\gmi-calculator\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("GMI Calculator (Glucose Management Indicator)")
+  PASS  T3-① <title> verbatim: "GMI Calculator – Glucose Management Indicator | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/gmi-calculator" (got "https://glcalc.vercel.app/gmi-calculator")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("GMI Calculator (Glucose Management Indicator)")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "Why is my GMI different from my lab A1C?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Why is my GMI different from my lab A1C?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How many days of CGM data do I need for a reliable GMI?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How many days of CGM data do I need for a reliable GMI?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Can GMI replace a lab A1C test?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Can GMI replace a lab A1C test?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Which number from my CGM app should I enter?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Which number from my CGM app should I enter?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 2)
+  PASS  T3-⑤ related-tools link targets a known route (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link targets a known route (/glucose-to-a1c-estimator)
+  PASS  T3-⑤ related-tools link is not a self-link (/glucose-to-a1c-estimator)
+  PASS  T3-④ gmi page body contains formula constant "0.02392"
+  PASS  T3-④ gmi page body contains formula intercept "3.31"
+  PASS  T3-④ gmi page cites "Bergenstal" (Diabetes Care 2018)
+  PASS  T3-④ gmi page carries the ±0.5 percentage-point difference copy
+  PASS  T3-④ gmi page states a GMI/A1C mismatch is "not a data error"
+  PASS  T3-④ gmi page states GMI "cannot replace a laboratory A1C"
+  PASS  T3-④ exactly one .gmi-panel (found 1)
+  PASS  T3-④ no percentage value prerendered in the gmi panel (no hardcoded result)
+  PASS  T3-④ D4: gmi panel contains no "normal"
+  PASS  T3-④ D4: gmi panel contains no "prediabetes"
+  PASS  T3-④ D4: gmi panel contains no "diabetes"
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /a1c-to-eag-calculator
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\a1c-to-eag-calculator\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("A1C to eAG Calculator")
+  PASS  T3-① <title> verbatim: "A1C Calculator – Convert A1C to eAG | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/a1c-to-eag-calculator" (got "https://glcalc.vercel.app/a1c-to-eag-calculator")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("A1C to eAG Calculator")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "What does eAG actually represent?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "What does eAG actually represent?"
+  PASS  T3-⑧ FAQ question visible verbatim: "Why doesn't this page tell me whether my A1C is normal, prediabetes, or diabetes?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Why doesn't this page tell me whether my A1C is normal, prediabetes, or diabetes?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How accurate is the eAG estimate?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How accurate is the eAG estimate?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 2)
+  PASS  T3-⑤ related-tools link targets a known route (/glucose-to-a1c-estimator)
+  PASS  T3-⑤ related-tools link is not a self-link (/glucose-to-a1c-estimator)
+  PASS  T3-⑤ related-tools link targets a known route (/gmi-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/gmi-calculator)
+  PASS  T3-④ a1c page body contains formula string "28.7"
+  PASS  T3-④ a1c page body cites "Nathan" (Diabetes Care 2008)
+  PASS  T3-④ a1c page states the ADAG sample size (507)
+  PASS  T3-④ a1c page states the ADAG error SD (15.7 mg/dL)
+  PASS  T3-④ exactly one .a1c-reference-table (found 1)
+  PASS  T3-④ ADA reference table has 3 static rows (found 3)
+  PASS  T3-④ ADA reference table lists "Normal" (static education)
+  PASS  T3-④ ADA reference table lists "Prediabetes" (static education)
+  PASS  T3-④ ADA reference table lists "Diabetes" (static education)
+  PASS  T3-④ D4: reference table has no highlight class / aria-current marker
+  PASS  T3-④ exactly one .a1c-calculator-panel (found 1)
+  PASS  T3-④ D4: calculator panel (result/notice area) contains no "normal"
+  PASS  T3-④ D4: calculator panel (result/notice area) contains no "prediabetes"
+  PASS  T3-④ D4: calculator panel (result/notice area) contains no "diabetes"
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /blood-sugar-converter
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\blood-sugar-converter\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("Blood Sugar Converter (mg/dL ⇄ mmol/L)")
+  PASS  T3-① <title> verbatim: "Blood Sugar Converter – mg/dL ⇄ mmol/L | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/blood-sugar-converter" (got "https://glcalc.vercel.app/blood-sugar-converter")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("Blood Sugar Converter (mg/dL ⇄ mmol/L)")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "Why are there two different blood sugar units?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Why are there two different blood sugar units?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How do I convert blood sugar from mg/dL to mmol/L?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How do I convert blood sugar from mg/dL to mmol/L?"
+  PASS  T3-⑧ FAQ question visible verbatim: "What is a normal blood sugar level in mg/dL and mmol/L?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "What is a normal blood sugar level in mg/dL and mmol/L?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 3)
+  PASS  T3-⑤ related-tools link targets a known route (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link targets a known route (/glucose-to-a1c-estimator)
+  PASS  T3-⑤ related-tools link is not a self-link (/glucose-to-a1c-estimator)
+  PASS  T3-⑤ related-tools link targets a known route (/gmi-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/gmi-calculator)
+  PASS  T3-④ converter page contains formula string "18.018"
+  PASS  T3-④ exactly one .conversion-table (found 1)
+  PASS  T3-④ conversion table has 6 body rows (found 6)
+  PASS  T3-④ conversion table row: 70 mg/dL → 3.9 mmol/L
+  PASS  T3-④ conversion table row: 100 mg/dL → 5.6 mmol/L
+  PASS  T3-④ conversion table row: 126 mg/dL → 7.0 mmol/L
+  PASS  T3-④ conversion table row: 140 mg/dL → 7.8 mmol/L
+  PASS  T3-④ conversion table row: 180 mg/dL → 10.0 mmol/L
+  PASS  T3-④ conversion table row: 200 mg/dL → 11.1 mmol/L
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /glucose-to-a1c-estimator
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\glucose-to-a1c-estimator\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("Average Glucose to A1C Estimator")
+  PASS  T3-① <title> verbatim: "Average Glucose to A1C Estimator | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/glucose-to-a1c-estimator" (got "https://glcalc.vercel.app/glucose-to-a1c-estimator")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [FAQPage, WebApplication] (got [FAQPage, WebApplication])
+  PASS  T3-⑧ WebApplication.name = page H1 ("Average Glucose to A1C Estimator")
+  PASS  T3-⑧ WebApplication.url = canonical
+  PASS  T3-⑧ applicationCategory = "HealthApplication"
+  PASS  T3-⑧ operatingSystem = "Any"
+  PASS  T3-⑧ offers = price 0 USD
+  PASS  T3-⑧ WebApplication.description = meta description
+  PASS  T3-⑧ exactly one FAQPage (visible FAQ present)
+  PASS  T3-⑧ FAQPage has mainEntity questions
+  PASS  T3-⑧ FAQ question visible verbatim: "Why does this estimator show a range instead of one A1C number?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "Why does this estimator show a range instead of one A1C number?"
+  PASS  T3-⑧ FAQ question visible verbatim: "How is this different from the A1C to eAG calculator?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "How is this different from the A1C to eAG calculator?"
+  PASS  T3-⑧ FAQ question visible verbatim: "My lab A1C is different from this estimate. Which one should I trust?"
+  PASS  T3-⑧ FAQ answer visible verbatim for: "My lab A1C is different from this estimate. Which one should I trust?"
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑤ exactly one .related-tools container (found 1)
+  PASS  T3-⑤ related-tools has ≥2 internal links (found 2)
+  PASS  T3-⑤ related-tools link targets a known route (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/a1c-to-eag-calculator)
+  PASS  T3-⑤ related-tools link targets a known route (/gmi-calculator)
+  PASS  T3-⑤ related-tools link is not a self-link (/gmi-calculator)
+  PASS  T3-④ estimator page body contains formula string "28.7"
+  PASS  T3-④ estimator page shows the backwards formula "(eAG + 46.7) ÷ 28.7"
+  PASS  T3-④ estimator page states the ADAG error SD (15.7 mg/dL)
+  PASS  T3-④ estimator page carries the approximation copy ("algebraic")
+  PASS  T3-④ estimator page explains regression asymmetry ("asymmetric")
+  PASS  T3-④ exactly one .estimator-panel (found 1)
+  PASS  T3-④ estimator panel has exactly one result card (a single RANGE card, no point cards)
+  PASS  T3-④ no percentage value prerendered in the estimator panel (no single-point output)
+  PASS  T3-④ D4: estimator panel contains no "normal"
+  PASS  T3-④ D4: estimator panel contains no "prediabetes"
+  PASS  T3-④ D4: estimator panel contains no "diabetes"
+  PASS  T3-④ estimator panel never labels the backwards equation "ADAG formula"
+  PASS  "ADAG formula" appears ONLY inside the related-tools context (forward-direction link)
+  PASS  the related-tools "ADAG formula" context links to /a1c-to-eag-calculator
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] /about
+  PASS  prerendered file exists: C:\Users\dangkang\Desktop\glcalc.com\dist\about\index.html
+  PASS  exactly one <title> (found 1)
+  PASS  exactly one <h1> (found 1)
+  PASS  <h1> is non-empty ("About GL Calc")
+  PASS  T3-① <title> verbatim: "About – Data Sources, Formulas & Disclaimer | GL Calc"
+  PASS  T3-② exactly one meta description (found 1)
+  PASS  T3-② meta description verbatim equals §5B.1 copy
+  PASS  T3-⑥ exactly one canonical (found 1)
+  PASS  T3-⑥ canonical = "https://glcalc.vercel.app/about" (got "https://glcalc.vercel.app/about")
+  PASS  T3-⑥ canonical has no trailing slash (root exempt)
+  PASS  T3-⑥ unique og:url identical to canonical
+  PASS  T3-⑥ unique og:title identical to title
+  PASS  T3-⑥ unique og:description identical to meta description
+  PASS  T3-⑥ unique og:image with absolute URL (got "https://glcalc.vercel.app/og-cover.png")
+  PASS  T3-⑥ og:type = website
+  PASS  T3-⑥ twitter:card present once
+  PASS  T3-⑧ all JSON-LD scripts parse as valid JSON
+  PASS  T3-⑧ JSON-LD types = [AboutPage, Organization] (got [AboutPage, Organization])
+  PASS  T3-⑧ no FAQPage (no visible FAQ)
+  PASS  T3-⑧ no MedicalWebPage anywhere
+  PASS  T3-⑨ no "Harvard"
+  PASS  T3-⑨ no "works offline" claim
+  PASS  GA4 config present
+  PASS  GA4 config has no hostname condition
+  PASS  T3-⑤ SiteNav has exactly 8 links (found 8)
+  PASS  T3-⑤ SiteNav covers all 8 routes
+  PASS  T3-⑨ about page names the data source "DiOGenes"
+  PASS  T3-⑨ about page cites "Aston" (Obesity Reviews 2010)
+  PASS  T3-⑨ about page carries the honest provenance copy ("category-level" assignments)
+  PASS  T3-⑨ about page names the Atkinson 2021 upgrade path
+  PASS  T3-⑨ about page cites "Nathan" (ADAG, Diabetes Care 2008)
+  PASS  T3-⑨ about page cites "Bergenstal" (GMI, Diabetes Care 2018)
+  PASS  T3-⑨ about page states the MIT License attribution
+  PASS  T3-⑨ about page credits upstream author "Assaf Morami"
+  PASS  T3-⑨ about page links to the upstream assafmo/glcalc.com repository
+  PASS  T3-⑨ about page links to the GitHub Issues contact entry point
+  PASS  T3-⑨ Organization JSON-LD contactPoint matches the GitHub Issues contact URL
+  PASS  T3-⑦ exactly one .tool-footer (found 1)
+  PASS  T3-⑦ footer ① non-diagnostic statement (literal)
+  PASS  T3-⑦ footer ② attribution "Maintained by the GL Calc project." (literal fallback)
+  PASS  T3-⑦ footer ③ review status (literal)
+  PASS  T3-⑦ footer ④ matches /Last updated: \d{4}-\d{2}-\d{2}/
+  PASS  T3-⑦ footer ⑤ "Data sources & contact:" (literal)
+  PASS  T3-⑦ footer ⑤ links to /about
+[verify-dist] T3-⑩ glcalc.vercel.app zero-hit scan: SKIPPED (P5 前)
+[verify-dist] dist/sitemap.xml
+  PASS  sitemap exists: C:\Users\dangkang\Desktop\glcalc.com\dist\sitemap.xml
+  PASS  sitemap has exactly 8 <url> entries (found 8)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/</loc>
+  PASS  sitemap lastmod for / comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/glycemic-load-calculator</loc>
+  PASS  sitemap lastmod for /glycemic-load-calculator comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/glycemic-index-calculator</loc>
+  PASS  sitemap lastmod for /glycemic-index-calculator comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/gmi-calculator</loc>
+  PASS  sitemap lastmod for /gmi-calculator comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/a1c-to-eag-calculator</loc>
+  PASS  sitemap lastmod for /a1c-to-eag-calculator comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/blood-sugar-converter</loc>
+  PASS  sitemap lastmod for /blood-sugar-converter comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/glucose-to-a1c-estimator</loc>
+  PASS  sitemap lastmod for /glucose-to-a1c-estimator comes from src/sitemap-lastmod.json (2026-09-13)
+  PASS  sitemap contains <loc>https://glcalc.vercel.app/about</loc>
+  PASS  sitemap lastmod for /about comes from src/sitemap-lastmod.json (2026-09-13)
+[verify-dist] dist/robots.txt
+  PASS  robots.txt exists: C:\Users\dangkang\Desktop\glcalc.com\dist\robots.txt
+  PASS  robots.txt allows all
+  PASS  robots.txt has no blanket Disallow
+  PASS  robots.txt points to sitemap
+[verify-dist] dist/404.html
+  PASS  404 page exists: C:\Users\dangkang\Desktop\glcalc.com\dist\404.html
+  PASS  404 page links to /
+  PASS  404 page links to /glycemic-load-calculator
+  PASS  404 page links to /glycemic-index-calculator
+  PASS  404 page links to /gmi-calculator
+  PASS  404 page links to /a1c-to-eag-calculator
+  PASS  404 page links to /blood-sugar-converter
+  PASS  404 page links to /glucose-to-a1c-estimator
+  PASS  404 page links to /about
+[verify-dist] vercel.json routing invariants
+  PASS  vercel.json exists
+  PASS  cleanUrls is true
+  PASS  trailingSlash is false
+  PASS  no rewrites/routes (catch-all rewrite forbidden)
+[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨(incl. /about positives) + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).
+
+> gl-calc@0.0.1 test:e2e
+> playwright test
+
+
+Running 90 tests using 4 workers
+
+(node:25604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21844) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:25604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:21844) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:27396) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:32792) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  4 [static] › tests\e2e\seo.spec.js:56:3 › prerendered / exposes correct title/canonical/JSON-LD without JavaScript (2.0s)
+  ok  3 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered / returns 200 with visible H1 (no JavaScript) (2.3s)
+  ok  2 [app] › tests\e2e\app.spec.js:60:1 › loads the app shell (3.2s)
+  ok  1 [app] › tests\e2e\a1c.spec.js:32:1 › typing 7.0 shows both eAG units with the display-rounded golden values (3.3s)
+  ok  5 [static] › tests\e2e\seo.spec.js:56:3 › prerendered /glycemic-load-calculator exposes correct title/canonical/JSON-LD without JavaScript (2.3s)
+  ok  6 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /glycemic-load-calculator returns 200 with visible H1 (no JavaScript) (2.1s)
+  ok  8 [app] › tests\e2e\a1c.spec.js:42:1 › typing 6.5 shows 139.9 mg/dL (half-up of raw 139.85, not the 139.8 float trap) (2.2s)
+  ok 10 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /glycemic-index-calculator returns 200 with visible H1 (no JavaScript) (1.3s)
+  ok  9 [static] › tests\e2e\seo.spec.js:56:3 › prerendered /gmi-calculator exposes correct title/canonical/JSON-LD without JavaScript (1.4s)
+  ok  7 [app] › tests\e2e\app.spec.js:78:1 › workflow shell keeps one active finder at a time (2.9s)
+  ok 12 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /gmi-calculator returns 200 with visible H1 (no JavaScript) (1.2s)
+  ok 11 [app] › tests\e2e\a1c.spec.js:51:1 › A1C below the ADAG range still calculates but shows the out-of-range warning (2.3s)
+  ok 13 [static] › tests\e2e\seo.spec.js:56:3 › prerendered /about exposes correct title/canonical/JSON-LD without JavaScript (2.1s)
+  ok 15 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /a1c-to-eag-calculator returns 200 with visible H1 (no JavaScript) (1.1s)
+  ok 17 [static] › tests\e2e\seo.spec.js:98:1 › FAQPage JSON-LD appears exactly on the pages with a visible FAQ (108ms)
+  ok 19 [static] › tests\e2e\seo.spec.js:106:1 › robots.txt and sitemap.xml are served with the 8-route map (40ms)
+  ok 20 [static] › tests\e2e\seo.spec.js:120:1 › GA4 config is unconditional (no hostname gate) (22ms)
+(node:30304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 18 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /blood-sugar-converter returns 200 with visible H1 (no JavaScript) (1.3s)
+  ok 14 [app] › tests\e2e\app.spec.js:102:1 › finder tabs support arrow-key navigation (3.5s)
+  ok 16 [app] › tests\e2e\a1c.spec.js:63:1 › D4 red line: input in the ADA prediabetes band is never graded or highlighted (2.4s)
+(node:30304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 21 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /glucose-to-a1c-estimator returns 200 with visible H1 (no JavaScript) (1.9s)
+  ok 22 [app] › tests\e2e\app.spec.js:124:1 › manual barcode copy stays honest in the workflow shell (2.4s)
+  ok 23 [app] › tests\e2e\a1c.spec.js:94:1 › invalid input shows an error and clears both result cards (2.1s)
+  ok 25 [static] › tests\e2e\prerender.spec.js:23:3 › prerendered /about returns 200 with visible H1 (no JavaScript) (2.4s)
+  ok 27 [app] › tests\e2e\a1c.spec.js:112:1 › empty input shows placeholders and never NaN or 0 (2.5s)
+  ok 26 [app] › tests\e2e\app.spec.js:134:1 › clearing search ignores stale worker responses (3.1s)
+  ok 24 [app] › tests\e2e\converter.spec.js:27:1 › typing mg/dL updates the mmol/L side with the display-rounded value (3.7s)
+  ok 28 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /glycemic-load-calculator by clicking a real link (1.6s)
+  ok 32 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /glycemic-index-calculator by clicking a real link (1.5s)
+  ok 29 [app] › tests\e2e\estimator.spec.js:41:1 › typing 126 mg/dL shows the golden range ≈ 5.5% – 6.6% (3.0s)
+  ok 31 [app] › tests\e2e\converter.spec.js:37:1 › typing mmol/L updates the mg/dL side with the display-rounded value (2.5s)
+  ok 33 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /gmi-calculator by clicking a real link (1.3s)
+  ok 30 [app] › tests\e2e\app.spec.js:198:1 › searches for a food and calculates carbs and glycemic load from an ounce serving (4.2s)
+  ok 36 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /a1c-to-eag-calculator by clicking a real link (1.4s)
+  ok 35 [app] › tests\e2e\converter.spec.js:45:1 › invalid input shows an error and clears the derived side and result (2.4s)
+  ok 34 [app] › tests\e2e\estimator.spec.js:54:1 › switching to mmol/L and typing 7.0 gives the 126.126 mg/dL range (2.9s)
+  ok 38 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /blood-sugar-converter by clicking a real link (2.3s)
+  ok 39 [app] › tests\e2e\converter.spec.js:64:1 › values above 1000 mg/dL warn without blocking the conversion (2.2s)
+  ok 40 [app] › tests\e2e\estimator.spec.js:63:1 › no single-point output: the only result value node matches the range shape (2.4s)
+  ok 37 [app] › tests\e2e\app.spec.js:216:1 › selected food summary appears after choosing a food and search clear does not drop it (4.5s)
+  ok 41 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /glucose-to-a1c-estimator by clicking a real link (2.4s)
+  ok 42 [app] › tests\e2e\converter.spec.js:74:1 › empty input shows placeholders and never NaN or 0 (2.2s)
+  ok 43 [app] › tests\e2e\estimator.spec.js:81:1 › out-of-range input (50 mg/dL) still shows the range plus the ADAG warning (2.3s)
+  ok 45 [static] › tests\e2e\prerender.spec.js:37:3 › home reaches /about by clicking a real link (1.4s)
+  ok 46 [app] › tests\e2e\gi.spec.js:31:1 › searching a staple shows GI value, band badge, and carbs per 100 g (2.6s)
+  ok 47 [app] › tests\e2e\estimator.spec.js:92:1 › unit toggle converts the typed value both ways (first UnitToggle coverage) (2.8s)
+  ok 48 [static] › tests\e2e\prerender.spec.js:51:1 › all 8 pages render the unified disclaimer footer (3.0s)
+  ok 44 [app] › tests\e2e\app.spec.js:235:1 › tab switching preserves draft input and keeps the active selected food (5.4s)
+  ok 49 [app] › tests\e2e\gi.spec.js:50:1 › high-GI food gets the High badge and an encoded GL deep link (2.6s)
+  ok 51 [static] › tests\e2e\prerender.spec.js:71:1 › converter page shows formula, reference table, and FAQ without JavaScript (1.4s)
+  ok 50 [app] › tests\e2e\estimator.spec.js:114:1 › invalid input shows an error and clears the range card (2.8s)
+  ok 54 [static] › tests\e2e\prerender.spec.js:94:1 › a1c page shows formula, applicability limits, reference table, and FAQ without JavaScript (1.5s)
+  ok 53 [app] › tests\e2e\gi.spec.js:68:1 › clicking the deep link lands on the GL page with the food preselected (2.9s)
+  ok 56 [static] › tests\e2e\prerender.spec.js:122:1 › estimator page shows formula, approximation copy, and FAQ without JavaScript (1.4s)
+  ok 55 [app] › tests\e2e\estimator.spec.js:131:1 › empty input shows the placeholder and never NaN or 0 (2.5s)
+  ok 52 [app] › tests\e2e\app.spec.js:261:1 › summary reset clears only the selected result (5.1s)
+  ok 58 [static] › tests\e2e\prerender.spec.js:149:1 › gmi page shows formula, difference copy, and FAQ without JavaScript (1.5s)
+  ok 57 [app] › tests\e2e\gi.spec.js:89:1 › egg white shows GI: N/A with no numeric 70 anywhere in the result (2.5s)
+  ok 59 [app] › tests\e2e\gmi.spec.js:34:1 › typing 150 mg/dL shows the golden GMI 6.9% and the mmol/L echo (2.4s)
+  ok 61 [static] › tests\e2e\prerender.spec.js:175:1 › gi page shows static table, provenance note, GI vs GL copy, and FAQ without JavaScript (2.2s)
+  ok 60 [app] › tests\e2e\app.spec.js:274:1 › looks up a barcode, confirms a candidate, and calculates GL (3.4s)
+  ok 62 [app] › tests\e2e\gi.spec.js:120:1 › no-match and cleared searches behave sanely and never write the URL (2.5s)
+  ok 63 [app] › tests\e2e\gmi.spec.js:50:1 › typing 154 mg/dL rounds 6.99368 up to 7.0% (half-up carry) (2.4s)
+  ok 64 [static] › tests\e2e\prerender.spec.js:208:1 › gl page shows static GL table, band copy, and glycaemic spelling without JavaScript (1.6s)
+  ok 68 [static] › tests\e2e\prerender.spec.js:245:1 › about page shows data provenance, formula sources, MIT attribution, and contact link without JavaScript (1.1s)
+  ok 69 [static] › tests\e2e\prerender.spec.js:283:1 › unknown path returns HTTP 404, not a soft-404 shell (33ms)
+  ok 70 [static] › tests\e2e\prerender.spec.js:288:1 › trailing-slash URL redirects to the no-trailing-slash URL (14ms)
+  ok 66 [app] › tests\e2e\pwa.spec.js:3:1 › exposes installable PWA metadata and icon assets (2.0s)
+  ok 67 [app] › tests\e2e\gmi.spec.js:57:1 › mmol/L mode: 8.3 converts to 149.5494 mg/dL before the formula (GMI 6.9%) (2.4s)
+  ok 65 [app] › tests\e2e\app.spec.js:290:1 › replacing selected food from another finder updates the summary (4.9s)
+  ok 71 [app] › tests\e2e\gmi.spec.js:72:1 › out-of-sensor-range input (700 mg/dL) warns but still shows the GMI (2.3s)
+  ok 73 [app] › tests\e2e\gmi.spec.js:82:1 › unit toggle converts the typed value both ways (2.5s)
+  ok 74 [app] › tests\e2e\gmi.spec.js:100:1 › invalid input shows an error and clears the GMI card (2.1s)
+  ok 72 [app] › tests\e2e\app.spec.js:307:1 › switching finders or running lookups without confirm does not replace the selected food (6.2s)
+  ok 75 [app] › tests\e2e\gmi.spec.js:118:1 › empty input shows the placeholder and never NaN or 0 (2.3s)
+  ok 76 [app] › tests\e2e\app.spec.js:336:1 › uploads a photo, confirms a candidate, and calculates GL (2.6s)
+  ok 77 [app] › tests\e2e\app.spec.js:352:1 › mobile layout moves the result workspace ahead of the workflow stack after selection (2.8s)
+  ok 78 [app] › tests\e2e\app.spec.js:376:1 › finder-local clear actions do not wipe the selected summary or result (4.8s)
+  ok 79 [app] › tests\e2e\app.spec.js:404:1 › clearing barcode ignores stale lookup responses and does not keep loading (5.0s)
+  ok 80 [app] › tests\e2e\app.spec.js:433:1 › clearing photo ignores stale identify responses and resets loading (5.2s)
+  ok 81 [app] › tests\e2e\app.spec.js:462:1 › shows a recoverable error for an invalid barcode (2.4s)
+  ok 82 [app] › tests\e2e\app.spec.js:473:1 › shows a recoverable error for an unknown barcode (2.3s)
+  ok 83 [app] › tests\e2e\app.spec.js:484:1 › shows a recoverable error for an unrecognized photo (2.4s)
+  ok 84 [app] › tests\e2e\app.spec.js:496:3 › ?food= deep link (ticket 05) › preselects an existing gi.json food as a confirmed selection (2.1s)
+  ok 85 [app] › tests\e2e\app.spec.js:511:3 › ?food= deep link (ticket 05) › ignores an unknown ?food= key and renders normally (2.4s)
+  ok 86 [app] › tests\e2e\app.spec.js:520:3 › ?food= deep link (ticket 05) › deep-linked selection can be cleared and replaced by search (2.5s)
+  ok 87 [app] › tests\e2e\app.spec.js:544:3 › GL page N/A entries and static reference table (ticket 12) › egg white via ?food= deep link shows N/A semantics with no numeric GL (2.2s)
+  ok 88 [app] › tests\e2e\app.spec.js:569:3 › GL page N/A entries and static reference table (ticket 12) › egg white via search shows the N/A pill in the dropdown and N/A result on confirm (3.8s)
+  ok 89 [app] › tests\e2e\app.spec.js:596:3 › GL page N/A entries and static reference table (ticket 12) › a measurable food still gets the numeric flow (regression guard) (2.2s)
+  ok 90 [app] › tests\e2e\app.spec.js:608:3 › GL page N/A entries and static reference table (ticket 12) › static GL reference table renders with 27 rows and band copy (2.1s)
+
+  90 passed (1.7m)

@@ -52,7 +52,7 @@
 - [x] 【第 2 批三页开工前】竞品精评（ticket 16）｜完成: 2026-09-13 ｜证据: 跳过——执行环境无选词/盘面工具，按 ticket 16 无工具分支登记，不臆造数据；08/09/10 按 Spec 现有规格执行
 - [x] ticket 12：GL 页静态食物参考表（27 条含典型份量 GL/分档、glycaemic 英拼、how-to 段、N/A 条目 GL 页交互闭环、verify-dist T3-④ GL 行）｜开始: 2026-09-13 06:40 ｜完成: 2026-09-13 07:30 ｜证据: `npm run check` 全绿：unit 7 文件 74/74（+gl-static-table.test.js 3 条：27 行/逐行 GL=formulas.gl 容差断言+分档取未舍入值/黄金 3 行 Rye bread 12.549→"12.5" Medium、Watermelon 7.3872→"7.4" Low、Couscous 22.425→"22.4" High 且三档齐备）→ build+prerender 8 路由 → verify-dist 全 PASS（新增 T3-④ GL 行：公式串 ÷100 或 /100、.gl-static-table 恰 1 个 27 行、黄金 2 行手算硬编码（Rye bread 30g→12.5 Medium / Watermelon 120g→7.4 Low，独立于 glStaticTable.js）、分档边界 "≤ 10"/"≥ 20"、"glycaemic" 英拼、DiOGenes 出处、表内无 N/A 无 Egg 编码嫌疑）→ e2e 89/89（+4 条 app app.spec.js 新 describe：蛋清 ?food= 深链→结果区 GL ≈ 0 + GI: N/A (too little carbohydrate to measure) 无 "70" 无 pill、蛋清经搜索下拉 pill 显示 GI: N/A 且确认后同语义（改 serving 也不出数值）、Blueberries 数值流回归护栏 4.95、静态表 27 行+Rye bread golden 行+边界语义可见；+1 条 static 禁 JS prerender.spec.js：27 行表/12.5/1 slice (30 g)/无 N/A 无 Egg/≤10 ≥20/glycaemic/DiOGenes/how-to 段/FAQ 5 条含新 band 问答）。份量口径：国际 GI 表名义份量硬编码 src/data/glStaticTable.js（面包 30g/片、水果 120g/个、蔬菜 80g、奶 250g、熟意面 180g、豆类 150g、冰淇淋 50g/球；couscous、生鹰嘴豆按干重 50g 标注 dry；parsnip 用 100g 避开 80g 名义份量恰落 10.0 分档边界）；GL 构建时经 formulas.gl 计算、glBand 取未舍入值、显示 1 位小数。App.jsx 零改动（N/A 分支在 CalculatorResult.jsx；FoodSearch defaultResultPill 走 §6.1 规则，合规条目 pill 逐字节不变）；app.spec.js 97 行纯追加 0 删改；GI 页/其他页零改动；glFaq.js 纯追加 1 条（原 4 条冻结，JSON-LD 同源自动同步）
 - [x] `/about`（DiOGenes 来源 + 公式出处 + MIT 署名 + 联系方式）（ticket 13，含 P1 README MIT 署名）｜开始: 2026-09-13 08:05 ｜完成: 2026-09-13 08:15 ｜证据: `npm run check` 全绿（.scratch/ticket13-check.log）：unit 7 文件 74/74（零改动）→ build+prerender 8 路由 → verify-dist 全 PASS（新增 T3-⑨ /about 正向断言：DiOGenes/Aston/category-level/Atkinson/Nathan/Bergenstal/MIT/Assaf Morami + assafmo 仓库链接 + GitHub Issues 联系链接（可见 <a> + Organization contactPoint 双断言，URL 独立硬编码）；原 Harvard/works offline 全站负向断言保留）→ e2e 90/90（+1 条 static 禁 JS 直访 /about：数据出处段（含 "no longer maintained"）/公式引文（含 18.018）/MIT 归属+上游仓库链接可见/维护者兜底串+Issues 链接可见/医学审阅状态+NGSP 免责）。AboutPage.jsx 六段正体：站点定位（教育用途）、DiOGenes 诚实口径（类别赋值+已停维护+建议交叉核对 Sydney/Atkinson 2021 升级路径）、公式出处四条（GL 定义/Nathan 2008/Bergenstal 2018/18.018）、MIT 归属（assafmo/glcalc.com 链接）、维护者+联系（CONTACT_URL 同源 pageSeo.js）+ 审阅状态、完整免责段（NGSP 认证实验室）；无 related-tools（页脚全站链入）；JSON-LD 沿用 ticket 04 不动；sitemap-lastmod /about 已是 2026-09-13 未动
-- [ ] 现有 app.spec.js 入口 URL 迁移（仅改 goto 目标，断言不变）｜开始: ｜完成: ｜证据:
+- [x] 现有 app.spec.js 入口 URL 迁移（仅改 goto 目标，断言不变）｜开始: ｜完成: 2026-09-13 01:32 ｜证据: ticket 05 已完成（20 处 goto "/" → "/glycemic-load-calculator"，断言零删改），本条目为漏勾，ticket 14 收口补记
 
 ## P4 数据质量管道（Spec §6）
 
@@ -62,13 +62,13 @@
 
 ## 验收（Spec §8）
 
-- [ ] `scripts/verify-dist.mjs`（DOM 解析断言，P5 前 ①~⑨ + ⑩ SKIPPED）｜开始: ｜完成: ｜证据: ticket 04 已落地 ①②③⑥⑧⑨（⑨ 仅禁 Harvard/works offline，/about 正体断言属 ticket 13）+ ⑩ SKIPPED + sitemap/robots/GA4 断言；ticket 06 已落地 ⑤（首页正文内链 ≥7 排除 nav/footer、工具页 related-tools 容器内 ≥2 不计导航、每页 nav 恰 8 项）+ ⑦（页脚 5 项：①②③⑤字面串、④日期正则）；④公式串属后续 ticket
-- [ ] T4 e2e 全绿（static + app 双 project，含 404 状态断言、?food= 深链）｜开始: ｜完成: ｜证据:
-- [ ] `npm run check` 全绿 ｜开始: ｜完成: ｜证据:
-- [ ] T5 Rich Results Test + Lighthouse mobile ≥70（人工）｜开始: ｜完成: ｜证据:
-- [ ] Spec §9 红线逐条自查 ｜开始: ｜完成: ｜证据:
-- [ ] §3 数据口径声明：重拉选词数据（有工具）或标注「沿用 2026-09 快照，未重验」（Spec §3-4 / §10）｜开始: ｜完成: ｜证据:
-- [ ] 交付说明：新增/修改文件清单 + 差异摘要 + 竞品情报记录（Spec §10）｜开始: ｜完成: ｜证据:
+- [x] `scripts/verify-dist.mjs`（DOM 解析断言，P5 前 ①~⑨ + ⑩ SKIPPED）｜开始: ｜完成: 2026-09-13 09:05 ｜证据: 逐 ticket 落地（04:①②③⑥⑧⑨+⑩SKIPPED+sitemap/robots/GA4；06:⑤⑦；07~12:④六工具页公式行；13:⑨/about 正向）；ticket 14 单独运行全 PASS，输出存档 docs/2026-09-13-delivery/verify-dist-output.txt（①~⑨ PASS + ⑩ `SKIPPED (P5 前)` 可见）
+- [x] T4 e2e 全绿（static + app 双 project，含 404 状态断言、?food= 深链）｜开始: ｜完成: 2026-09-13 09:03 ｜证据: check 内 Playwright 90/90 通过（1.7m，static+app 双 project；404/?food= 深链用例在内），见 docs/2026-09-13-delivery/check-output.txt
+- [x] `npm run check` 全绿 ｜开始: 2026-09-13 08:50 ｜完成: 2026-09-13 09:03 ｜证据: exit 0：unit 7 文件 74/74 → build+prerender 8 路由 → verify-dist 全 PASS（⑩ SKIPPED）→ e2e 90/90；完整输出 docs/2026-09-13-delivery/check-output.txt（ticket 14）
+- [!] T5 Rich Results Test + Lighthouse mobile ≥70（人工）｜开始: 2026-09-13 09:10 ｜证据: Lighthouse 本地实跑（13.4.1+Chrome headless，serve-dist :4188）：4 关键页 SEO/a11y/BP 全 100，mobile perf home 46（复跑 63）/gl 65/a1c 65/gmi 47——**未达 ≥70**，本地方差大，待站长生产环境 PSI 复测后定优化立项；Rich Results Test 为 Google 在线工具无法本地自动化，待站长执行（离线替代：verify-dist T3-⑧ 8 页 JSON-LD JSON.parse+@type 分布断言全 PASS）。报告 JSON 存档 docs/2026-09-13-delivery/（ticket 14）
+- [x] Spec §9 红线逐条自查 ｜开始: 2026-09-13 09:05 ｜完成: 2026-09-13 09:15 ｜证据: docs/2026-09-13-delivery/redline-audit.md 八条全 PASS（DOM 脚本 .scratch/redline-dom-audit.mjs 27/27 + rg 零命中证据；判定词红线按 panel 级口径、ADA 教育表豁免但断言静态性）（ticket 14）
+- [x] §3 数据口径声明：重拉选词数据（有工具）或标注「沿用 2026-09 快照，未重验」（Spec §3-4 / §10）｜开始: 2026-09-13 09:15 ｜完成: 2026-09-13 09:20 ｜证据: 无选词工具，走无条件分支：声明「沿用 2026-09 GSC/Ads 快照，未重验；上线后以 GSC 实测为准（ticket 17）」，写入 docs/2026-09-13-delivery/delivery-report.md §2；无任何数字标注「已验证」（ticket 14）
+- [x] 交付说明：新增/修改文件清单 + 差异摘要 + 竞品情报记录（Spec §10）｜开始: 2026-09-13 09:15 ｜完成: 2026-09-13 09:25 ｜证据: docs/2026-09-13-delivery/delivery-report.md——13 commit 按 ticket 分组清单、§10 交付清单逐项打勾、ticket 16 无工具跳过声明、遗留项 8 条（P0×3/ticket 15/ticket 17/Rich Results/Lighthouse 复核/选词重验）（ticket 14）
 
 ## P5 域名切换（阻塞于 P0 域名购买）
 
@@ -80,7 +80,7 @@
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
-- [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 上线后启动
+- [!] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 阻塞于上线（P0 域名/GSC 验证 + P5 切换，ticket 17 启动）
 - [ ] 第 2 个月门槛：索引报告 ≥5 页 ｜备注: 未达标须回查预渲染/内链
 - [ ] 第 3 个月门槛：平均排名 ≤35 且季度展示 ≥2,000 ｜备注:
 - [ ] 第 6 个月门槛：季度 clicks ≥40 ｜备注:

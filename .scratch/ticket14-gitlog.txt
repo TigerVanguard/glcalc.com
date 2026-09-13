@@ -1,0 +1,298 @@
+commit f47bb2379b3090b633d9a73a1da48ba8aa0db28b
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 00:49:44 2026 -0700
+
+    feat: centralized medical formulas library (ticket 01, verified)
+    
+    Pure functions per spec v2.2 s5A.1/T1; gl.js delegates to formulas; 20 tolerance-based unit tests; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ src/lib/formulas.js         | 106 +++++++++++++++++++++++++++++++++++++++
+ src/lib/gl.js               |  29 +++--------
+ tasks.md                    |   4 +-
+ tests/unit/formulas.test.js | 119 ++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 235 insertions(+), 23 deletions(-)
+
+commit 702348d2b68696dad405f01f824ce535a696a833
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 01:14:13 2026 -0700
+
+    feat: MPA skeleton, post-build prerender pipeline, dual-project test infra (ticket 03, verified)
+    
+    8 routes via react-router v6 (app intact at /); scripts/prerender.mjs + serve-dist.mjs + verify-dist.mjs skeleton; playwright static/app projects; check = unit -> build -> verify-dist -> e2e; vercel.json cleanUrls/no-trailing-slash; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ package-lock.json                     | 189 ++++++++++++++++++++++++++++++++++
+ package.json                          |   7 +-
+ playwright.config.js                  |  48 +++++++--
+ scripts/prerender.mjs                 | 117 +++++++++++++++++++++
+ scripts/serve-dist.mjs                | 129 +++++++++++++++++++++++
+ scripts/verify-dist.mjs               |  91 ++++++++++++++++
+ src/index.jsx                         |  34 +++++-
+ src/pages/A1cToEagPage.jsx            |  11 ++
+ src/pages/AboutPage.jsx               |  12 +++
+ src/pages/BloodSugarConverterPage.jsx |  11 ++
+ src/pages/GiLookupPage.jsx            |  11 ++
+ src/pages/GlCalculatorPage.jsx        |  11 ++
+ src/pages/GlucoseToA1cPage.jsx        |  11 ++
+ src/pages/GmiCalculatorPage.jsx       |  11 ++
+ src/site.config.js                    |   6 ++
+ tasks.md                              |  16 +--
+ tests/e2e/prerender.spec.js           |  40 +++++++
+ vercel.json                           |   4 +
+ vite.config.js                        |   6 ++
+ yarn.lock                             |  96 +++++++++++++++++
+ 20 files changed, 840 insertions(+), 21 deletions(-)
+
+commit 4e3a9e81acc5cf789123613b943cce0c7890e995
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 01:22:47 2026 -0700
+
+    feat: GI data display rules and static-table selector (ticket 02, verified)
+    
+    giData.js pure functions per spec s6: N/A rule for carbs<2.5, encoding-suspect filter (carbs<10 and GI in {45,70}); 14 unit tests incl. egg-white GI-70 regression anchor; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ src/lib/giData.js          | 156 ++++++++++++++++++++++++++++++++++++++++
+ tasks.md                   |   6 +-
+ tests/unit/gi-data.test.js | 175 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 334 insertions(+), 3 deletions(-)
+
+commit 66bcbd8e3e3c64240eecc36e47999a07d7cae5da
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 01:36:23 2026 -0700
+
+    feat: migrate GL calculator to /glycemic-load-calculator with ?food= deep link (ticket 05, verified)
+    
+    App body moved off /; minimal home placeholder pending ticket 06; App.js dead code removed; app.spec.js 20 goto-only replacements, zero assertion changes, +3 deep-link tests; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ scripts/prerender.mjs          |   2 +-
+ src/App.js                     | 297 -----------------------------------------
+ src/App.jsx                    |   7 +-
+ src/index.jsx                  |   4 +-
+ src/pages/GlCalculatorPage.jsx |  40 ++++--
+ src/pages/HomePage.jsx         |  17 +++
+ tasks.md                       |   4 +-
+ tests/e2e/app.spec.js          |  80 ++++++++---
+ tests/e2e/prerender.spec.js    |   2 +-
+ 9 files changed, 120 insertions(+), 333 deletions(-)
+
+commit d1bb52946fed976f0cfbfc6532fe1a632e099053
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 02:11:32 2026 -0700
+
+    feat: per-route SEO head layer, JSON-LD, sitemap from lastmod source, og-cover (ticket 04, verified)
+    
+    Custom HeadManager (useLayoutEffect, pre-snapshot); s5B.1 verbatim titles/descriptions; s5B.2 JSON-LD incl. GL-page FAQPage from shared glFaq source; index.html page-level head torn down; GA4 hostname gate removed; verify-dist extended to T3 1/2/6/8/9 + 10 SKIPPED; seo.spec.js rewritten on static project; QA note: e2e split is static 17 + app 24; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ index.html                    |  99 +--------------
+ playwright.config.js          |  10 +-
+ public/og-cover.png           | Bin 0 -> 27785 bytes
+ scripts/generate-og-cover.mjs |  56 +++++++++
+ scripts/prerender.mjs         |  53 +++++++-
+ scripts/verify-dist.mjs       | 282 ++++++++++++++++++++++++++++++++++++++----
+ src/App.jsx                   |  26 +---
+ src/data/glFaq.js             |  28 +++++
+ src/index.jsx                 |   4 +
+ src/seo/HeadManager.jsx       |  76 ++++++++++++
+ src/seo/pageSeo.js            | 133 ++++++++++++++++++++
+ src/sitemap-lastmod.json      |  10 ++
+ tasks.md                      |  14 +--
+ tests/e2e/app.spec.js         |   4 +-
+ tests/e2e/seo.spec.js         | 153 +++++++++++++++--------
+ 15 files changed, 742 insertions(+), 206 deletions(-)
+
+commit ac442298c76e6f1841fa936ad95f729e68a2ae5e
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 02:47:30 2026 -0700
+
+    feat: site layout, nav home page, internal-link topology, unified footer (ticket 06, verified)
+    
+    SiteNav 8 items sitewide; home = 6 tool cards + brand intro + health notice; s5B.3 cluster interlinks with 13 unique anchors; s7 five-item footer on all 8 pages; verify-dist T3-5/7; e2e 49/49; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ scripts/verify-dist.mjs                |  83 +++++++++++++-
+ src/features/common/RelatedTools.jsx   |  28 +++++
+ src/features/common/SiteNav.jsx        |  35 ++++++
+ src/features/common/ToolFooter.jsx     |  31 +++++
+ src/features/common/ToolPageLayout.jsx |  25 +++++
+ src/pages/A1cToEagPage.jsx             |  38 ++++++-
+ src/pages/AboutPage.jsx                |  19 +++-
+ src/pages/BloodSugarConverterPage.jsx  |  44 +++++++-
+ src/pages/GiLookupPage.jsx             |  38 ++++++-
+ src/pages/GlCalculatorPage.jsx         |  34 +++++-
+ src/pages/GlucoseToA1cPage.jsx         |  38 ++++++-
+ src/pages/GmiCalculatorPage.jsx        |  35 +++++-
+ src/pages/HomePage.jsx                 |  94 ++++++++++++++--
+ src/styles/app.css                     | 199 +++++++++++++++++++++++++++++++++
+ tasks.md                               |   8 +-
+ tests/e2e/prerender.spec.js            |  37 ++++++
+ 16 files changed, 735 insertions(+), 51 deletions(-)
+
+commit 6d416e80c4c2caf463c597cf8079d3040f3c5c13
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 03:29:15 2026 -0700
+
+    feat: blood sugar converter page with shared input components (ticket 07, verified)
+    
+    NumberField/UnitToggle/ResultCard; display.js centralizes UI rounding; last-edited-side source of truth (no round-trip drift, browser-tested); static conversion table + 3 FAQs with same-source FAQPage; verify-dist T3-4 converter row independently hardcoded; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ playwright.config.js                  |   2 +-
+ scripts/verify-dist.mjs               |  45 +++++++-
+ src/data/bloodSugarConverterFaq.js    |  28 +++++
+ src/features/common/NumberField.jsx   |  44 ++++++++
+ src/features/common/ResultCard.jsx    |  27 +++++
+ src/features/common/UnitToggle.jsx    |  50 +++++++++
+ src/lib/display.js                    |  35 +++++++
+ src/pages/BloodSugarConverterPage.jsx | 186 ++++++++++++++++++++++++++++++++--
+ src/seo/pageSeo.js                    |  22 ++--
+ src/styles/app.css                    | 132 +++++++++++++++++++++++-
+ tasks.md                              |   4 +-
+ tests/e2e/converter.spec.js           |  89 ++++++++++++++++
+ tests/e2e/prerender.spec.js           |  22 ++++
+ tests/e2e/seo.spec.js                 |  10 +-
+ tests/unit/display.test.js            |  57 +++++++++++
+ 15 files changed, 724 insertions(+), 29 deletions(-)
+
+commit 7c56d9f701874492c96824a73137f53c054dadbf
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 04:03:57 2026 -0700
+
+    feat: A1C to eAG calculator page (ticket 08, verified)
+    
+    Dual-unit eAG output, 1-decimal half-up via formatEag (toPrecision guard against 139.85 float trap); ADAG scope notes + static ADA reference table with D4 red line (no diagnostic binning, byte-identical table under input, 3-layer enforcement); out-of-range banner; 3 same-source FAQs; independent QA pass cycle 1, one unrelated flake re-run green
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ playwright.config.js        |   2 +-
+ scripts/verify-dist.mjs     |  48 ++++++++++-
+ src/data/a1cToEagFaq.js     |  28 +++++++
+ src/lib/display.js          |  17 ++++
+ src/pages/A1cToEagPage.jsx  | 195 ++++++++++++++++++++++++++++++++++++++++++--
+ src/seo/pageSeo.js          |  21 +++--
+ tasks.md                    |   2 +-
+ tests/e2e/a1c.spec.js       | 124 ++++++++++++++++++++++++++++
+ tests/e2e/prerender.spec.js |  27 ++++++
+ tests/e2e/seo.spec.js       |   9 +-
+ tests/unit/display.test.js  |  33 +++++++-
+ 11 files changed, 481 insertions(+), 25 deletions(-)
+
+commit 2437477359469fc527d0ad05fa0f30276bb446d6
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 04:58:31 2026 -0700
+
+    feat: average glucose to A1C estimator page, range-only output (ticket 09, verified)
+    
+    a1cRange interval display via formatA1cRange (no point formatter exists); UnitToggle first use verified with 180 vs 10.0 mmol discriminator pair; ADAG-formula label confined to related-tools context; zero verdict words; 3 same-source FAQs; independent QA pass cycle 1, 39/39 browser probes
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ playwright.config.js           |   2 +-
+ scripts/verify-dist.mjs        |  71 ++++++++++++++++-
+ src/data/glucoseToA1cFaq.js    |  32 ++++++++
+ src/lib/display.js             |  15 ++++
+ src/pages/GlucoseToA1cPage.jsx | 176 +++++++++++++++++++++++++++++++++++++++--
+ src/seo/pageSeo.js             |  18 +++--
+ tasks.md                       |   2 +-
+ tests/e2e/estimator.spec.js    | 143 +++++++++++++++++++++++++++++++++
+ tests/e2e/prerender.spec.js    |  26 ++++++
+ tests/e2e/seo.spec.js          |   5 +-
+ tests/unit/display.test.js     |  44 ++++++++++-
+ 11 files changed, 511 insertions(+), 23 deletions(-)
+
+commit b079e9193b7c6a55eb7e4304c388777d8eaa7263
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 05:45:29 2026 -0700
+
+    feat: GMI calculator page (ticket 10, verified)
+    
+    Bergenstal 2018 formula, formatGmi 1-decimal half-up with float guard; mmol discriminator verified (8.3 mmol -> 6.9% not 3.5%); 40-400 mg/dL sensor-range warning, non-blocking; +/-0.5% GMI-vs-A1C explainer; 4 same-source FAQs; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ playwright.config.js            |   2 +-
+ scripts/verify-dist.mjs         |  51 ++++++++-
+ src/data/gmiFaq.js              |  38 +++++++
+ src/lib/display.js              |  18 ++++
+ src/pages/GmiCalculatorPage.jsx | 227 ++++++++++++++++++++++++++++++++++++++--
+ src/seo/pageSeo.js              |  18 ++--
+ tasks.md                        |   2 +-
+ tests/e2e/gmi.spec.js           | 130 +++++++++++++++++++++++
+ tests/e2e/prerender.spec.js     |  25 +++++
+ tests/e2e/seo.spec.js           |   6 +-
+ tests/unit/display.test.js      |  38 ++++++-
+ 11 files changed, 532 insertions(+), 23 deletions(-)
+
+commit 39f10bf87131ecb2f5f6a915b39c34a81f18e949
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 06:36:48 2026 -0700
+
+    feat: glycemic index lookup page (ticket 11, verified)
+    
+    FoodSearch reuse via optional resultPill prop (GL page byte-identical); s6.1 N/A rule enforced incl. search dropdown (egg-white leak closed); 27-row static GI table with DiOGenes provenance copy; encoded ?food= deep link to GL page cross-page verified; 4 same-source FAQs; also carries ticket-10 comment wording fix; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ playwright.config.js               |   2 +-
+ scripts/verify-dist.mjs            |  63 +++++++++-
+ src/data/giFaq.js                  |  37 ++++++
+ src/features/search/FoodSearch.jsx |  45 ++++---
+ src/pages/GiLookupPage.jsx         | 248 +++++++++++++++++++++++++++++++++++--
+ src/pages/GmiCalculatorPage.jsx    |   4 +-
+ src/seo/pageSeo.js                 |  18 ++-
+ src/styles/app.css                 |   7 ++
+ tasks.md                           |   2 +-
+ tests/e2e/gi.spec.js               | 142 +++++++++++++++++++++
+ tests/e2e/prerender.spec.js        |  34 +++++
+ tests/e2e/seo.spec.js              |   5 +-
+ 12 files changed, 569 insertions(+), 38 deletions(-)
+
+commit 79988212cffe987867c7b86548760b32de63938a
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 08:00:33 2026 -0700
+
+    feat: GL page reference table, N/A interaction loop, content upgrade (ticket 12, verified)
+    
+    27-row build-time GL table (intl GI-table nominal servings; parsnip 100g avoids 10.0-boundary contradiction); CalculatorResult N/A branch closes egg-white loop on all paths; FoodSearch default pill now s6.1-compliant sitewide (verifier ruled spec-required); glFaq append-only +1; app.spec.js 97+/0-; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ scripts/verify-dist.mjs                      |  66 +++++++++++++-
+ src/data/glFaq.js                            |   8 ++
+ src/data/glStaticTable.js                    |  96 +++++++++++++++++++++
+ src/features/calculator/CalculatorResult.jsx |  48 +++++++++++
+ src/features/search/FoodSearch.jsx           |  33 +++++--
+ src/pages/GlCalculatorPage.jsx               | 123 +++++++++++++++++++++++++++
+ src/styles/app.css                           |  14 +++
+ tasks.md                                     |   1 +
+ tests/e2e/app.spec.js                        |  97 +++++++++++++++++++++
+ tests/e2e/prerender.spec.js                  |  36 ++++++++
+ tests/unit/gl-static-table.test.js           |  76 +++++++++++++++++
+ 11 files changed, 586 insertions(+), 12 deletions(-)
+
+commit 6b9199efb8faeec8bc227d75fc75b862de314273
+Author: TigerVanguard <share004@outlook.com>
+Date:   Sun Sep 13 08:46:04 2026 -0700
+
+    feat: about page with honest data provenance and MIT attribution (ticket 13, verified)
+    
+    DiOGenes/Aston 2010 category-level disclosure + Atkinson 2021 upgrade path; formula citations Nathan 2008/Bergenstal 2018/18.018; MIT attribution to assafmo/glcalc.com verified against git history and LICENSE; maintainer fallback + GitHub Issues contact; verify-dist T3-9 positives; independent QA pass cycle 1
+    
+    Co-authored-by: Cursor <cursoragent@cursor.com>
+
+ README.md                   |   2 +
+ scripts/verify-dist.mjs     |  52 ++++++++++++++--
+ src/pages/AboutPage.jsx     | 142 +++++++++++++++++++++++++++++++++++++++++---
+ tasks.md                    |   4 +-
+ tests/e2e/prerender.spec.js |  46 ++++++++++++++
+ 5 files changed, 232 insertions(+), 14 deletions(-)
