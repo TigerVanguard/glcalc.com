@@ -1,17 +1,43 @@
 import { defineConfig } from "@playwright/test";
 
-const port = process.env.E2E_PORT ?? "4183";
-const baseURL = `http://127.0.0.1:${port}/`;
+// Two projects (Spec §8 T0-2):
+// - "static": serves the built dist/ via scripts/serve-dist.mjs (file-system
+//   routing + real 404s, no API). Requires `npm run build` to have run first
+//   (`npm run check` guarantees the order). Runs prerender.spec.js.
+// - "app": vite dev server, which carries the barcode/photo API middlewares
+//   (Spec §0A-2) — those e2e flows can only run here. Runs app/pwa/seo specs.
+
+const appPort = process.env.E2E_PORT ?? "4183";
+const staticPort = process.env.E2E_STATIC_PORT ?? "4184";
+const appBaseURL = `http://127.0.0.1:${appPort}/`;
+const staticBaseURL = `http://127.0.0.1:${staticPort}/`;
 
 export default defineConfig({
   testDir: "tests/e2e",
-  use: {
-    baseURL,
-  },
-  webServer: {
-    command: `npm run dev -- --host 127.0.0.1 --port ${port}`,
-    url: baseURL,
-    reuseExistingServer: false,
-    timeout: 120000,
-  },
+  projects: [
+    {
+      name: "static",
+      testMatch: /prerender\.spec\.js/,
+      use: { baseURL: staticBaseURL },
+    },
+    {
+      name: "app",
+      testMatch: /(app|pwa|seo)\.spec\.js/,
+      use: { baseURL: appBaseURL },
+    },
+  ],
+  webServer: [
+    {
+      command: `node scripts/serve-dist.mjs --port ${staticPort}`,
+      url: staticBaseURL,
+      reuseExistingServer: false,
+      timeout: 120000,
+    },
+    {
+      command: `npm run dev -- --host 127.0.0.1 --port ${appPort}`,
+      url: appBaseURL,
+      reuseExistingServer: false,
+      timeout: 120000,
+    },
+  ],
 });

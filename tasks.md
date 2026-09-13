@@ -14,8 +14,10 @@
 
 ## T0 测试基建改造（先于一切开发任务，Spec §8 T0）
 
-- [ ] `check` 脚本顺序改为 unit → build（含 prerender）→ verify-dist → e2e ｜开始: ｜完成: ｜证据:
-- [ ] Playwright 拆双 project：static（dist 静态服务器）/ app（npm run dev 含 API 中间件）｜开始: ｜完成: ｜证据:
+- [x] ticket 03：多页骨架 + 预渲染管线 + 测试基建（覆盖本节 3 项及 P2 的路由/site.config/prerender/vercel.json/BUILD_DATE）｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: `npm run check` 全链路绿：unit 4 文件 33/33 → build+prerender 8 路由+404.html → verify-dist 骨架全过 → e2e 双 project 33/33（static 10 + app 23，app/pwa/seo 零改动）。静态服务器自写 scripts/serve-dist.mjs（vite preview 会 SPA 回退产生软 404，弃用）；根路由无双 H1（React render 整树替换 #root 静态外壳后快照）。独立验证 PASS（第 1 轮）：验证者亲跑 check 115s 全绿 + curl 实测 404/308/200 + spec 零改动核对。备忘: seo.spec.js 重写时迁 static project（ticket 04）
+
+- [x] `check` 脚本顺序改为 unit → build（含 prerender）→ verify-dist → e2e ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: package.json check=`test:unit && build && verify-dist && test:e2e`，全绿（ticket 03）
+- [x] Playwright 拆双 project：static（dist 静态服务器）/ app（npm run dev 含 API 中间件）｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: playwright.config.js 双 project + 双 webServer（static=serve-dist.mjs 404 模式 :4184，app=npm run dev :4183）；static 跑 prerender.spec.js，app 跑 app/pwa/seo（ticket 03）
 - [ ] `tests/e2e/seo.spec.js` 按 §5B 重写（非追加）｜开始: ｜完成: ｜证据:
 
 ## P1 义务补齐（可单独合入；导航与 /about 必须随 P2 部署）
@@ -25,18 +27,18 @@
 
 ## P2 多页化（核心工程，Spec §4 P2 + §5A/§5B）
 
-- [ ] `src/site.config.js`：SITE_ORIGIN + BRAND 常量 ｜开始: ｜完成: ｜证据:
-- [ ] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: ｜完成: ｜证据:
+- [x] `src/site.config.js`：SITE_ORIGIN + BRAND 常量 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: SITE_ORIGIN/BRAND 均带 VITE_ 环境变量覆盖（ticket 03）
+- [x] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: react-router-dom@6.30.6；`/` 渲染现有 App 不动，7 个占位页组件含 §5 定稿 H1；页面内容属 ticket 04+（ticket 03）
 - [x] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）（ticket 01）｜开始: 2026-09-13 00:45 ｜完成: 2026-09-13 01:05 ｜证据: 独立验证 PASS（第 1 轮）：验证者亲跑 `npm run test:unit` 4 文件 33/33 绿；逐行复算 eag(6.5)=139.85、gmi(150)=6.898、a1cRange(126)=[5.5,6.6]、18.018 换算；断言全容差式；gl.js 委托保真、无越界改动
 - [ ] 共享组件：NumberField / UnitToggle / ResultCard / ToolPageLayout / ToolFooter ｜开始: ｜完成: ｜证据:
 - [ ] 每路由独立 head：落地 §5B.1 逐页定稿 title/description 文案 + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
 - [ ] JSON-LD 按 §5B.2 分页配置（工具页 WebApplication、FAQPage 逐字一致、/about AboutPage+Organization、禁 MedicalWebPage）｜开始: ｜完成: ｜证据:
 - [ ] 内链拓扑按 §5B.3：页头 8 项导航（ToolPageLayout 渲染）+ 各页正文相关工具区 ≥2 条（GL⇄GI、A1C 簇两两互链、converter→A1C 簇）+ 锚文本规则 ｜开始: ｜完成: ｜证据:
 - [ ] 制作 `public/og-cover.png` 初版（1200×630 含品牌名，纯色底+文字即可）+ 每页 og 标签（§5B.4）｜开始: ｜完成: ｜证据:
-- [ ] `scripts/prerender.mjs`（静态服务器须 SPA 回退到 dist/index.html）+ build 脚本接入 ｜开始: ｜完成: ｜证据:
+- [x] `scripts/prerender.mjs`（静态服务器须 SPA 回退到 dist/index.html）+ build 脚本接入 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: build=`vite build && node scripts/prerender.mjs`；内部 SPA 回退服务器 + Playwright chromium 逐路由快照，先全部渲染再写盘（防根 index.html 被覆写污染回退）；含 dist/404.html 生成；sitemap/robots 未动（ticket 04）
 - [ ] sitemap（真源 `src/sitemap-lastmod.json`）+ robots 重写 + `dist/404.html` 生成 ｜开始: ｜完成: ｜证据:
-- [ ] `vercel.json`：cleanUrls + trailingSlash:false，禁 catch-all rewrite ｜开始: ｜完成: ｜证据:
-- [ ] `VITE_BUILD_DATE` 注入机制 ｜开始: ｜完成: ｜证据:
+- [x] `vercel.json`：cleanUrls + trailingSlash:false，禁 catch-all rewrite ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: 仅两键无 rewrites；verify-dist 断言核对 + static e2e 断言 /about/ → 308 /about（本地模拟）（ticket 03）
+- [x] `VITE_BUILD_DATE` 注入机制 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: vite.config.js define 注入构建当天 ISO 日期；消费方 ToolFooter 属后续 ticket（ticket 03）
 
 ## P3 内容页实现（Spec §5/§5A 逐页）
 

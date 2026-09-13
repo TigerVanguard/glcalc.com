@@ -68,6 +68,12 @@ function photoApiPlugin() {
 
 export default defineConfig({
   plugins: [react(), barcodeApiPlugin(), photoApiPlugin()],
+  define: {
+    // Build-day ISO date, consumed by ToolFooter's "Last updated" line (Spec §4 P2-7).
+    "import.meta.env.VITE_BUILD_DATE": JSON.stringify(
+      new Date().toISOString().slice(0, 10),
+    ),
+  },
   build: {
     outDir: resolve(__dirname, "dist"),
   },
