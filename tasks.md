@@ -55,9 +55,9 @@
 
 ## P4 数据质量管道（Spec §6）
 
-- [ ] 展示层规则：carbs_per_100g < 2.5 → "GI: N/A · GL ≈ 0" ｜开始: ｜完成: ｜证据:
-- [ ] 静态表选择器（≥2.5 且非编码嫌疑 <10 ∧ GI∈{45,70}，≥20 条）｜开始: ｜完成: ｜证据:
-- [ ] `tests/unit/gi-data.test.js`（含低碳水蛋清回归锚点）｜开始: ｜完成: ｜证据:
+- [x] 展示层规则：carbs_per_100g < 2.5 → "GI: N/A · GL ≈ 0"（ticket 02，含下两项）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: `src/lib/giData.js` giDisplayRule 纯函数 + 规格化展示常量（GI_NA_LABEL/GL_APPROX_ZERO_LABEL/GI_NA_FULL_LABEL）；`npm run test:unit` 5 文件 47/47 绿（gi-data 14 新增）；对全量 573 条 carbs<2.5 条目断言 N/A 语义
+- [x] 静态表选择器（≥2.5 且非编码嫌疑 <10 ∧ GI∈{45,70}，≥20 条）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: selectStaticTable 固定名单 27 条（主食6/水果6/蔬菜5/乳制品5/豆类5），逐条校验存在性+合规性，违规抛错不静默跳过（ticket 02）
+- [x] `tests/unit/gi-data.test.js`（含低碳水蛋清回归锚点）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: 蛋清锚点 "Egg. chicken. white. raw"(carbs 1.2)/"Egg Chicken White Raw"(carbs 0.4) 断言返回 N/A 且展示结构零处出现 70；合规条目 Rye bread 89/High、Apple 38/Low、Couscous 65/Medium（ticket 02）
 
 ## 验收（Spec §8）
 
