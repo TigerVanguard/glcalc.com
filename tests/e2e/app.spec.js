@@ -531,3 +531,100 @@ test.describe("?food= deep link (ticket 05)", () => {
     expect(new URL(page.url()).search).toBe("?food=Blueberries");
   });
 });
+
+// Ticket 12 (Spec §6.1 / §6.2): the egg-white regression closes its loop on
+// the GL page — an entry with carbs_per_100g < 2.5 must show the N/A
+// semantics in the RESULT AREA (never its encoded numeric GI, never a
+// computed GL), whether it arrives via the ?food= deep link or via search —
+// and the static serving-level GL reference table is part of the page.
+test.describe("GL page N/A entries and static reference table (ticket 12)", () => {
+  const EGG_WHITE_DEEP_LINK =
+    "/glycemic-load-calculator?food=Egg.%20chicken.%20white.%20raw";
+
+  test("egg white via ?food= deep link shows N/A semantics with no numeric GL", async ({
+    page,
+  }) => {
+    await page.goto(EGG_WHITE_DEEP_LINK);
+
+    const summary = summaryPanel(page);
+    await expect(summary).toContainText("Egg. chicken. white. raw");
+    await expect(summary).toContainText("Shared link");
+
+    const panel = resultPanel(page);
+    await expect(
+      panel.getByRole("heading", { name: "Egg. chicken. white. raw", exact: true }),
+    ).toBeVisible();
+    await expect(panel).toContainText("GL ≈ 0");
+    await expect(panel).toContainText(
+      "GI: N/A (too little carbohydrate to measure)",
+    );
+
+    // No numeric GL, no encoded GI 70, no band pills anywhere in the panel.
+    expect(await panel.textContent()).not.toContain("70");
+    await expect(panel.locator(".pill")).toHaveCount(0);
+    await expect(panel).not.toContainText("Estimated for");
+    await expect(panel).not.toContainText("Carbohydrates in this serving");
+  });
+
+  test("egg white via search shows the N/A pill in the dropdown and N/A result on confirm", async ({
+    page,
+  }) => {
+    await page.goto("/glycemic-load-calculator");
+
+    await page.getByRole("searchbox", { name: "Food" }).fill("egg. chicken. white");
+    // §6.1 applies to the dropdown too: "GI: N/A", never "GI 70 - High".
+    const resultButton = page.getByRole("button", {
+      name: "Egg. chicken. white. raw GI: N/A",
+      exact: true,
+    });
+    await expect(resultButton).toBeVisible();
+    await resultButton.click();
+
+    const panel = resultPanel(page);
+    await expect(panel).toContainText("GL ≈ 0");
+    await expect(panel).toContainText(
+      "GI: N/A (too little carbohydrate to measure)",
+    );
+    expect(await panel.textContent()).not.toContain("70");
+
+    // Serving edits don't conjure a numeric GL for a non-measurable entry.
+    await page.getByRole("spinbutton", { name: "Serving size" }).fill("250");
+    await expect(panel).toContainText("GL ≈ 0");
+    expect(await panel.textContent()).not.toContain("70");
+  });
+
+  test("a measurable food still gets the numeric flow (regression guard)", async ({
+    page,
+  }) => {
+    await page.goto("/glycemic-load-calculator?food=Blueberries");
+
+    const panel = resultPanel(page);
+    await expect(panel.getByText("Estimated glycemic load", { exact: true })).toBeVisible();
+    await expect(panel.getByText("4.95")).toBeVisible();
+    await expect(panel).not.toContainText("GL ≈ 0");
+    await expect(panel).not.toContainText("N/A");
+  });
+
+  test("static GL reference table renders with 27 rows and band copy", async ({ page }) => {
+    await page.goto("/glycemic-load-calculator");
+
+    const table = page.locator(".gl-static-table");
+    await expect(table).toBeVisible();
+    await expect(table.locator("tbody tr")).toHaveCount(27);
+
+    // Golden row (same derivation as verify-dist): Rye bread, 30 g slice →
+    // GL 12.5 Medium.
+    const ryeRow = table.locator("tbody tr", { hasText: "Rye bread" });
+    await expect(ryeRow).toContainText("1 slice (30 g)");
+    await expect(ryeRow).toContainText("12.5");
+    await expect(ryeRow).toContainText("Medium");
+
+    // The table never contains the N/A display string (§6.1) and the band
+    // boundary copy is on the page.
+    expect(await table.textContent()).not.toContain("N/A");
+    const main = page.locator("body");
+    await expect(main).toContainText("GL ≤ 10");
+    await expect(main).toContainText("GL ≥ 20");
+    await expect(main).toContainText("glycaemic");
+  });
+});

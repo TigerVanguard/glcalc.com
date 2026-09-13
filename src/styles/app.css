@@ -826,6 +826,20 @@ h3 {
   line-height: 1.65;
 }
 
+/* Ticket 12: bulleted how-to list inside .seo-panel sections (GL page). */
+.seo-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.seo-list li::marker {
+  color: var(--green);
+}
+
 .formula-box {
   display: flex;
   flex-wrap: wrap;

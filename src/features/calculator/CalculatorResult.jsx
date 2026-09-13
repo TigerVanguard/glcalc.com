@@ -5,6 +5,11 @@ import {
   getGlLabel,
   normalizeServingToGrams,
 } from "../../lib/gl.js";
+import {
+  giDisplayRule,
+  GI_NA_LABEL,
+  GL_APPROX_ZERO_LABEL,
+} from "../../lib/giData.js";
 
 function formatServing(unit, serving) {
   if (unit === "oz") {
@@ -65,6 +70,49 @@ export default function CalculatorResult({ food, serving, unit }) {
   }
 
   const carbsPer100g = food.carbs_per_100g ?? food.carbsPer100g;
+
+  // §6.1 display rule (ticket 12): entries with carbs_per_100g < 2.5 carry an
+  // encoded, non-measured GI (e.g. "egg white GI 70"). Whether they arrive via
+  // search, ?food= deep link, or another finder, the result area must show the
+  // N/A semantics — never the numeric GI, never a computed GL.
+  const display = giDisplayRule({ gi: food.gi, carbs_per_100g: carbsPer100g });
+
+  if (display.glApproxZero) {
+    return (
+      <section className="panel panel--results" aria-labelledby="results-heading">
+        <div className="section-heading">
+          <p className="eyebrow">Review GL</p>
+          <h2 id="results-heading">{food.title}</h2>
+        </div>
+
+        <p className="results-lead">
+          This food carries too little carbohydrate for a glycemic index to be
+          measured, so any number a database attaches to it is a placeholder.
+        </p>
+
+        <dl className="stats">
+          <div className="stat stat--gl">
+            <dt className="stat__label">Estimated glycemic load</dt>
+            <dd className="stat__value stat__value--gl">
+              <strong>{GL_APPROX_ZERO_LABEL}</strong>
+            </dd>
+            <p className="stat__note">
+              At any realistic serving the glycemic load of this food is
+              effectively zero, so there is no meaningful number to calculate.
+            </p>
+          </div>
+
+          <div className="stat">
+            <dt className="stat__label">Glycemic index</dt>
+            <dd className="stat__value">
+              <strong>{GI_NA_LABEL}</strong>
+            </dd>
+          </div>
+        </dl>
+      </section>
+    );
+  }
+
   const carbs = calculateCarbs({
     carbsPer100g,
     serving,

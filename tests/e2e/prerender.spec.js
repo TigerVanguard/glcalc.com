@@ -198,6 +198,42 @@ test("gi page shows static table, provenance note, GI vs GL copy, and FAQ withou
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });
 
+// Ticket 12 (Spec §8 T4-2 / T3-④ runtime mirror): the GL page's static
+// content — the 27-row serving-level GL reference table (from
+// src/data/glStaticTable.js, computed at build time), the band boundary copy
+// (GL ≤ 10 / ≥ 20), the "glycaemic" British spelling, and the DiOGenes
+// provenance — is served in the prerendered HTML with JavaScript disabled.
+// The §6.1 "N/A" display string must never appear inside the table (every
+// row is an eligible, measurable-carbs entry by construction).
+test("gl page shows static GL table, band copy, and glycaemic spelling without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/glycemic-load-calculator");
+  const body = page.locator("body");
+
+  const rows = page.locator(".gl-static-table tbody tr");
+  await expect(rows).toHaveCount(27);
+  const table = page.locator(".gl-static-table");
+  await expect(table).toContainText("Rye bread");
+  await expect(table).toContainText("12.5");
+  await expect(table).toContainText("1 slice (30 g)");
+  expect(await table.textContent()).not.toContain("N/A");
+  expect(await table.textContent()).not.toContain("Egg");
+
+  await expect(body).toContainText("GL ≤ 10");
+  await expect(body).toContainText("GL ≥ 20");
+  await expect(body).toContainText("glycaemic");
+  await expect(body).toContainText("DiOGenes");
+  await expect(body).toContainText("How to lower the glycemic load of a meal");
+
+  // The FAQ (including the ticket 12 band question) is native <details>.
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(5);
+  await expect(faqEntries.last().locator("summary")).toContainText(
+    "What counts as a low, medium, or high glycemic load?",
+  );
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

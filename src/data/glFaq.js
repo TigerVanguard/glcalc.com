@@ -25,4 +25,12 @@ export const GL_FAQS = [
     answer:
       "No. GL is an estimate for education and meal planning. If you manage diabetes, pregnancy nutrition, or another medical condition, use professional guidance for personal decisions.",
   },
+  // Ticket 12 extension (existing four entries above are frozen — the visible
+  // FAQ and the FAQPage JSON-LD both read this array, so additions sync
+  // automatically).
+  {
+    question: "What counts as a low, medium, or high glycemic load?",
+    answer:
+      "For a single serving, a glycemic load of 10 or below is generally treated as low, above 10 and below 20 as medium, and 20 or above as high. The bands are continuous conventions for comparing servings, not medical thresholds.",
+  },
 ];

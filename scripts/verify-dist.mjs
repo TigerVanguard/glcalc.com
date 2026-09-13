@@ -13,10 +13,13 @@
 // explainer + the .gmi-panel negative scans; extended in ticket 11 with the
 // ④ gi row: static table exactly 27 rows + two hardcoded spot checks + honest
 // provenance keywords + no "N/A" inside the table, and the FAQPage whitelist
-// gains the gi page).
+// gains the gi page; extended in ticket 12 with the ④ GL row: GL formula
+// string + 27-row serving-level GL table + two hand-computed golden rows +
+// band boundary semantics (≤ 10 / ≥ 20) + "glycaemic" spelling + DiOGenes
+// provenance + negative scans (no N/A / no encoding suspect in the table)).
 //
-// Still out of scope (later tickets): ④ GL formula string on the GL page,
-// ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
+// Still out of scope (later tickets): ⑨'s positive /about assertions
+// (DiOGenes/MIT — /about is ticket 13).
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
@@ -539,6 +542,61 @@ for (const page of PAGES) {
     );
   }
 
+  // T3-④ (ticket 12 — GL row): the static serving-level GL table must hold
+  // exactly the 27 selector foods, spot-checked against two golden rows
+  // hand-computed HERE from gi.json + the hardcoded typical servings
+  // (independent of src/data/glStaticTable.js, so a data or rounding bug
+  // cannot self-certify):
+  //   Rye bread   gi 89, carbs 47 g/100 g, 30 g slice → 14.1 g carbs
+  //               → GL = 89 × 14.1 / 100 = 12.549 → "12.5" / Medium
+  //   Watermelon  gi 76, carbs 8.1 g/100 g, 120 g slice → 9.72 g carbs
+  //               → GL = 76 × 9.72 / 100 = 7.3872 → "7.4" / Low
+  // Plus: the §5 GL formula string (÷ 100 or / 100), the band boundary
+  // semantics (≤ 10 / ≥ 20), the "glycaemic" British spelling, the DiOGenes
+  // provenance, and the negative scans — no N/A display string and no
+  // encoding-suspect entry (egg white) inside the table.
+  if (route === "/glycemic-load-calculator") {
+    const bodyText = root.querySelector("body")?.text ?? "";
+    check(
+      bodyText.includes("÷ 100") || bodyText.includes("/ 100"),
+      'T3-④ GL page contains the GL formula string ("÷ 100" or "/ 100")',
+    );
+
+    const tables = root.querySelectorAll(".gl-static-table");
+    check(tables.length === 1, `T3-④ exactly one .gl-static-table (found ${tables.length})`);
+    const rows = tables[0]?.querySelectorAll("tbody tr") ?? [];
+    check(rows.length === 27, `T3-④ GL static table has exactly 27 rows (found ${rows.length})`);
+    const rowCells = rows.map((tr) =>
+      tr.querySelectorAll("th,td").map((cell) => cell.text.trim()),
+    );
+    // [name, gi, carbs_per_100g, serving label, GL display, GL band]
+    const expectedGlRows = [
+      ["Rye bread", "89", "47", "1 slice (30 g)", "12.5", "Medium"],
+      ["Watermelon", "76", "8.1", "1 slice (120 g)", "7.4", "Low"],
+    ];
+    for (const expected of expectedGlRows) {
+      check(
+        rowCells.some((cells) => expected.every((value, i) => cells[i] === value)),
+        `T3-④ GL static table row: ${expected[0]} → ${expected[3]} → GL ${expected[4]} (${expected[5]})`,
+      );
+    }
+
+    const tableText = tables[0]?.text ?? "";
+    check(
+      !tableText.includes("N/A"),
+      "T3-④ §6.1 N/A display string never appears inside the GL static table",
+    );
+    check(
+      !tableText.includes("Egg"),
+      "T3-④ no encoding-suspect entry (egg white) inside the GL static table",
+    );
+
+    check(bodyText.includes("≤ 10"), 'T3-④ GL band boundary semantics: "≤ 10" (Low) prerendered');
+    check(bodyText.includes("≥ 20"), 'T3-④ GL band boundary semantics: "≥ 20" (High) prerendered');
+    check(bodyText.includes("glycaemic"), 'T3-④ GL page covers the British spelling "glycaemic"');
+    check(bodyText.includes("DiOGenes"), 'T3-④ GL page names the data source "DiOGenes"');
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -638,5 +696,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );

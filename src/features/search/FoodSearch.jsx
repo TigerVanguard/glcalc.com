@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import workerScript from "../../SearchWorker.js";
 import glycemicIndex from "../../data/gi.json";
-import { getGiLabel } from "../../lib/gl.js";
+import { giDisplayRule, GI_NA_DISPLAY } from "../../lib/giData.js";
 
 function formatResultCount(count) {
   if (!count) {
@@ -15,15 +15,32 @@ function normalizeQuery(value) {
   return value.trim().toLowerCase();
 }
 
-// Default result pill — the GL page's historical rendering, byte-for-byte
-// (app.spec.js asserts accessible names like "Blueberries GI 45 - Low").
-// Ticket 11 made it overridable so the GI lookup page can apply the §6.1
-// display rule (giData.giDisplayRule) to its own result list without touching
-// this default or the worker. A null return renders no pill.
+// Default result pill. For measurable entries this is the GL page's
+// historical rendering, byte-for-byte (app.spec.js asserts accessible names
+// like "Blueberries GI 45 - Low"). Ticket 12 routes it through the §6.1
+// display rule (giData.giDisplayRule): entries with carbs_per_100g < 2.5
+// show "GI: N/A" instead of their encoded numeric GI — Spec §6.1 applies to
+// ALL tool search results, so the GL page dropdown must not leak "GI 70" for
+// egg white. The "Too many results." sentinel (no gi field) gets no pill.
+// Ticket 11 made the pill overridable; the GI page passes its own variant.
 function defaultResultPill(result) {
-  const label = getGiLabel(Number(result.gi));
+  if (result.gi === undefined) {
+    return null;
+  }
 
-  return { text: `GI ${result.gi} - ${label}`, tone: label.toLowerCase() };
+  const display = giDisplayRule({
+    gi: result.gi,
+    carbs_per_100g: result.carbsPer100g,
+  });
+
+  if (display.giValue === null) {
+    return { text: `GI: ${GI_NA_DISPLAY}`, tone: "na" };
+  }
+
+  return {
+    text: `GI ${result.gi} - ${display.giBand}`,
+    tone: display.giBand.toLowerCase(),
+  };
 }
 
 export default function FoodSearch({ onSelectSelection, resultPill = defaultResultPill }) {
