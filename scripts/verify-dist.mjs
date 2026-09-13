@@ -1,10 +1,11 @@
 // Build-artifact verification (Spec §8 T3; skeleton from ticket 03, extended in
 // ticket 04 with ① title copy, ② description copy, ⑥ canonical/OG, ⑧ JSON-LD,
-// ⑨ forbidden-copy scan, ⑩ SKIPPED marker, GA4 gate removal, sitemap/robots).
+// ⑨ forbidden-copy scan, ⑩ SKIPPED marker, GA4 gate removal, sitemap/robots;
+// extended in ticket 06 with ⑤ internal-link counts + nav presence and
+// ⑦ the 5-item footer disclaimer).
 //
-// Still out of scope (later tickets): ④ formula strings per page, ⑤ internal
-// link counts, ⑦ footer disclaimer, ⑨'s positive /about assertions
-// (DiOGenes/MIT — /about content is ticket 13).
+// Still out of scope (later tickets): ④ formula strings per page, ⑨'s positive
+// /about assertions (DiOGenes/MIT — /about content is ticket 13).
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
@@ -259,6 +260,78 @@ for (const page of PAGES) {
   // GA4 gate removal (Spec §4 P1-2; ticket 04 acceptance criterion).
   check(html.includes('gtag("config", "G-PDPYWE3JR5")'), "GA4 config present");
   check(!html.includes("window.location.hostname"), "GA4 config has no hostname condition");
+
+  // T3-⑤ (ticket 06): header nav asserted separately on EVERY page — exactly
+  // 8 real <a href> items covering all 8 routes (Spec §5B.3-1). Deliberately
+  // NOT counted toward the in-body link quotas below, otherwise the nav would
+  // make "≥2" always true and §5B.3-2 would go untested.
+  const navLinks = root.querySelectorAll(".site-nav a[href]");
+  check(navLinks.length === 8, `T3-⑤ SiteNav has exactly 8 links (found ${navLinks.length})`);
+  const navHrefs = new Set(navLinks.map((a) => a.getAttribute("href")));
+  check(
+    ROUTES.every((r) => navHrefs.has(r)),
+    "T3-⑤ SiteNav covers all 8 routes",
+  );
+
+  const isInternal = (a) => (a.getAttribute("href") ?? "").startsWith("/");
+  const outsideChrome = (a) => !a.closest(".site-nav") && !a.closest(".tool-footer");
+
+  if (route === "/") {
+    // Home: ≥7 internal links by DOM count. Counted OUTSIDE nav AND footer
+    // (stricter than the spec floor): 6 tool cards + 1 in-body /about link.
+    const bodyInternal = root.querySelectorAll("a[href]").filter((a) => isInternal(a) && outsideChrome(a));
+    check(
+      bodyInternal.length >= 7,
+      `T3-⑤ home has ≥7 in-body internal links outside nav/footer (found ${bodyInternal.length})`,
+    );
+  } else if (route !== "/about") {
+    // 6 tool pages: the in-body related-tools container holds ≥2 internal
+    // links to OTHER known routes (Spec §5B.3-2 topology lives in there).
+    const relatedContainers = root.querySelectorAll(".related-tools");
+    check(relatedContainers.length === 1, `T3-⑤ exactly one .related-tools container (found ${relatedContainers.length})`);
+    const relatedLinks = (relatedContainers[0]?.querySelectorAll("a[href]") ?? []).filter(isInternal);
+    check(
+      relatedLinks.length >= 2,
+      `T3-⑤ related-tools has ≥2 internal links (found ${relatedLinks.length})`,
+    );
+    for (const a of relatedLinks) {
+      const href = a.getAttribute("href");
+      check(ROUTES.includes(href), `T3-⑤ related-tools link targets a known route (${href})`);
+      check(href !== route, `T3-⑤ related-tools link is not a self-link (${href})`);
+    }
+  }
+
+  // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
+  // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
+  const footers = root.querySelectorAll(".tool-footer");
+  check(footers.length === 1, `T3-⑦ exactly one .tool-footer (found ${footers.length})`);
+  const footerText = (footers[0]?.text ?? "").replace(/\s+/g, " ").replace(/&amp;/g, "&");
+  check(
+    footerText.includes(
+      "This calculator is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.",
+    ),
+    "T3-⑦ footer ① non-diagnostic statement (literal)",
+  );
+  check(
+    footerText.includes(`Maintained by the ${BRAND} project.`),
+    `T3-⑦ footer ② attribution "Maintained by the ${BRAND} project." (literal fallback)`,
+  );
+  check(
+    footerText.includes("This tool has not been reviewed by a medical professional."),
+    "T3-⑦ footer ③ review status (literal)",
+  );
+  check(
+    /Last updated: \d{4}-\d{2}-\d{2}/.test(footerText),
+    "T3-⑦ footer ④ matches /Last updated: \\d{4}-\\d{2}-\\d{2}/",
+  );
+  check(
+    footerText.includes("Data sources & contact:"),
+    'T3-⑦ footer ⑤ "Data sources & contact:" (literal)',
+  );
+  check(
+    (footers[0]?.querySelectorAll('a[href="/about"]') ?? []).length >= 1,
+    "T3-⑦ footer ⑤ links to /about",
+  );
 }
 
 // T3-⑩ — enabled only after P5 (domain switch): dist-wide grep for
@@ -326,4 +399,4 @@ if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);
 }
-console.log("[verify-dist] all assertions passed (T3 ①②③⑥⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).");
+console.log("[verify-dist] all assertions passed (T3 ①②③⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).");

@@ -1,17 +1,89 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
+import { BRAND } from "../site.config.js";
 
-// Minimal placeholder home (ticket 05): `/` must no longer render the App
-// (it now lives at /glycemic-load-calculator; duplicating it on two URLs
-// would create full-content duplication). The real navigation home page
-// with tool cards is ticket 06.
+// Navigation home page (ticket 06, Spec §5 "/" row): brand intro (2–3
+// sentences) + 6 tool cards + health note + About link. No calculator
+// functionality here, and no copy shared with the GL page (its H1/FAQ/workflow
+// text lives only on /glycemic-load-calculator — duplication would recreate
+// the two-URL content clash ticket 05 removed).
+//
+// verify-dist T3-⑤ counts in-body internal links (outside nav/footer) ≥7:
+// 6 cards + 1 About link below = 7.
+const TOOLS = [
+  {
+    href: "/glycemic-load-calculator",
+    name: "Glycemic Load Calculator",
+    blurb:
+      "See how a real serving of a food affects blood sugar — find foods by search, barcode, or photo.",
+  },
+  {
+    href: "/glycemic-index-calculator",
+    name: "Glycemic Index Calculator",
+    blurb: "Check a food's GI value and whether it counts as low, medium, or high.",
+  },
+  {
+    href: "/gmi-calculator",
+    name: "GMI Calculator",
+    blurb: "Turn a CGM average glucose into a Glucose Management Indicator.",
+  },
+  {
+    href: "/a1c-to-eag-calculator",
+    name: "A1C to eAG Calculator",
+    blurb: "Convert an A1C percentage into estimated average glucose, in mg/dL or mmol/L.",
+  },
+  {
+    href: "/blood-sugar-converter",
+    name: "Blood Sugar Converter",
+    blurb: "Move between mg/dL and mmol/L instantly, in both directions.",
+  },
+  {
+    href: "/glucose-to-a1c-estimator",
+    name: "Glucose to A1C Estimator",
+    blurb: "Estimate an A1C range from your average blood glucose readings.",
+  },
+];
+
 export default function HomePage() {
   return (
-    <main className="app-shell">
-      <h1>Free Blood Sugar &amp; Glycemic Calculators</h1>
-      <p>
-        Free calculators for glycemic load, glycemic index, A1C conversion, and
-        blood sugar units. Site navigation is under construction.
-      </p>
-    </main>
+    <ToolPageLayout
+      h1="Free Blood Sugar & Glycemic Calculators"
+      intro={
+        <p>
+          {BRAND} is a small, free collection of blood sugar and glycemic math
+          tools. Every calculator runs in your browser with no sign-up, and
+          each one cites the published formula or dataset behind it. Pick a
+          tool below to get started.
+        </p>
+      }
+    >
+      <section className="tool-cards" aria-label="All calculators">
+        {TOOLS.map(({ href, name, blurb }) => (
+          <article className="panel tool-card" key={href}>
+            <h2 className="tool-card__title">
+              <Link to={href}>{name}</Link>
+            </h2>
+            <p>{blurb}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="panel home-health-note" aria-labelledby="home-health-heading">
+        <h2 id="home-health-heading">A note on health decisions</h2>
+        <p>
+          These calculators are educational tools, not medical devices. Numbers
+          they produce are estimates built on published averages, so talk with
+          your care team before changing diet, medication, or monitoring
+          routines based on anything you compute here.
+        </p>
+        <p>
+          Want to know{" "}
+          <Link to="/about">where our GI data and formulas come from</Link>?
+          The about page lists every source, the open-source license, and how
+          to reach us.
+        </p>
+      </section>
+    </ToolPageLayout>
   );
 }

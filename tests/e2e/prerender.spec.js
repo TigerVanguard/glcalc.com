@@ -4,6 +4,8 @@
 
 import { test, expect } from "@playwright/test";
 
+const BRAND = process.env.VITE_BRAND ?? "GL Calc";
+
 const ROUTES = [
   { path: "/", h1: "Free Blood Sugar & Glycemic Calculators" },
   { path: "/glycemic-load-calculator", h1: "Glycemic Load Calculator" },
@@ -26,6 +28,41 @@ for (const { path, h1 } of ROUTES) {
     await expect(page.locator("h1")).toHaveText(h1);
   });
 }
+
+// Ticket 06 (Spec §8 T4-3): starting from the home page, every other page is
+// reachable by clicking a REAL link — tool pages via their home cards, /about
+// via the header nav. JavaScript is disabled (file-level test.use above), so
+// these are native <a href> navigations against the prerendered dist/.
+for (const { path, h1 } of ROUTES.filter((route) => route.path !== "/")) {
+  test(`home reaches ${path} by clicking a real link`, async ({ page }) => {
+    await page.goto("/");
+    const selector =
+      path === "/about"
+        ? `.site-nav a[href="${path}"]`
+        : `.tool-cards a[href="${path}"]`;
+    await page.locator(selector).click();
+    await expect(page).toHaveURL(path);
+    await expect(page.locator("h1")).toHaveText(h1);
+  });
+}
+
+// Ticket 06 (Spec §7 / §8 T3-⑦ runtime mirror): the unified 5-item footer is
+// present on all 8 pages.
+test("all 8 pages render the unified disclaimer footer", async ({ page }) => {
+  for (const { path } of ROUTES) {
+    await page.goto(path);
+    const footer = page.locator(".tool-footer");
+    await expect(footer, `footer on ${path}`).toBeVisible();
+    await expect(footer).toContainText(
+      "This calculator is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.",
+    );
+    await expect(footer).toContainText(`Maintained by the ${BRAND} project.`);
+    await expect(footer).toContainText("This tool has not been reviewed by a medical professional.");
+    await expect(footer).toContainText(/Last updated: \d{4}-\d{2}-\d{2}/);
+    await expect(footer).toContainText("Data sources & contact:");
+    await expect(footer.locator('a[href="/about"]'), `footer /about link on ${path}`).toHaveCount(1);
+  }
+});
 
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
