@@ -27,7 +27,10 @@
 - [ ] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: ｜完成: ｜证据:
 - [ ] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）｜开始: ｜完成: ｜证据:
 - [ ] 共享组件：NumberField / UnitToggle / ResultCard / ToolPageLayout / ToolFooter ｜开始: ｜完成: ｜证据:
-- [ ] 每路由独立 head + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
+- [ ] 每路由独立 head：落地 §5B.1 逐页定稿 title/description 文案 + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
+- [ ] JSON-LD 按 §5B.2 分页配置（工具页 WebApplication、FAQPage 逐字一致、/about AboutPage+Organization、禁 MedicalWebPage）｜开始: ｜完成: ｜证据:
+- [ ] 内链拓扑按 §5B.3：页头 8 项导航（ToolPageLayout 渲染）+ 各页正文相关工具区 ≥2 条（GL⇄GI、A1C 簇两两互链、converter→A1C 簇）+ 锚文本规则 ｜开始: ｜完成: ｜证据:
+- [ ] 制作 `public/og-cover.png` 初版（1200×630 含品牌名，纯色底+文字即可）+ 每页 og 标签（§5B.4）｜开始: ｜完成: ｜证据:
 - [ ] `scripts/prerender.mjs`（静态服务器须 SPA 回退到 dist/index.html）+ build 脚本接入 ｜开始: ｜完成: ｜证据:
 - [ ] sitemap（真源 `src/sitemap-lastmod.json`）+ robots 重写 + `dist/404.html` 生成 ｜开始: ｜完成: ｜证据:
 - [ ] `vercel.json`：cleanUrls + trailingSlash:false，禁 catch-all rewrite ｜开始: ｜完成: ｜证据:
@@ -42,6 +45,7 @@
 - [ ] `/a1c-to-eag-calculator`（参考区间不匹配用户输入，红线 D4）｜开始: ｜完成: ｜证据:
 - [ ] `/blood-sugar-converter`（双向绑定）｜开始: ｜完成: ｜证据:
 - [ ] `/glucose-to-a1c-estimator`（只输出区间，端点各自舍入 0.1%）｜开始: ｜完成: ｜证据:
+- [ ] 【第 2 批三页开工前】若有选词/盘面工具：对 a1c-calculator.net 做竞品精评并更新 §5 决策；无工具则标注跳过（Spec §5 竞品情报）｜开始: ｜完成: ｜证据:
 - [ ] `/about`（DiOGenes 来源 + 公式出处 + MIT 署名 + 联系方式）｜开始: ｜完成: ｜证据:
 - [ ] 现有 app.spec.js 入口 URL 迁移（仅改 goto 目标，断言不变）｜开始: ｜完成: ｜证据:
 
@@ -58,6 +62,8 @@
 - [ ] `npm run check` 全绿 ｜开始: ｜完成: ｜证据:
 - [ ] T5 Rich Results Test + Lighthouse mobile ≥70（人工）｜开始: ｜完成: ｜证据:
 - [ ] Spec §9 红线逐条自查 ｜开始: ｜完成: ｜证据:
+- [ ] §3 数据口径声明：重拉选词数据（有工具）或标注「沿用 2026-09 快照，未重验」（Spec §3-4 / §10）｜开始: ｜完成: ｜证据:
+- [ ] 交付说明：新增/修改文件清单 + 差异摘要 + 竞品情报记录（Spec §10）｜开始: ｜完成: ｜证据:
 
 ## P5 域名切换（阻塞于 P0 域名购买）
 
@@ -66,6 +72,14 @@
 - [!] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜备注: 等 P0
 - [!] GSC 新资源 + sitemap 提交 ｜备注: 等 P0
 - [!] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜备注: 等 P0
+
+## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
+
+- [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 上线后启动
+- [ ] 第 2 个月门槛：索引报告 ≥5 页 ｜备注: 未达标须回查预渲染/内链
+- [ ] 第 3 个月门槛：平均排名 ≤35 且季度展示 ≥2,000 ｜备注:
+- [ ] 第 6 个月门槛：季度 clicks ≥40 ｜备注:
+- [ ] 第 9~12 个月门槛：a1c 族 ≥1 词进前 30、季度 clicks ≥150（基线 4）｜备注:
 
 ## 已完成（本会话，规划阶段）
 
