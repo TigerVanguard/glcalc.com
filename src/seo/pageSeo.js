@@ -16,6 +16,7 @@
 
 import { SITE_ORIGIN, BRAND } from "../site.config.js";
 import { GL_FAQS } from "../data/glFaq.js";
+import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
 
 export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
 
@@ -68,9 +69,19 @@ const glPage = toolPage(
   "Glycemic Load Calculator",
   "Calculate glycemic load from real serving sizes. Search foods, scan barcodes, or use a photo, then see GI, carbs, and GL together. GL = GI × carbs ÷ 100.",
 );
-// Only page with a visible FAQ block today → only page allowed a FAQPage
-// (§5B.2-3). The old index.html @graph FAQPage semantics converge here.
+// FAQPage only where the page shows a visible FAQ (§5B.2-3): the GL page
+// (src/data/glFaq.js — the old index.html @graph FAQPage semantics converge
+// here) and, since ticket 07, the converter page
+// (src/data/bloodSugarConverterFaq.js).
 glPage.jsonLd.push(faqPage(GL_FAQS));
+
+const converterPage = toolPage(
+  "/blood-sugar-converter",
+  "Blood Sugar Converter – mg/dL ⇄ mmol/L",
+  "Blood Sugar Converter (mg/dL ⇄ mmol/L)",
+  "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
+);
+converterPage.jsonLd.push(faqPage(BLOOD_SUGAR_CONVERTER_FAQS));
 
 export const PAGE_SEO = {
   "/": {
@@ -100,12 +111,7 @@ export const PAGE_SEO = {
     "A1C to eAG Calculator",
     "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
   ),
-  "/blood-sugar-converter": toolPage(
-    "/blood-sugar-converter",
-    "Blood Sugar Converter – mg/dL ⇄ mmol/L",
-    "Blood Sugar Converter (mg/dL ⇄ mmol/L)",
-    "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
-  ),
+  "/blood-sugar-converter": converterPage,
   "/glucose-to-a1c-estimator": toolPage(
     "/glucose-to-a1c-estimator",
     "Average Glucose to A1C Estimator",

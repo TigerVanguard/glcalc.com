@@ -82,12 +82,14 @@ for (const { path, title, canonical, jsonLdTypes } of SPOT_CHECKS) {
   });
 }
 
-test("FAQPage JSON-LD appears on the GL page and nowhere else", async ({ request }) => {
+// Pages with a visible FAQ block — and therefore the ONLY pages allowed a
+// FAQPage node (§5B.2-3): GL (ticket 04) and the converter (ticket 07).
+const FAQ_ROUTES = new Set(["/glycemic-load-calculator", "/blood-sugar-converter"]);
+
+test("FAQPage JSON-LD appears exactly on the pages with a visible FAQ", async ({ request }) => {
   for (const path of ALL_ROUTES) {
     const html = await (await request.get(path)).text();
-    expect(html.includes('"FAQPage"'), `FAQPage presence on ${path}`).toBe(
-      path === "/glycemic-load-calculator",
-    );
+    expect(html.includes('"FAQPage"'), `FAQPage presence on ${path}`).toBe(FAQ_ROUTES.has(path));
     expect(html.includes("MedicalWebPage"), `MedicalWebPage forbidden on ${path}`).toBe(false);
   }
 });

@@ -64,6 +64,28 @@ test("all 8 pages render the unified disclaimer footer", async ({ page }) => {
   }
 });
 
+// Ticket 07 (Spec §8 T4-2 / T3-④ runtime mirror): the converter's static
+// content — the 18.018 formula string, the common-values table, and the FAQ —
+// is served in the prerendered HTML and usable with JavaScript disabled.
+// <details>/<summary> is native HTML, so opening a FAQ entry needs no JS.
+test("converter page shows formula, reference table, and FAQ without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/blood-sugar-converter");
+  await expect(page.locator("main")).toContainText("18.018");
+
+  const rows = page.locator(".conversion-table tbody tr");
+  await expect(rows).toHaveCount(6);
+  await expect(rows.nth(2)).toContainText("126");
+  await expect(rows.nth(2)).toContainText("7.0");
+
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(3);
+  await expect(faqEntries.first().locator("summary")).toBeVisible();
+  await faqEntries.first().locator("summary").click();
+  await expect(faqEntries.first().locator("p")).toBeVisible();
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

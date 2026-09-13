@@ -1048,6 +1048,135 @@ h3 {
   color: var(--green);
 }
 
+/* ── Ticket 07: shared numeric-tool components (NumberField / UnitToggle /
+   ResultCard) + converter page. Reused by tickets 08/09/10. ── */
+
+.converter-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.converter-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.number-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.number-field__input {
+  padding-right: 84px;
+}
+
+.number-field__suffix {
+  position: absolute;
+  right: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.number-field__input--invalid {
+  border-color: rgba(171, 70, 60, 0.45);
+}
+
+.number-field__input--invalid:focus {
+  border-color: rgba(171, 70, 60, 0.55);
+  box-shadow: 0 0 0 4px rgba(171, 70, 60, 0.1);
+}
+
+.unit-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(41, 101, 72, 0.06);
+  border: 1px solid rgba(39, 49, 39, 0.08);
+}
+
+.unit-toggle__option {
+  border: 0;
+  border-radius: 999px;
+  min-height: 40px;
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.unit-toggle__option:hover {
+  color: var(--ink);
+}
+
+.unit-toggle__option--active {
+  background: var(--green-deep);
+  color: #fff;
+}
+
+.unit-toggle__option:focus-visible {
+  outline: 3px solid rgba(13, 111, 115, 0.24);
+  outline-offset: 2px;
+}
+
+.notice--warning {
+  border-color: rgba(168, 106, 22, 0.28);
+  background: rgba(255, 250, 240, 0.96);
+}
+
+.notice--warning .notice__title {
+  color: var(--amber);
+}
+
+.result-card {
+  background: linear-gradient(140deg, rgba(226, 238, 229, 0.98), rgba(255, 255, 255, 0.92));
+  border-color: rgba(41, 101, 72, 0.16);
+}
+
+.result-card__placeholder {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.converter-guide h3 {
+  margin: 6px 0 0;
+  font-size: 1.1rem;
+}
+
+.conversion-table {
+  width: 100%;
+  max-width: 420px;
+  border-collapse: collapse;
+}
+
+.conversion-table th,
+.conversion-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.conversion-table thead th {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.conversion-table tbody th {
+  font-weight: 800;
+}
+
 @media (min-width: 640px) {
   .tool-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1120,7 +1249,8 @@ h3 {
   .controls,
   .barcode-form,
   .stats,
-  .seo-grid {
+  .seo-grid,
+  .converter-fields {
     grid-template-columns: 1fr;
   }
 

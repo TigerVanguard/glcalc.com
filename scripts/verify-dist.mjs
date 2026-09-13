@@ -2,10 +2,11 @@
 // ticket 04 with ① title copy, ② description copy, ⑥ canonical/OG, ⑧ JSON-LD,
 // ⑨ forbidden-copy scan, ⑩ SKIPPED marker, GA4 gate removal, sitemap/robots;
 // extended in ticket 06 with ⑤ internal-link counts + nav presence and
-// ⑦ the 5-item footer disclaimer).
+// ⑦ the 5-item footer disclaimer; extended in ticket 07 with the ④ converter
+// row: "18.018" formula string + static reference table content).
 //
-// Still out of scope (later tickets): ④ formula strings per page, ⑨'s positive
-// /about assertions (DiOGenes/MIT — /about content is ticket 13).
+// Still out of scope (later tickets): ④ formula strings for the other tool
+// pages, ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
@@ -71,8 +72,9 @@ const PAGES = [
     pageTitle: "Blood Sugar Converter – mg/dL ⇄ mmol/L",
     description:
       "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
-    jsonLdTypes: ["WebApplication"],
+    jsonLdTypes: ["FAQPage", "WebApplication"],
     webAppName: "Blood Sugar Converter (mg/dL ⇄ mmol/L)",
+    hasFaq: true,
   },
   {
     route: "/glucose-to-a1c-estimator",
@@ -301,6 +303,37 @@ for (const page of PAGES) {
     }
   }
 
+  // T3-④ (ticket 07 — converter row only; the other pages' formula strings
+  // land with their content tickets): "18.018" present, plus the static
+  // common-values table (JS-free content: this file reads raw dist/ HTML).
+  // Expected pairs are HARDCODED here, independent of src/lib/display.js, so a
+  // rounding bug in the app cannot self-certify: mmol = mgdl / 18.018 rounded
+  // half-up to 1 decimal.
+  if (route === "/blood-sugar-converter") {
+    check(html.includes("18.018"), 'T3-④ converter page contains formula string "18.018"');
+    const tables = root.querySelectorAll(".conversion-table");
+    check(tables.length === 1, `T3-④ exactly one .conversion-table (found ${tables.length})`);
+    const rows = tables[0]?.querySelectorAll("tbody tr") ?? [];
+    check(rows.length === 6, `T3-④ conversion table has 6 body rows (found ${rows.length})`);
+    const expectedPairs = [
+      ["70", "3.9"],
+      ["100", "5.6"],
+      ["126", "7.0"],
+      ["140", "7.8"],
+      ["180", "10.0"],
+      ["200", "11.1"],
+    ];
+    const rowCells = rows.map((tr) =>
+      tr.querySelectorAll("th,td").map((cell) => cell.text.trim()),
+    );
+    for (const [mgdl, mmol] of expectedPairs) {
+      check(
+        rowCells.some((cells) => cells[0] === mgdl && cells[1] === mmol),
+        `T3-④ conversion table row: ${mgdl} mg/dL → ${mmol} mmol/L`,
+      );
+    }
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -399,4 +432,6 @@ if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);
 }
-console.log("[verify-dist] all assertions passed (T3 ①②③⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).");
+console.log(
+  "[verify-dist] all assertions passed (T3 ①②③④(converter)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+);
