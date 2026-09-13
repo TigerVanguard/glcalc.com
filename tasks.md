@@ -1,5 +1,7 @@
 # 任务清单（真源：docs/2026-09-12-execution-spec-v2.2.md §4/§8）
 
+> **执行单元**：Spec 已拆为 17 张可独立执行+验证的 ticket，见 `.scratch/glucomath-rebuild/issues/`（每张含 What to build / Blocked by / 验收命令）。子代理按 ticket 认领执行；本文件是状态总账，ticket 开始/完成时同步更新对应条目。frontier 规则：只认领所有 Blocked-by 均已完成的 ticket。
+
 **协议**（与 AGENTS.md 一致）：动手前把对应条目改 `[~]` 并填开始时间；完成且验证通过后改 `[x]` 并填完成时间+证据；受阻改 `[!]` 并写原因。同一时刻只允许一个 `[~]`。新任务先登记再执行。
 
 格式：`- [状态] 任务 ｜开始: ｜完成: ｜证据/备注:`

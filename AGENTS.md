@@ -13,6 +13,10 @@ Vite 5 + React 17 纯 CSR 单页应用（血糖/升糖计算器），部署于 g
 - Spec §8：Test Plan（T0 测试基建改造先于一切）
 - Spec §9：八条红线（禁迁框架、禁 site:、禁诊断分档、禁 glcalc 变体……）
 
+## 执行单元（ticket）
+
+Spec 已拆为 17 张 ticket：`.scratch/glucomath-rebuild/issues/01~17`（依赖序编号，每张含 What to build / Blocked by / 验收标准）。认领规则：只做 **frontier** 上的 ticket（所有 Blocked-by 已完成）；01/02/03/16 无阻塞可立即开始。完成一张必须跑通其验收命令并在 `tasks.md` 登记证据。
+
 ## 任务纪律（强制）
 
 **每个任务执行之前，先写入根目录 `tasks.md`；完成后立即标记完成。** 规则：
