@@ -234,6 +234,52 @@ test("gl page shows static GL table, band copy, and glycaemic spelling without J
   );
 });
 
+// Ticket 13 (Spec §8 T4-2 / T3-⑨ runtime mirror): the /about page's full
+// static content — honest DiOGenes/Aston data provenance (category-level
+// archived data + Atkinson 2021 upgrade path), formula citations (Nathan
+// 2008 / Bergenstal 2018 / 18.018), the MIT upstream attribution with a real
+// link to assafmo/glcalc.com, the maintainer fallback + GitHub Issues contact
+// link, the medical-review status, and the full disclaimer paragraph — is
+// served in the prerendered HTML and visible with JavaScript disabled
+// (file-level test.use({ javaScriptEnabled: false }) above applies).
+test("about page shows data provenance, formula sources, MIT attribution, and contact link without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/about");
+  const main = page.locator("main");
+
+  // Data provenance (honest framing).
+  await expect(main).toContainText("DiOGenes");
+  await expect(main).toContainText("Aston");
+  await expect(main).toContainText("category-level");
+  await expect(main).toContainText("no longer maintained");
+  await expect(main).toContainText("Atkinson");
+
+  // Formula citations.
+  await expect(main).toContainText("Nathan");
+  await expect(main).toContainText("Bergenstal");
+  await expect(main).toContainText("18.018");
+
+  // MIT upstream attribution with a real link.
+  await expect(main).toContainText("MIT License");
+  await expect(main).toContainText("Assaf Morami");
+  await expect(
+    main.locator('a[href="https://github.com/assafmo/glcalc.com"]'),
+  ).toBeVisible();
+
+  // Maintainer fallback + contact entry point (Spec §4 P0-3).
+  await expect(main).toContainText(`Maintained by the ${BRAND} project`);
+  await expect(
+    main.locator('a[href="https://github.com/TigerVanguard/glcalc.com/issues"]'),
+  ).toBeVisible();
+
+  // Medical review status (consistent with footer item ③) + disclaimer.
+  await expect(main).toContainText(
+    "This tool has not been reviewed by a medical professional.",
+  );
+  await expect(main).toContainText("NGSP-certified");
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

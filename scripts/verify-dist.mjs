@@ -16,10 +16,12 @@
 // gains the gi page; extended in ticket 12 with the ④ GL row: GL formula
 // string + 27-row serving-level GL table + two hand-computed golden rows +
 // band boundary semantics (≤ 10 / ≥ 20) + "glycaemic" spelling + DiOGenes
-// provenance + negative scans (no N/A / no encoding suspect in the table)).
-//
-// Still out of scope (later tickets): ⑨'s positive /about assertions
-// (DiOGenes/MIT — /about is ticket 13).
+// provenance + negative scans (no N/A / no encoding suspect in the table);
+// extended in ticket 13 with ⑨'s positive /about assertions: DiOGenes/Aston
+// provenance, formula citations (Nathan/Bergenstal), MIT upstream attribution
+// (assafmo repo link), GitHub Issues contact link (visible + Organization
+// contactPoint), and the Atkinson 2021 upgrade-path mention. The ⑨ negative
+// scans (no "Harvard" / no "works offline", site-wide) are unchanged.
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
@@ -597,6 +599,46 @@ for (const page of PAGES) {
     check(bodyText.includes("DiOGenes"), 'T3-④ GL page names the data source "DiOGenes"');
   }
 
+  // T3-⑨ (ticket 13 — /about positive assertions, completing the row whose
+  // negative scans above run site-wide): honest data provenance (DiOGenes /
+  // Aston, category-level archived data), formula citations (Nathan 2008,
+  // Bergenstal 2018), the Atkinson 2021 upgrade path, MIT upstream
+  // attribution with a link to the assafmo repo, and the GitHub Issues
+  // contact entry point — both visible in the body and mirrored by the
+  // Organization JSON-LD contactPoint. The contact URL is HARDCODED here,
+  // independent of src/seo/pageSeo.js CONTACT_URL, so a typo there cannot
+  // self-certify.
+  if (route === "/about") {
+    const bodyText = root.querySelector("body")?.text ?? "";
+    check(bodyText.includes("DiOGenes"), 'T3-⑨ about page names the data source "DiOGenes"');
+    check(bodyText.includes("Aston"), 'T3-⑨ about page cites "Aston" (Obesity Reviews 2010)');
+    check(
+      bodyText.includes("category-level"),
+      'T3-⑨ about page carries the honest provenance copy ("category-level" assignments)',
+    );
+    check(bodyText.includes("Atkinson"), 'T3-⑨ about page names the Atkinson 2021 upgrade path');
+    check(bodyText.includes("Nathan"), 'T3-⑨ about page cites "Nathan" (ADAG, Diabetes Care 2008)');
+    check(bodyText.includes("Bergenstal"), 'T3-⑨ about page cites "Bergenstal" (GMI, Diabetes Care 2018)');
+    check(bodyText.includes("MIT"), 'T3-⑨ about page states the MIT License attribution');
+    check(bodyText.includes("Assaf Morami"), 'T3-⑨ about page credits upstream author "Assaf Morami"');
+    check(
+      root.querySelectorAll('a[href="https://github.com/assafmo/glcalc.com"]').length >= 1,
+      "T3-⑨ about page links to the upstream assafmo/glcalc.com repository",
+    );
+    const contactUrl = "https://github.com/TigerVanguard/glcalc.com/issues";
+    check(
+      root.querySelectorAll(`a[href="${contactUrl}"]`).length >= 1,
+      "T3-⑨ about page links to the GitHub Issues contact entry point",
+    );
+    if (nodes !== null) {
+      const org = nodes.find((node) => node["@type"] === "Organization");
+      check(
+        org?.contactPoint?.url === contactUrl,
+        "T3-⑨ Organization JSON-LD contactPoint matches the GitHub Issues contact URL",
+      );
+    }
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -696,5 +738,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨(incl. /about positives) + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );
