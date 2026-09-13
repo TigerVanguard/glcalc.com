@@ -1,0 +1,133 @@
+// Per-route SEO source of truth (ticket 04, Spec §5B.1 / §5B.2 / §5B.4).
+//
+// - pageTitle / description: the FINAL copy from Spec §5B.1, verbatim — do not
+//   edit without updating the spec. Full <title> = `${pageTitle} | ${BRAND}`.
+// - canonical: SITE_ORIGIN + path, no trailing slash; root is exempt and uses
+//   SITE_ORIGIN + "/" (§5B.4).
+// - jsonLd: §5B.2 distribution — home: WebSite + WebApplication; each tool
+//   page: one WebApplication (name = page H1, description = meta description);
+//   FAQPage ONLY where the page shows a visible FAQ (currently just the GL
+//   page, sourced verbatim from src/data/glFaq.js); /about: AboutPage +
+//   Organization. MedicalWebPage / MedicalRiskCalculator are forbidden
+//   site-wide (§5B.2-5).
+//
+// scripts/verify-dist.mjs intentionally re-hardcodes the §5B.1 copy instead of
+// importing this module, so a typo here cannot self-certify.
+
+import { SITE_ORIGIN, BRAND } from "../site.config.js";
+import { GL_FAQS } from "../data/glFaq.js";
+
+export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
+
+// P0 fallback contact entry point (Spec §4 P0-3): GitHub repository issues
+// until the maintainer provides a real contact channel.
+export const CONTACT_URL = "https://github.com/TigerVanguard/glcalc.com/issues";
+
+export function canonicalFor(path) {
+  return path === "/" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${path}`;
+}
+
+function webApplication(path, name, description) {
+  return {
+    "@type": "WebApplication",
+    name,
+    url: canonicalFor(path),
+    applicationCategory: "HealthApplication",
+    operatingSystem: "Any",
+    offers: { "@type": "Offer", price: 0, priceCurrency: "USD" },
+    description,
+  };
+}
+
+function faqPage(faqs) {
+  return {
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  };
+}
+
+// { path: { pageTitle, description, jsonLd } } — a plain tool page needs only
+// its WebApplication; home / GL / about get extra nodes below.
+function toolPage(path, pageTitle, h1, description) {
+  return { pageTitle, description, jsonLd: [webApplication(path, h1, description)] };
+}
+
+const HOME_DESCRIPTION =
+  "Free calculators for glycemic load, glycemic index, GMI, A1C to eAG, and blood sugar unit conversion. No sign-up, no ads walls, every formula source cited.";
+
+const ABOUT_DESCRIPTION =
+  "Where our GI data and formulas come from: DiOGenes GI database, ADAG (Nathan 2008), GMI (Bergenstal 2018). Open-source attribution and medical disclaimer.";
+
+const glPage = toolPage(
+  "/glycemic-load-calculator",
+  "Glycemic Load Calculator – GL by Food & Serving",
+  "Glycemic Load Calculator",
+  "Calculate glycemic load from real serving sizes. Search foods, scan barcodes, or use a photo, then see GI, carbs, and GL together. GL = GI × carbs ÷ 100.",
+);
+// Only page with a visible FAQ block today → only page allowed a FAQPage
+// (§5B.2-3). The old index.html @graph FAQPage semantics converge here.
+glPage.jsonLd.push(faqPage(GL_FAQS));
+
+export const PAGE_SEO = {
+  "/": {
+    pageTitle: "Free Blood Sugar & Glycemic Calculators",
+    description: HOME_DESCRIPTION,
+    jsonLd: [
+      { "@type": "WebSite", name: BRAND, url: `${SITE_ORIGIN}/`, inLanguage: "en" },
+      webApplication("/", "Free Blood Sugar & Glycemic Calculators", HOME_DESCRIPTION),
+    ],
+  },
+  "/glycemic-load-calculator": glPage,
+  "/glycemic-index-calculator": toolPage(
+    "/glycemic-index-calculator",
+    "Glycemic Index Calculator – Look Up Food GI",
+    "Glycemic Index Calculator",
+    "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
+  ),
+  "/gmi-calculator": toolPage(
+    "/gmi-calculator",
+    "GMI Calculator – Glucose Management Indicator",
+    "GMI Calculator (Glucose Management Indicator)",
+    "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
+  ),
+  "/a1c-to-eag-calculator": toolPage(
+    "/a1c-to-eag-calculator",
+    "A1C Calculator – Convert A1C to eAG",
+    "A1C to eAG Calculator",
+    "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
+  ),
+  "/blood-sugar-converter": toolPage(
+    "/blood-sugar-converter",
+    "Blood Sugar Converter – mg/dL ⇄ mmol/L",
+    "Blood Sugar Converter (mg/dL ⇄ mmol/L)",
+    "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
+  ),
+  "/glucose-to-a1c-estimator": toolPage(
+    "/glucose-to-a1c-estimator",
+    "Average Glucose to A1C Estimator",
+    "Average Glucose to A1C Estimator",
+    "Estimate an A1C range from your average blood glucose. Shows a range, not a single number, and explains why reverse estimation has built-in uncertainty.",
+  ),
+  "/about": {
+    pageTitle: "About – Data Sources, Formulas & Disclaimer",
+    description: ABOUT_DESCRIPTION,
+    jsonLd: [
+      {
+        "@type": "AboutPage",
+        name: `About ${BRAND}`,
+        url: canonicalFor("/about"),
+        description: ABOUT_DESCRIPTION,
+      },
+      {
+        "@type": "Organization",
+        name: BRAND,
+        url: `${SITE_ORIGIN}/`,
+        contactPoint: { "@type": "ContactPoint", contactType: "support", url: CONTACT_URL },
+      },
+    ],
+  },
+};

@@ -3,9 +3,11 @@ import { defineConfig } from "@playwright/test";
 // Two projects (Spec §8 T0-2):
 // - "static": serves the built dist/ via scripts/serve-dist.mjs (file-system
 //   routing + real 404s, no API). Requires `npm run build` to have run first
-//   (`npm run check` guarantees the order). Runs prerender.spec.js.
+//   (`npm run check` guarantees the order). Runs prerender.spec.js and
+//   seo.spec.js (rewritten per §5B in ticket 04 — it asserts prerendered head
+//   output, which only exists in dist/).
 // - "app": vite dev server, which carries the barcode/photo API middlewares
-//   (Spec §0A-2) — those e2e flows can only run here. Runs app/pwa/seo specs.
+//   (Spec §0A-2) — those e2e flows can only run here. Runs app/pwa specs.
 
 const appPort = process.env.E2E_PORT ?? "4183";
 const staticPort = process.env.E2E_STATIC_PORT ?? "4184";
@@ -17,12 +19,12 @@ export default defineConfig({
   projects: [
     {
       name: "static",
-      testMatch: /prerender\.spec\.js/,
+      testMatch: /(prerender|seo)\.spec\.js/,
       use: { baseURL: staticBaseURL },
     },
     {
       name: "app",
-      testMatch: /(app|pwa|seo)\.spec\.js/,
+      testMatch: /(app|pwa)\.spec\.js/,
       use: { baseURL: appBaseURL },
     },
   ],

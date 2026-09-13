@@ -60,7 +60,9 @@ function photoPayload() {
 test("loads the app shell", async ({ page }) => {
   await page.goto("/glycemic-load-calculator");
 
-  await expect(page).toHaveTitle("Glycemic Load Calculator | GI and GL Food Search");
+  // Title = §5B.1 final copy (ticket 04 head layer): the pre-rebuild hardcoded
+  // index.html title no longer exists. Still an exact-match assertion.
+  await expect(page).toHaveTitle("Glycemic Load Calculator – GL by Food & Serving | GL Calc");
   await expect(page.getByRole("heading", { name: "Glycemic Load Calculator", exact: true })).toBeVisible();
   const startCta = page.locator(".hero__cta");
   await expect(startCta).toBeVisible();

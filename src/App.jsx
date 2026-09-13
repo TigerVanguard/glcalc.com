@@ -7,6 +7,7 @@ import DisclosureNotice from "./features/common/DisclosureNotice.jsx";
 import FinderTabs from "./features/workflow/FinderTabs.jsx";
 import SelectedFoodSummary from "./features/workflow/SelectedFoodSummary.jsx";
 import { normalizeServingToGrams } from "./lib/gl.js";
+import { GL_FAQS } from "./data/glFaq.js";
 
 const DEFAULT_SERVING = 100;
 const DEFAULT_UNIT = "g";
@@ -46,28 +47,9 @@ const USE_CASES = [
   },
 ];
 
-const FAQS = [
-  {
-    question: "What is glycemic load?",
-    answer:
-      "Glycemic load estimates how much a serving of food may raise blood glucose by combining the food's glycemic index with the available carbohydrates in that serving.",
-  },
-  {
-    question: "How is glycemic load calculated?",
-    answer:
-      "This calculator uses GL = GI x available carbohydrate grams in the serving / 100. It first converts the serving to grams, estimates carbohydrates for that serving, then applies the GI value.",
-  },
-  {
-    question: "Is glycemic load the same as glycemic index?",
-    answer:
-      "No. Glycemic index describes carbohydrate quality for a food. Glycemic load adds the serving size, which makes it more useful when comparing what you actually plan to eat.",
-  },
-  {
-    question: "Can this replace medical advice?",
-    answer:
-      "No. GL is an estimate for education and meal planning. If you manage diabetes, pregnancy nutrition, or another medical condition, use professional guidance for personal decisions.",
-  },
-];
+// FAQ content lives in src/data/glFaq.js so the visible text and the FAQPage
+// JSON-LD (src/seo/pageSeo.js) can never drift apart (ticket 04, Spec §5B.2-3).
+const FAQS = GL_FAQS;
 
 function SeoGuide() {
   return (

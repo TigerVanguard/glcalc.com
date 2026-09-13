@@ -10,6 +10,7 @@ import A1cToEagPage from "./pages/A1cToEagPage.jsx";
 import BloodSugarConverterPage from "./pages/BloodSugarConverterPage.jsx";
 import GlucoseToA1cPage from "./pages/GlucoseToA1cPage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
+import HeadManager from "./seo/HeadManager.jsx";
 
 // React 17: keep ReactDOM.render (NOT hydrate) — the prerendered snapshot is not
 // guaranteed to match the runtime tree; render replaces it wholesale (Spec §0A-5).
@@ -17,6 +18,9 @@ const rootElement = document.getElementById("root");
 
 ReactDOM.render(
   <BrowserRouter>
+    {/* Single integration point for per-route head tags (ticket 04): keyed on
+        useLocation().pathname, covers all 8 routes without per-page wiring. */}
+    <HeadManager />
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/glycemic-load-calculator" element={<GlCalculatorPage />} />

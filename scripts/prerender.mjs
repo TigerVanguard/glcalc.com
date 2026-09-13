@@ -5,12 +5,13 @@
 // MUST fall back to it or sub-routes would 404 and never render), renders each
 // route with Playwright Chromium, and writes the full HTML to
 // dist/<route>/index.html (the root route overwrites dist/index.html).
-// Also emits a static dist/404.html with site-wide <a href> navigation.
-//
-// Out of scope here (ticket 04): sitemap.xml / robots.txt rewriting, per-route
-// head tags, index.html shell teardown.
+// Also emits a static dist/404.html with site-wide <a href> navigation, and
+// (ticket 04, Spec §4 P2-5 / §5B.4) rewrites dist/sitemap.xml + dist/robots.txt.
+// Sitemap lastmod's single source of truth is src/sitemap-lastmod.json (updated
+// by hand when page content actually changes) — NEVER the build date, which
+// would fabricate freshness.
 
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "@playwright/test";
@@ -18,6 +19,9 @@ import { createDistServer } from "./serve-dist.mjs";
 
 const DIST = join(process.cwd(), "dist");
 const BRAND = process.env.VITE_BRAND || "GL Calc";
+// Node-side mirror of src/site.config.js (that module uses import.meta.env and
+// cannot be imported here); same env var, same default.
+const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glcalc.vercel.app";
 
 const ROUTES = [
   { path: "/", label: "Home", h1: "Free Blood Sugar & Glycemic Calculators" },
@@ -108,7 +112,44 @@ async function main() {
 
   await writeFile(join(DIST, "404.html"), notFoundHtml(), "utf-8");
   console.log(`[prerender] wrote ${join(DIST, "404.html")}`);
-  console.log(`[prerender] done: ${rendered.length} routes + 404.html`);
+
+  await writeSitemapAndRobots();
+  console.log(`[prerender] done: ${rendered.length} routes + 404.html + sitemap.xml + robots.txt`);
+}
+
+// URL policy (Spec §5B.4): no trailing slash anywhere, root path exempt.
+function urlFor(path) {
+  return path === "/" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${path}`;
+}
+
+async function writeSitemapAndRobots() {
+  const lastmodFile = join(process.cwd(), "src", "sitemap-lastmod.json");
+  const lastmod = JSON.parse(await readFile(lastmodFile, "utf-8"));
+
+  // The lastmod map must cover exactly the route table — fail loudly on drift
+  // (a route added without a lastmod entry, or a stale entry for a dead route).
+  for (const { path } of ROUTES) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(lastmod[path] ?? "")) {
+      throw new Error(`src/sitemap-lastmod.json: missing/invalid ISO date for route "${path}"`);
+    }
+  }
+  for (const path of Object.keys(lastmod)) {
+    if (!ROUTES.some((route) => route.path === path)) {
+      throw new Error(`src/sitemap-lastmod.json: entry "${path}" is not a known route`);
+    }
+  }
+
+  const urls = ROUTES.map(
+    ({ path }) =>
+      `  <url>\n    <loc>${urlFor(path)}</loc>\n    <lastmod>${lastmod[path]}</lastmod>\n  </url>`,
+  ).join("\n");
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+  await writeFile(join(DIST, "sitemap.xml"), sitemap, "utf-8");
+  console.log(`[prerender] wrote ${join(DIST, "sitemap.xml")} (${ROUTES.length} URLs)`);
+
+  const robots = `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`;
+  await writeFile(join(DIST, "robots.txt"), robots, "utf-8");
+  console.log(`[prerender] wrote ${join(DIST, "robots.txt")}`);
 }
 
 main().catch((error) => {

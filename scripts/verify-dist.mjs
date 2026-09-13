@@ -1,10 +1,15 @@
-// Build-artifact verification — SKELETON (ticket 03; Spec §8 T3).
+// Build-artifact verification (Spec §8 T3; skeleton from ticket 03, extended in
+// ticket 04 with ① title copy, ② description copy, ⑥ canonical/OG, ⑧ JSON-LD,
+// ⑨ forbidden-copy scan, ⑩ SKIPPED marker, GA4 gate removal, sitemap/robots).
 //
-// Scope in this ticket: per-route HTML file exists, exactly one <title>, exactly
-// one <h1>, dist/404.html exists with full site navigation, and vercel.json
-// routing invariants (cleanUrls, trailingSlash:false, no catch-all rewrite).
-// The full §5B assertion set (title/description copy, canonical/OG, formulas,
-// internal-link counts, JSON-LD, footer disclaimer) belongs to ticket 04+.
+// Still out of scope (later tickets): ④ formula strings per page, ⑤ internal
+// link counts, ⑦ footer disclaimer, ⑨'s positive /about assertions
+// (DiOGenes/MIT — /about content is ticket 13).
+//
+// The §5B.1 title/description copy below is intentionally HARDCODED here
+// (independent of src/seo/pageSeo.js): if both sides imported one module, a
+// typo in that module would self-certify. Assertions use a DOM parser
+// (node-html-parser), never grep line counts.
 
 import { readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -12,17 +17,80 @@ import { join } from "node:path";
 import { parse } from "node-html-parser";
 
 const DIST = join(process.cwd(), "dist");
+const BRAND = process.env.VITE_BRAND || "GL Calc";
+const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glcalc.vercel.app";
 
-const ROUTES = [
-  "/",
-  "/glycemic-load-calculator",
-  "/glycemic-index-calculator",
-  "/gmi-calculator",
-  "/a1c-to-eag-calculator",
-  "/blood-sugar-converter",
-  "/glucose-to-a1c-estimator",
-  "/about",
+// §5B.1 final copy, verbatim (title = `${pageTitle} | ${BRAND}`), plus the
+// §5B.2 JSON-LD distribution per page (webAppName = page H1; hasFaq = page has
+// a visible FAQ block → exactly one FAQPage allowed).
+const PAGES = [
+  {
+    route: "/",
+    pageTitle: "Free Blood Sugar & Glycemic Calculators",
+    description:
+      "Free calculators for glycemic load, glycemic index, GMI, A1C to eAG, and blood sugar unit conversion. No sign-up, no ads walls, every formula source cited.",
+    jsonLdTypes: ["WebApplication", "WebSite"],
+    webAppName: "Free Blood Sugar & Glycemic Calculators",
+  },
+  {
+    route: "/glycemic-load-calculator",
+    pageTitle: "Glycemic Load Calculator – GL by Food & Serving",
+    description:
+      "Calculate glycemic load from real serving sizes. Search foods, scan barcodes, or use a photo, then see GI, carbs, and GL together. GL = GI × carbs ÷ 100.",
+    jsonLdTypes: ["FAQPage", "WebApplication"],
+    webAppName: "Glycemic Load Calculator",
+    hasFaq: true,
+  },
+  {
+    route: "/glycemic-index-calculator",
+    pageTitle: "Glycemic Index Calculator – Look Up Food GI",
+    description:
+      "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
+    jsonLdTypes: ["WebApplication"],
+    webAppName: "Glycemic Index Calculator",
+  },
+  {
+    route: "/gmi-calculator",
+    pageTitle: "GMI Calculator – Glucose Management Indicator",
+    description:
+      "Convert your CGM average glucose into a Glucose Management Indicator (GMI). Uses the published Bergenstal 2018 formula and explains how GMI differs from lab A1C.",
+    jsonLdTypes: ["WebApplication"],
+    webAppName: "GMI Calculator (Glucose Management Indicator)",
+  },
+  {
+    route: "/a1c-to-eag-calculator",
+    pageTitle: "A1C Calculator – Convert A1C to eAG",
+    description:
+      "Convert A1C to estimated average glucose (eAG) in mg/dL and mmol/L using the ADAG formula (28.7 × A1C − 46.7). Includes accuracy limits and reference info.",
+    jsonLdTypes: ["WebApplication"],
+    webAppName: "A1C to eAG Calculator",
+  },
+  {
+    route: "/blood-sugar-converter",
+    pageTitle: "Blood Sugar Converter – mg/dL ⇄ mmol/L",
+    description:
+      "Convert blood sugar between mg/dL and mmol/L instantly in both directions. Includes a reference table of common values and why the two units exist.",
+    jsonLdTypes: ["WebApplication"],
+    webAppName: "Blood Sugar Converter (mg/dL ⇄ mmol/L)",
+  },
+  {
+    route: "/glucose-to-a1c-estimator",
+    pageTitle: "Average Glucose to A1C Estimator",
+    description:
+      "Estimate an A1C range from your average blood glucose. Shows a range, not a single number, and explains why reverse estimation has built-in uncertainty.",
+    jsonLdTypes: ["WebApplication"],
+    webAppName: "Average Glucose to A1C Estimator",
+  },
+  {
+    route: "/about",
+    pageTitle: "About – Data Sources, Formulas & Disclaimer",
+    description:
+      "Where our GI data and formulas come from: DiOGenes GI database, ADAG (Nathan 2008), GMI (Bergenstal 2018). Open-source attribution and medical disclaimer.",
+    jsonLdTypes: ["AboutPage", "Organization"],
+  },
 ];
+
+const ROUTES = PAGES.map((page) => page.route);
 
 let failures = 0;
 
@@ -39,26 +107,196 @@ function routeFile(route) {
   return route === "/" ? join(DIST, "index.html") : join(DIST, route.slice(1), "index.html");
 }
 
-for (const route of ROUTES) {
+function canonicalFor(route) {
+  return route === "/" ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}`;
+}
+
+// Flatten every <script type="application/ld+json"> (including @graph wrappers)
+// into a single array of schema nodes.
+function jsonLdNodes(root) {
+  const nodes = [];
+  for (const script of root.querySelectorAll('script[type="application/ld+json"]')) {
+    let parsed;
+    try {
+      parsed = JSON.parse(script.text);
+    } catch {
+      return null; // caller reports invalid JSON
+    }
+    const items = Array.isArray(parsed) ? parsed : parsed["@graph"] ?? [parsed];
+    nodes.push(...items);
+  }
+  return nodes;
+}
+
+for (const page of PAGES) {
+  const { route } = page;
   console.log(`[verify-dist] ${route}`);
   const file = routeFile(route);
   const fileExists = existsSync(file);
   check(fileExists, `prerendered file exists: ${file}`);
   if (!fileExists) continue;
 
-  const root = parse(await readFile(file, "utf-8"));
+  const html = await readFile(file, "utf-8");
+  const root = parse(html);
+
+  // Skeleton (ticket 03): unique title/H1.
   const titles = root.querySelectorAll("title");
   const h1s = root.querySelectorAll("h1");
   check(titles.length === 1, `exactly one <title> (found ${titles.length})`);
-  check(
-    titles.length >= 1 && titles[0].text.trim().length > 0,
-    `<title> is non-empty ("${titles[0]?.text.trim() ?? ""}")`,
-  );
   check(h1s.length === 1, `exactly one <h1> (found ${h1s.length})`);
   check(
     h1s.length >= 1 && h1s[0].text.trim().length > 0,
     `<h1> is non-empty ("${h1s[0]?.text.trim() ?? ""}")`,
   );
+
+  // T3-①: title verbatim equals §5B.1 final copy.
+  const expectedTitle = `${page.pageTitle} | ${BRAND}`;
+  check(
+    titles.length === 1 && titles[0].text.trim() === expectedTitle,
+    `T3-① <title> verbatim: "${expectedTitle}"`,
+  );
+
+  // T3-②: meta description verbatim, and unique.
+  const descriptions = root.querySelectorAll('meta[name="description"]');
+  check(descriptions.length === 1, `T3-② exactly one meta description (found ${descriptions.length})`);
+  check(
+    descriptions.length === 1 && descriptions[0].getAttribute("content") === page.description,
+    "T3-② meta description verbatim equals §5B.1 copy",
+  );
+
+  // T3-⑥: canonical policy + OG consistency, all unique (double-tag guard).
+  const canonicals = root.querySelectorAll('link[rel="canonical"]');
+  const expectedCanonical = canonicalFor(route);
+  check(canonicals.length === 1, `T3-⑥ exactly one canonical (found ${canonicals.length})`);
+  const canonicalHref = canonicals[0]?.getAttribute("href") ?? "";
+  check(canonicalHref === expectedCanonical, `T3-⑥ canonical = "${expectedCanonical}" (got "${canonicalHref}")`);
+  check(
+    route === "/" || !canonicalHref.endsWith("/"),
+    "T3-⑥ canonical has no trailing slash (root exempt)",
+  );
+  const ogUrls = root.querySelectorAll('meta[property="og:url"]');
+  check(
+    ogUrls.length === 1 && ogUrls[0].getAttribute("content") === expectedCanonical,
+    "T3-⑥ unique og:url identical to canonical",
+  );
+  const ogTitles = root.querySelectorAll('meta[property="og:title"]');
+  check(
+    ogTitles.length === 1 && ogTitles[0].getAttribute("content") === expectedTitle,
+    "T3-⑥ unique og:title identical to title",
+  );
+  const ogDescriptions = root.querySelectorAll('meta[property="og:description"]');
+  check(
+    ogDescriptions.length === 1 && ogDescriptions[0].getAttribute("content") === page.description,
+    "T3-⑥ unique og:description identical to meta description",
+  );
+  const ogImages = root.querySelectorAll('meta[property="og:image"]');
+  const ogImage = ogImages[0]?.getAttribute("content") ?? "";
+  check(
+    ogImages.length === 1 && /^https?:\/\//.test(ogImage),
+    `T3-⑥ unique og:image with absolute URL (got "${ogImage}")`,
+  );
+  check(
+    root.querySelectorAll('meta[property="og:type"]').length === 1 &&
+      root.querySelector('meta[property="og:type"]').getAttribute("content") === "website",
+    "T3-⑥ og:type = website",
+  );
+  check(root.querySelectorAll('meta[name="twitter:card"]').length === 1, "T3-⑥ twitter:card present once");
+
+  // T3-⑧: JSON-LD type distribution per §5B.2.
+  const nodes = jsonLdNodes(root);
+  check(nodes !== null, "T3-⑧ all JSON-LD scripts parse as valid JSON");
+  if (nodes !== null) {
+    const types = nodes.map((node) => node["@type"]).sort();
+    check(
+      JSON.stringify(types) === JSON.stringify([...page.jsonLdTypes].sort()),
+      `T3-⑧ JSON-LD types = [${page.jsonLdTypes.join(", ")}] (got [${types.join(", ")}])`,
+    );
+
+    const webApp = nodes.find((node) => node["@type"] === "WebApplication");
+    if (page.webAppName) {
+      check(webApp?.name === page.webAppName, `T3-⑧ WebApplication.name = page H1 ("${page.webAppName}")`);
+      check(webApp?.url === expectedCanonical, "T3-⑧ WebApplication.url = canonical");
+      check(webApp?.applicationCategory === "HealthApplication", 'T3-⑧ applicationCategory = "HealthApplication"');
+      check(webApp?.operatingSystem === "Any", 'T3-⑧ operatingSystem = "Any"');
+      check(
+        webApp?.offers?.price === 0 && webApp?.offers?.priceCurrency === "USD",
+        "T3-⑧ offers = price 0 USD",
+      );
+      check(webApp?.description === page.description, "T3-⑧ WebApplication.description = meta description");
+    }
+
+    // FAQPage: only on pages with a visible FAQ, and Q/A text must verbatim
+    // match visible text (questions render as <summary>, answers as body text).
+    const faqPages = nodes.filter((node) => node["@type"] === "FAQPage");
+    check(
+      faqPages.length === (page.hasFaq ? 1 : 0),
+      page.hasFaq ? "T3-⑧ exactly one FAQPage (visible FAQ present)" : "T3-⑧ no FAQPage (no visible FAQ)",
+    );
+    if (page.hasFaq && faqPages.length === 1) {
+      const summaries = root.querySelectorAll("summary").map((node) => node.text.trim());
+      const pageText = root.querySelector("body").text;
+      const mainEntity = faqPages[0].mainEntity ?? [];
+      check(mainEntity.length > 0, "T3-⑧ FAQPage has mainEntity questions");
+      for (const entry of mainEntity) {
+        check(
+          summaries.includes(entry.name),
+          `T3-⑧ FAQ question visible verbatim: "${entry.name}"`,
+        );
+        check(
+          pageText.includes(entry.acceptedAnswer?.text ?? "\u0000"),
+          `T3-⑧ FAQ answer visible verbatim for: "${entry.name}"`,
+        );
+      }
+    }
+  }
+  check(!html.includes("MedicalWebPage"), "T3-⑧ no MedicalWebPage anywhere");
+
+  // T3-⑨ (partial — /about positive assertions are ticket 13): forbidden copy.
+  const lowered = html.toLowerCase();
+  check(!lowered.includes("harvard"), 'T3-⑨ no "Harvard"');
+  check(!lowered.includes("works offline"), 'T3-⑨ no "works offline" claim');
+
+  // GA4 gate removal (Spec §4 P1-2; ticket 04 acceptance criterion).
+  check(html.includes('gtag("config", "G-PDPYWE3JR5")'), "GA4 config present");
+  check(!html.includes("window.location.hostname"), "GA4 config has no hostname condition");
+}
+
+// T3-⑩ — enabled only after P5 (domain switch): dist-wide grep for
+// "glcalc.vercel.app" zero hits. Before P5 the origin legitimately IS
+// glcalc.vercel.app, so:
+console.log("[verify-dist] T3-⑩ glcalc.vercel.app zero-hit scan: SKIPPED (P5 前)");
+
+console.log("[verify-dist] dist/sitemap.xml");
+const sitemapFile = join(DIST, "sitemap.xml");
+const sitemapExists = existsSync(sitemapFile);
+check(sitemapExists, `sitemap exists: ${sitemapFile}`);
+if (sitemapExists) {
+  const sitemap = await readFile(sitemapFile, "utf-8");
+  const lastmodSource = JSON.parse(
+    await readFile(join(process.cwd(), "src", "sitemap-lastmod.json"), "utf-8"),
+  );
+  const entries = [...sitemap.matchAll(/<url>\s*<loc>([^<]*)<\/loc>\s*<lastmod>([^<]*)<\/lastmod>\s*<\/url>/g)];
+  check(entries.length === 8, `sitemap has exactly 8 <url> entries (found ${entries.length})`);
+  const byLoc = new Map(entries.map(([, loc, lastmod]) => [loc, lastmod]));
+  for (const route of ROUTES) {
+    const loc = canonicalFor(route);
+    check(byLoc.has(loc), `sitemap contains <loc>${loc}</loc>`);
+    check(
+      byLoc.get(loc) === lastmodSource[route],
+      `sitemap lastmod for ${route} comes from src/sitemap-lastmod.json (${lastmodSource[route]})`,
+    );
+  }
+}
+
+console.log("[verify-dist] dist/robots.txt");
+const robotsFile = join(DIST, "robots.txt");
+const robotsExists = existsSync(robotsFile);
+check(robotsExists, `robots.txt exists: ${robotsFile}`);
+if (robotsExists) {
+  const robots = await readFile(robotsFile, "utf-8");
+  check(robots.includes("Allow: /"), "robots.txt allows all");
+  check(!/^Disallow:\s*\/\s*$/m.test(robots), "robots.txt has no blanket Disallow");
+  check(robots.includes(`Sitemap: ${SITE_ORIGIN}/sitemap.xml`), "robots.txt points to sitemap");
 }
 
 console.log("[verify-dist] dist/404.html");
@@ -88,4 +326,4 @@ if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);
 }
-console.log("[verify-dist] all skeleton assertions passed.");
+console.log("[verify-dist] all assertions passed (T3 ①②③⑥⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).");

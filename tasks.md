@@ -18,12 +18,12 @@
 
 - [x] `check` 脚本顺序改为 unit → build（含 prerender）→ verify-dist → e2e ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: package.json check=`test:unit && build && verify-dist && test:e2e`，全绿（ticket 03）
 - [x] Playwright 拆双 project：static（dist 静态服务器）/ app（npm run dev 含 API 中间件）｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: playwright.config.js 双 project + 双 webServer（static=serve-dist.mjs 404 模式 :4184，app=npm run dev :4183）；static 跑 prerender.spec.js，app 跑 app/pwa/seo（ticket 03）
-- [ ] `tests/e2e/seo.spec.js` 按 §5B 重写（非追加）｜开始: ｜完成: ｜证据:
+- [x] `tests/e2e/seo.spec.js` 按 §5B 重写（非追加）｜开始: 2026-09-13 01:40 ｜完成: 2026-09-13 01:58 ｜证据: 全量重写并迁入 static project（playwright.config testMatch: static=(prerender|seo)，app=(app|pwa)）；禁 JS 抽查 4 页 title/canonical/JSON-LD + FAQPage 仅 GL 页 + robots/sitemap + GA4 无门；e2e 41/41 绿（ticket 04）
 
 ## P1 义务补齐（可单独合入；导航与 /about 必须随 P2 部署）
 
 - [ ] README 顶部补 MIT 上游署名（assafmo/glcalc.com）｜开始: ｜完成: ｜证据:
-- [ ] 移除 index.html GA4 hostname 门（第 23~25 行）｜开始: ｜完成: ｜证据:
+- [x] 移除 index.html GA4 hostname 门（第 23~25 行）｜开始: 2026-09-13 01:40 ｜完成: 2026-09-13 01:58 ｜证据: gtag config 改无条件；verify-dist 每页断言含 config 串且无 window.location.hostname + seo.spec 同断言，全绿（ticket 04）
 
 ## P2 多页化（核心工程，Spec §4 P2 + §5A/§5B）
 
@@ -31,12 +31,12 @@
 - [x] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: react-router-dom@6.30.6；`/` 渲染现有 App 不动，7 个占位页组件含 §5 定稿 H1；页面内容属 ticket 04+（ticket 03）
 - [x] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）（ticket 01）｜开始: 2026-09-13 00:45 ｜完成: 2026-09-13 01:05 ｜证据: 独立验证 PASS（第 1 轮）：验证者亲跑 `npm run test:unit` 4 文件 33/33 绿；逐行复算 eag(6.5)=139.85、gmi(150)=6.898、a1cRange(126)=[5.5,6.6]、18.018 换算；断言全容差式；gl.js 委托保真、无越界改动
 - [ ] 共享组件：NumberField / UnitToggle / ResultCard / ToolPageLayout / ToolFooter ｜开始: ｜完成: ｜证据:
-- [ ] 每路由独立 head：落地 §5B.1 逐页定稿 title/description 文案 + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
-- [ ] JSON-LD 按 §5B.2 分页配置（工具页 WebApplication、FAQPage 逐字一致、/about AboutPage+Organization、禁 MedicalWebPage）｜开始: ｜完成: ｜证据:
+- [x] 每路由独立 head：落地 §5B.1 逐页定稿 title/description 文案 + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）（ticket 04，含 JSON-LD/og-cover/sitemap 三项）｜开始: 2026-09-13 01:40（原登记 02:40 为误值）｜完成: 2026-09-13 01:58 ｜证据: 自写 src/seo/HeadManager.jsx（useLayoutEffect，早于 render 回调标记，零依赖）+ src/seo/pageSeo.js 定稿配置；index.html 拆除 title/canonical/description/robots/og/twitter/@graph（PWA meta 保留，pwa.spec 依赖）；`npm run check` 全绿：unit 47/47 → build+prerender 8 路由 → verify-dist 全 PASS（T3 ①②③⑥⑧⑨+⑩SKIPPED）→ e2e 41/41
+- [x] JSON-LD 按 §5B.2 分页配置（工具页 WebApplication、FAQPage 逐字一致、/about AboutPage+Organization、禁 MedicalWebPage）｜开始: 2026-09-13 01:40 ｜完成: 2026-09-13 01:58 ｜证据: 首页 WebSite+WebApplication、6 工具页各一 WebApplication（name=H1、offers 0 USD、description=meta）、FAQPage 仅 GL 页且问答与可见文本同源（src/data/glFaq.js，App.jsx 与 schema 共用）、/about AboutPage+Organization（contactPoint=GitHub issues 兜底）；verify-dist T3-⑧ 全 PASS、全站无 MedicalWebPage（ticket 04）
 - [ ] 内链拓扑按 §5B.3：页头 8 项导航（ToolPageLayout 渲染）+ 各页正文相关工具区 ≥2 条（GL⇄GI、A1C 簇两两互链、converter→A1C 簇）+ 锚文本规则 ｜开始: ｜完成: ｜证据:
-- [ ] 制作 `public/og-cover.png` 初版（1200×630 含品牌名，纯色底+文字即可）+ 每页 og 标签（§5B.4）｜开始: ｜完成: ｜证据:
+- [x] 制作 `public/og-cover.png` 初版（1200×630 含品牌名，纯色底+文字即可）+ 每页 og 标签（§5B.4）｜开始: 2026-09-13 01:40 ｜完成: 2026-09-13 01:58 ｜证据: scripts/generate-og-cover.mjs（Playwright 截图 1200×630，读 VITE_BRAND，P5 重制可重跑）生成；每页 og:title/description/url/type/image+twitter:card 由 HeadManager 输出，verify-dist T3-⑥ og:image 绝对 URL 全 PASS（ticket 04）
 - [x] `scripts/prerender.mjs`（静态服务器须 SPA 回退到 dist/index.html）+ build 脚本接入 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: build=`vite build && node scripts/prerender.mjs`；内部 SPA 回退服务器 + Playwright chromium 逐路由快照，先全部渲染再写盘（防根 index.html 被覆写污染回退）；含 dist/404.html 生成；sitemap/robots 未动（ticket 04）
-- [ ] sitemap（真源 `src/sitemap-lastmod.json`）+ robots 重写 + `dist/404.html` 生成 ｜开始: ｜完成: ｜证据:
+- [x] sitemap（真源 `src/sitemap-lastmod.json`）+ robots 重写 + `dist/404.html` 生成 ｜开始: 2026-09-13 01:40 ｜完成: 2026-09-13 01:58 ｜证据: src/sitemap-lastmod.json（8 路由→ISO 日期，2026-09-13 初始化）；prerender.mjs 末尾只读真源生成 dist/sitemap.xml（8 URL+lastmod，路由/真源双向校验不符即抛错）+ 重写 robots.txt（Allow all + Sitemap 行）；404.html 属 ticket 03 已有；verify-dist sitemap/robots 断言全 PASS（ticket 04）
 - [x] `vercel.json`：cleanUrls + trailingSlash:false，禁 catch-all rewrite ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: 仅两键无 rewrites；verify-dist 断言核对 + static e2e 断言 /about/ → 308 /about（本地模拟）（ticket 03）
 - [x] `VITE_BUILD_DATE` 注入机制 ｜开始: 2026-09-13 01:10 ｜完成: 2026-09-13 01:15 ｜证据: vite.config.js define 注入构建当天 ISO 日期；消费方 ToolFooter 属后续 ticket（ticket 03）
 
@@ -61,7 +61,7 @@
 
 ## 验收（Spec §8）
 
-- [ ] `scripts/verify-dist.mjs`（DOM 解析断言，P5 前 ①~⑨ + ⑩ SKIPPED）｜开始: ｜完成: ｜证据:
+- [ ] `scripts/verify-dist.mjs`（DOM 解析断言，P5 前 ①~⑨ + ⑩ SKIPPED）｜开始: ｜完成: ｜证据: ticket 04 已落地 ①②③⑥⑧⑨（⑨ 仅禁 Harvard/works offline，/about 正体断言属 ticket 13）+ ⑩ SKIPPED + sitemap/robots/GA4 断言；④公式串/⑤内链计数/⑦免责五项属后续 ticket
 - [ ] T4 e2e 全绿（static + app 双 project，含 404 状态断言、?food= 深链）｜开始: ｜完成: ｜证据:
 - [ ] `npm run check` 全绿 ｜开始: ｜完成: ｜证据:
 - [ ] T5 Rich Results Test + Lighthouse mobile ≥70（人工）｜开始: ｜完成: ｜证据:
