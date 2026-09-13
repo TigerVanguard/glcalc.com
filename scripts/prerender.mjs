@@ -20,7 +20,7 @@ const DIST = join(process.cwd(), "dist");
 const BRAND = process.env.VITE_BRAND || "GL Calc";
 
 const ROUTES = [
-  { path: "/", label: "Home", h1: "Glycemic Load Calculator" },
+  { path: "/", label: "Home", h1: "Free Blood Sugar & Glycemic Calculators" },
   { path: "/glycemic-load-calculator", label: "Glycemic Load Calculator", h1: "Glycemic Load Calculator" },
   { path: "/glycemic-index-calculator", label: "Glycemic Index Calculator", h1: "Glycemic Index Calculator" },
   { path: "/gmi-calculator", label: "GMI Calculator", h1: "GMI Calculator (Glucose Management Indicator)" },

@@ -58,7 +58,7 @@ function photoPayload() {
 }
 
 test("loads the app shell", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await expect(page).toHaveTitle("Glycemic Load Calculator | GI and GL Food Search");
   await expect(page.getByRole("heading", { name: "Glycemic Load Calculator", exact: true })).toBeVisible();
@@ -74,7 +74,7 @@ test("loads the app shell", async ({ page }) => {
 });
 
 test("workflow shell keeps one active finder at a time", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   const searchTab = page.getByRole("tab", { name: "Search" });
   const barcodeTab = page.getByRole("tab", { name: "Barcode" });
@@ -98,7 +98,7 @@ test("workflow shell keeps one active finder at a time", async ({ page }) => {
 });
 
 test("finder tabs support arrow-key navigation", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   const searchTab = page.getByRole("tab", { name: "Search" });
   const barcodeTab = page.getByRole("tab", { name: "Barcode" });
@@ -120,7 +120,7 @@ test("finder tabs support arrow-key navigation", async ({ page }) => {
 });
 
 test("manual barcode copy stays honest in the workflow shell", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Barcode" }).click();
 
@@ -180,7 +180,7 @@ test("clearing search ignores stale worker responses", async ({ page }) => {
     };
   });
 
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.waitForTimeout(120);
@@ -196,7 +196,7 @@ test("clearing search ignores stale worker responses", async ({ page }) => {
 test("searches for a food and calculates carbs and glycemic load from an ounce serving", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -214,7 +214,7 @@ test("searches for a food and calculates carbs and glycemic load from an ounce s
 test("selected food summary appears after choosing a food and search clear does not drop it", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -231,7 +231,7 @@ test("selected food summary appears after choosing a food and search clear does 
 });
 
 test("tab switching preserves draft input and keeps the active selected food", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -257,7 +257,7 @@ test("tab switching preserves draft input and keeps the active selected food", a
 });
 
 test("summary reset clears only the selected result", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -270,7 +270,7 @@ test("summary reset clears only the selected result", async ({ page }) => {
 });
 
 test("looks up a barcode, confirms a candidate, and calculates GL", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Barcode" }).click();
   await page.getByRole("textbox", { name: "Barcode" }).fill("1234567890123");
@@ -286,7 +286,7 @@ test("looks up a barcode, confirms a candidate, and calculates GL", async ({ pag
 });
 
 test("replacing selected food from another finder updates the summary", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -305,7 +305,7 @@ test("replacing selected food from another finder updates the summary", async ({
 test("switching finders or running lookups without confirm does not replace the selected food", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -332,7 +332,7 @@ test("switching finders or running lookups without confirm does not replace the 
 });
 
 test("uploads a photo, confirms a candidate, and calculates GL", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Photo" }).click();
   await page.getByLabel("Food photo", { exact: true }).setInputFiles(blueberriesPhoto);
@@ -351,7 +351,7 @@ test("mobile layout moves the result workspace ahead of the workflow stack after
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   const initialWorkflowBox = await workflowStack(page).boundingBox();
   const initialResultBox = await page.locator(".result-column").boundingBox();
@@ -372,7 +372,7 @@ test("mobile layout moves the result workspace ahead of the workflow stack after
 });
 
 test("finder-local clear actions do not wipe the selected summary or result", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
@@ -409,7 +409,7 @@ test("clearing barcode ignores stale lookup responses and does not keep loading"
     });
   });
 
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
 
@@ -438,7 +438,7 @@ test("clearing photo ignores stale identify responses and resets loading", async
     });
   });
 
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
   await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
   await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
 
@@ -458,7 +458,7 @@ test("clearing photo ignores stale identify responses and resets loading", async
 });
 
 test("shows a recoverable error for an invalid barcode", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Barcode" }).click();
   await page.getByRole("textbox", { name: "Barcode" }).fill("abc");
@@ -469,7 +469,7 @@ test("shows a recoverable error for an invalid barcode", async ({ page }) => {
 });
 
 test("shows a recoverable error for an unknown barcode", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Barcode" }).click();
   await page.getByRole("textbox", { name: "Barcode" }).fill("0000000000000");
@@ -480,7 +480,7 @@ test("shows a recoverable error for an unknown barcode", async ({ page }) => {
 });
 
 test("shows a recoverable error for an unrecognized photo", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/glycemic-load-calculator");
 
   await page.getByRole("tab", { name: "Photo" }).click();
   await page.getByLabel("Food photo", { exact: true }).setInputFiles(unknownPhoto);
@@ -488,4 +488,44 @@ test("shows a recoverable error for an unrecognized photo", async ({ page }) => 
 
   await expect(page.getByRole("alert")).toContainText("Could not identify the photo");
   await expect(page.getByRole("alert")).toContainText("could not find a confident food match");
+});
+
+test.describe("?food= deep link (ticket 05)", () => {
+  test("preselects an existing gi.json food as a confirmed selection", async ({ page }) => {
+    await page.goto("/glycemic-load-calculator?food=Blueberries");
+
+    const summary = summaryPanel(page);
+    await expect(summary).toContainText("Blueberries");
+    await expect(summary).toContainText("Shared link");
+    await expect(resultPanel(page).getByRole("heading", { name: "Blueberries", exact: true })).toBeVisible();
+    await expect(resultPanel(page).getByText("Estimated glycemic load", { exact: true })).toBeVisible();
+    // Default serving 100 g of Blueberries (GI 45, 11 g carbs/100g) => GL 4.95.
+    await expect(resultPanel(page).getByText("4.95")).toBeVisible();
+
+    // Read-only: nothing is written back to the URL.
+    expect(new URL(page.url()).search).toBe("?food=Blueberries");
+  });
+
+  test("ignores an unknown ?food= key and renders normally", async ({ page }) => {
+    await page.goto("/glycemic-load-calculator?food=No-Such-Food-Key");
+
+    await expect(page.getByRole("heading", { name: "Glycemic Load Calculator", exact: true })).toBeVisible();
+    await expect(summaryPanel(page)).toBeHidden();
+    await expect(resultPanel(page).getByRole("heading", { name: "Your result will land here" })).toBeVisible();
+    expect(new URL(page.url()).search).toBe("?food=No-Such-Food-Key");
+  });
+
+  test("deep-linked selection can be cleared and replaced by search", async ({ page }) => {
+    await page.goto("/glycemic-load-calculator?food=Blueberries");
+
+    await expect(summaryPanel(page)).toContainText("Shared link");
+    await page.getByRole("button", { name: "Clear selected food" }).click();
+    await expect(summaryPanel(page)).toBeHidden();
+
+    await page.getByRole("searchbox", { name: "Food" }).fill("blueberries");
+    await page.getByRole("button", { name: "Blueberries GI 45 - Low" }).click();
+    await expect(summaryPanel(page)).toContainText("Text search");
+    // URL still untouched after interactions.
+    expect(new URL(page.url()).search).toBe("?food=Blueberries");
+  });
 });

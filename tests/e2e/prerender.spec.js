@@ -5,7 +5,7 @@
 import { test, expect } from "@playwright/test";
 
 const ROUTES = [
-  { path: "/", h1: "Glycemic Load Calculator" },
+  { path: "/", h1: "Free Blood Sugar & Glycemic Calculators" },
   { path: "/glycemic-load-calculator", h1: "Glycemic Load Calculator" },
   { path: "/glycemic-index-calculator", h1: "Glycemic Index Calculator" },
   { path: "/gmi-calculator", h1: "GMI Calculator (Glucose Management Indicator)" },

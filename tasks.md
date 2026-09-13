@@ -43,7 +43,7 @@
 ## P3 内容页实现（Spec §5/§5A 逐页）
 
 - [ ] `/`（导航首页：6 工具卡片 + 品牌介绍 + 健康声明）｜开始: ｜完成: ｜证据:
-- [ ] `/glycemic-load-calculator`（App.jsx 主体迁移，勿迁 App.js；+ ?food= 预填 + 静态食物表）｜开始: ｜完成: ｜证据:
+- [x] `/glycemic-load-calculator`（App.jsx 主体迁移，勿迁 App.js；+ ?food= 预填；静态食物表属 ticket 12）（ticket 05）｜开始: 2026-09-13 01:23 ｜完成: 2026-09-13 01:32 ｜证据: npm run check 全绿（unit 47 通过；build+prerender 8 路由；verify-dist 全 PASS；e2e 36 通过含 3 条新增 ?food= 用例）；App.js 已删除；app.spec.js 仅改 goto 目标（20 处 "/" → "/glycemic-load-calculator"），断言零删改；/ 改渲染 HomePage 占位（H1 "Free Blood Sugar & Glycemic Calculators"），prerender.mjs 与 prerender.spec.js 的 / H1 期望同步
 - [ ] `/glycemic-index-calculator`（复用 FoodSearch/SearchWorker，GI 分档连续区间）｜开始: ｜完成: ｜证据:
 - [ ] `/gmi-calculator` ｜开始: ｜完成: ｜证据:
 - [ ] `/a1c-to-eag-calculator`（参考区间不匹配用户输入，红线 D4）｜开始: ｜完成: ｜证据:
@@ -55,7 +55,7 @@
 
 ## P4 数据质量管道（Spec §6）
 
-- [x] 展示层规则：carbs_per_100g < 2.5 → "GI: N/A · GL ≈ 0"（ticket 02，含下两项）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: `src/lib/giData.js` giDisplayRule 纯函数 + 规格化展示常量（GI_NA_LABEL/GL_APPROX_ZERO_LABEL/GI_NA_FULL_LABEL）；`npm run test:unit` 5 文件 47/47 绿（gi-data 14 新增）；对全量 573 条 carbs<2.5 条目断言 N/A 语义
+- [x] 展示层规则：carbs_per_100g < 2.5 → "GI: N/A · GL ≈ 0"（ticket 02，含下两项）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: `src/lib/giData.js` giDisplayRule 纯函数 + 规格化展示常量（GI_NA_LABEL/GL_APPROX_ZERO_LABEL/GI_NA_FULL_LABEL）；`npm run test:unit` 5 文件 47/47 绿（gi-data 14 新增）；对全量 573 条 carbs<2.5 条目断言 N/A 语义。独立验证 PASS（第 1 轮）：验证者实跑选择器逐条核对 27 条全合规、随机 3 条与 gi.json 原值一致、蛋清无 70 泄漏
 - [x] 静态表选择器（≥2.5 且非编码嫌疑 <10 ∧ GI∈{45,70}，≥20 条）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: selectStaticTable 固定名单 27 条（主食6/水果6/蔬菜5/乳制品5/豆类5），逐条校验存在性+合规性，违规抛错不静默跳过（ticket 02）
 - [x] `tests/unit/gi-data.test.js`（含低碳水蛋清回归锚点）｜开始: 2026-09-13 01:45 ｜完成: 2026-09-13 01:19 ｜证据: 蛋清锚点 "Egg. chicken. white. raw"(carbs 1.2)/"Egg Chicken White Raw"(carbs 0.4) 断言返回 N/A 且展示结构零处出现 70；合规条目 Rye bread 89/High、Apple 38/Low、Couscous 65/Medium（ticket 02）
 

@@ -126,8 +126,11 @@ function SeoGuide() {
   );
 }
 
-export default function App() {
-  const [selectedFood, setSelectedFood] = useState(null);
+// initialSelection: optional preconfirmed food (same shape the finders emit on
+// confirm), used by the /glycemic-load-calculator `?food=` deep link (ticket
+// 05). Default null keeps behavior identical to before.
+export default function App({ initialSelection = null }) {
+  const [selectedFood, setSelectedFood] = useState(initialSelection);
   const [activeFinder, setActiveFinder] = useState("search");
   const [serving, setServing] = useState(DEFAULT_SERVING);
   const [unit, setUnit] = useState(DEFAULT_UNIT);
