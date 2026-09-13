@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "display_override": ["standalone"],
-  "theme_color": "#e8f2ea",
-  "background_color": "#edf4ef",
+  "theme_color": "#f4f0e5",
+  "background_color": "#f4f0e5",
   "icons": [
     {
       "src": "/icons/gl-guide-icon.svg",

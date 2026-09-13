@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ErrorNotice from "../common/ErrorNotice.jsx";
 import FoodCandidateList from "../confirm/FoodCandidateList.jsx";
 
@@ -6,11 +6,20 @@ function parseErrorMessage(payload) {
   return payload?.error?.message ?? "Barcode lookup failed.";
 }
 
-export default function BarcodeLookup({ onConfirmCandidate }) {
+export default function BarcodeLookup({ onSelectSelection }) {
+  const requestIdRef = useRef(0);
   const [barcode, setBarcode] = useState("");
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const clearBarcodeState = () => {
+    requestIdRef.current += 1;
+    setBarcode("");
+    setResult(null);
+    setError(null);
+    setIsLoading(false);
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -27,10 +36,16 @@ export default function BarcodeLookup({ onConfirmCandidate }) {
 
     setIsLoading(true);
     setError(null);
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
 
     try {
       const response = await fetch(`/api/barcode?barcode=${encodeURIComponent(value)}`);
       const payload = await response.json();
+
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
 
       if (!response.ok || !payload.ok) {
         setResult(null);
@@ -48,22 +63,37 @@ export default function BarcodeLookup({ onConfirmCandidate }) {
 
       setResult(payload);
     } catch (fetchError) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setResult(null);
       setError({
         title: "Barcode lookup failed",
         message: fetchError instanceof Error ? fetchError.message : "Please try again.",
       });
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
+  };
+
+  const handleConfirmCandidate = (candidate) => {
+    onSelectSelection?.({
+      food: candidate,
+      source: "barcode",
+      sourceLabel: "Barcode lookup",
+    });
   };
 
   return (
     <section className="panel panel--barcode" aria-labelledby="barcode-heading">
       <div className="section-heading">
-        <p className="eyebrow">Step 1b</p>
-        <h2 id="barcode-heading">Look up a packaged food by barcode</h2>
+        <p className="eyebrow">Find a food</p>
+        <h2 id="barcode-heading">Type a barcode</h2>
       </div>
+      <p className="muted">Use the package barcode to get likely food matches, then confirm the closest one.</p>
 
       <form className="barcode-form" onSubmit={handleSubmit}>
         <label className="field" htmlFor="barcode-input">
@@ -79,9 +109,16 @@ export default function BarcodeLookup({ onConfirmCandidate }) {
           />
         </label>
 
-        <button className="primary-button" type="submit" disabled={isLoading}>
-          {isLoading ? "Looking up..." : "Look up barcode"}
-        </button>
+        <div className="barcode-form__actions">
+          <button className="primary-button" type="submit" disabled={isLoading}>
+            {isLoading ? "Looking up..." : "Look up barcode"}
+          </button>
+          {barcode || result || error ? (
+            <button type="button" className="secondary-button" onClick={clearBarcodeState}>
+              Clear barcode
+            </button>
+          ) : null}
+        </div>
       </form>
 
       {error ? (
@@ -97,7 +134,7 @@ export default function BarcodeLookup({ onConfirmCandidate }) {
         <FoodCandidateList
           product={result.product}
           candidates={result.candidates}
-          onConfirm={onConfirmCandidate}
+          onConfirm={handleConfirmCandidate}
         />
       ) : null}
     </section>

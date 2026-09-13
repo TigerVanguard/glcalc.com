@@ -2,15 +2,17 @@ const workercode = () => {
   let glycemicIndex;
   let foods;
 
+  const normalizeQuery = (value) => value.trim().toLowerCase();
+
   //eslint-disable-next-line
-  self.onmessage = ({ data: { query, setGlycemicIndex } }) => {
+  self.onmessage = ({ data: { query, requestId, setGlycemicIndex } }) => {
     if (setGlycemicIndex) {
       glycemicIndex = setGlycemicIndex;
       foods = Object.keys(glycemicIndex).sort((a, b) => a.length - b.length);
       return;
     }
     if (query && glycemicIndex && foods) {
-      query = query.trim().toLowerCase();
+      query = normalizeQuery(query);
 
       const results = foods
         .filter((food) => food.toLowerCase().includes(query))
@@ -24,6 +26,8 @@ const workercode = () => {
       if (results.length > maxResults) {
         //eslint-disable-next-line
         self.postMessage({
+          requestId,
+          query,
           results: results.slice(0, maxResults).concat({
             title: "Too many results.",
             more: results.length - maxResults,
@@ -31,7 +35,7 @@ const workercode = () => {
         });
       } else {
         //eslint-disable-next-line
-        self.postMessage({ results });
+        self.postMessage({ requestId, query, results });
       }
       return;
     }

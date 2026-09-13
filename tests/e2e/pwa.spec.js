@@ -7,7 +7,7 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   await expect(manifestLink).toHaveAttribute("href", "/manifest.webmanifest");
 
   const themeColor = page.locator('meta[name="theme-color"]');
-  await expect(themeColor).toHaveAttribute("content", "#e8f2ea");
+  await expect(themeColor).toHaveAttribute("content", "#f4f0e5");
 
   const appleCapable = page.locator('meta[name="apple-mobile-web-app-capable"]');
   await expect(appleCapable).toHaveAttribute("content", "yes");
@@ -24,6 +24,8 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   const manifestJson = await manifest.json();
   expect(manifestJson.name).toBe("Glycemic Load Calculator");
   expect(manifestJson.short_name).toBe("GL Calc");
+  expect(manifestJson.theme_color).toBe("#f4f0e5");
+  expect(manifestJson.background_color).toBe("#f4f0e5");
   expect(manifestJson.icons).toEqual(
     expect.arrayContaining([
       expect.objectContaining({ src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }),

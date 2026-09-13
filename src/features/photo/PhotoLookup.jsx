@@ -46,8 +46,9 @@ function getErrorCopy(code) {
   };
 }
 
-export default function PhotoLookup({ onConfirmCandidate }) {
+export default function PhotoLookup({ onSelectSelection }) {
   const inputRef = useRef(null);
+  const requestIdRef = useRef(0);
   const [fileName, setFileName] = useState("");
   const [imageDataUrl, setImageDataUrl] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
@@ -56,11 +57,13 @@ export default function PhotoLookup({ onConfirmCandidate }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const clearSelection = () => {
+    requestIdRef.current += 1;
     setFileName("");
     setImageDataUrl("");
     setPreviewUrl("");
     setResult(null);
     setError(null);
+    setIsLoading(false);
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -75,14 +78,26 @@ export default function PhotoLookup({ onConfirmCandidate }) {
       return;
     }
 
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+
     try {
       const dataUrl = await readFileAsDataUrl(file);
+
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setFileName(file.name);
       setImageDataUrl(dataUrl);
       setPreviewUrl(dataUrl);
       setResult(null);
       setError(null);
     } catch (readError) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       clearSelection();
       setError({
         title: "Photo lookup failed",
@@ -105,6 +120,8 @@ export default function PhotoLookup({ onConfirmCandidate }) {
 
     setIsLoading(true);
     setError(null);
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
 
     try {
       const response = await fetch("/api/photo-identify", {
@@ -119,6 +136,10 @@ export default function PhotoLookup({ onConfirmCandidate }) {
       });
       const payload = await response.json();
 
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       if (!response.ok || !payload.ok) {
         const copy = getErrorCopy(payload?.error?.code);
         setResult(null);
@@ -131,24 +152,38 @@ export default function PhotoLookup({ onConfirmCandidate }) {
 
       setResult(payload);
     } catch (fetchError) {
+      if (requestId !== requestIdRef.current) {
+        return;
+      }
+
       setResult(null);
       setError({
         title: "Photo lookup failed",
         message: fetchError instanceof Error ? fetchError.message : "Please try again.",
       });
     } finally {
-      setIsLoading(false);
+      if (requestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 
   const photoTitle = result?.analysis?.label ?? fileName ?? "Uploaded photo";
+  const handleConfirmCandidate = (candidate) => {
+    onSelectSelection?.({
+      food: candidate,
+      source: "photo",
+      sourceLabel: "Photo lookup",
+    });
+  };
 
   return (
     <section className="panel panel--photo" aria-labelledby="photo-heading">
       <div className="section-heading">
-        <p className="eyebrow">Step 1c</p>
-        <h2 id="photo-heading">Identify a food from a photo</h2>
+        <p className="eyebrow">Find a food</p>
+        <h2 id="photo-heading">Upload a food photo</h2>
       </div>
+      <p className="muted">Upload a food photo, then confirm the closest match before calculating GL.</p>
 
       <form className="photo-form" onSubmit={handleSubmit}>
         <label className="field" htmlFor="photo-input">
@@ -209,7 +244,7 @@ export default function PhotoLookup({ onConfirmCandidate }) {
               : "Confirm the closest candidate before calculating GL.",
           }}
           candidates={result.candidates}
-          onConfirm={onConfirmCandidate}
+          onConfirm={handleConfirmCandidate}
           stepLabel="Step 2"
           heading="Confirm the matching food"
           emptyMessage="No strong match yet. Try another photo or upload a clearer image."

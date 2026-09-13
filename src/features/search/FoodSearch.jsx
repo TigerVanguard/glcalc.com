@@ -11,8 +11,14 @@ function formatResultCount(count) {
   return `${count} match${count === 1 ? "" : "es"}`;
 }
 
-export default function FoodSearch({ onSelect }) {
+function normalizeQuery(value) {
+  return value.trim().toLowerCase();
+}
+
+export default function FoodSearch({ onSelectSelection }) {
   const workerRef = useRef(null);
+  const latestRequestIdRef = useRef(0);
+  const latestQueryRef = useRef("");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +27,14 @@ export default function FoodSearch({ onSelect }) {
     const worker = new Worker(workerScript);
 
     worker.onmessage = ({ data }) => {
+      if (data?.requestId !== latestRequestIdRef.current) {
+        return;
+      }
+
+      if (data?.query !== normalizeQuery(latestQueryRef.current)) {
+        return;
+      }
+
       setIsLoading(false);
       setResults(data.results ?? []);
     };
@@ -35,33 +49,41 @@ export default function FoodSearch({ onSelect }) {
   }, []);
 
   useEffect(() => {
+    latestRequestIdRef.current += 1;
+    latestQueryRef.current = query;
+
     if (!query.trim()) {
       setResults([]);
       setIsLoading(false);
-      onSelect?.(null);
       return;
     }
 
     setIsLoading(true);
+    const requestId = latestRequestIdRef.current;
     const timeoutId = window.setTimeout(() => {
-      workerRef.current?.postMessage({ query });
+      workerRef.current?.postMessage({ query, requestId });
     }, 80);
 
     return () => window.clearTimeout(timeoutId);
-  }, [query, onSelect]);
+  }, [query]);
 
   const handlePick = (result) => {
     setResults([]);
     setIsLoading(false);
-    onSelect?.(result);
+    onSelectSelection?.({
+      food: result,
+      source: "search",
+      sourceLabel: "Text search",
+    });
   };
 
   return (
     <section className="panel panel--search" aria-labelledby="search-heading">
       <div className="section-heading">
-        <p className="eyebrow">Step 1</p>
-        <h2 id="search-heading">Search a food by text</h2>
+        <p className="eyebrow">Find a food</p>
+        <h2 id="search-heading">Search by food name</h2>
       </div>
+      <p className="muted">Start with a common food name, then choose the best match.</p>
 
       <label className="field-label" htmlFor="food-search">
         Food

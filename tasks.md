@@ -1,0 +1,76 @@
+# 任务清单（真源：docs/2026-09-12-execution-spec-v2.2.md §4/§8）
+
+**协议**（与 AGENTS.md 一致）：动手前把对应条目改 `[~]` 并填开始时间；完成且验证通过后改 `[x]` 并填完成时间+证据；受阻改 `[!]` 并写原因。同一时刻只允许一个 `[~]`。新任务先登记再执行。
+
+格式：`- [状态] 任务 ｜开始: ｜完成: ｜证据/备注:`
+
+## P0 人类依赖（Agent 无法代办，只登记状态）
+
+- [!] 购买 glucomath.com（Spaceship；溢价则备选 glucoconvert → glycocalc → a1cmate）｜备注: 等站长确认，不阻塞 P1~P4
+- [!] GSC 域名验证 DNS TXT ｜备注: 等站长
+- [!] 提供维护者署名与联系方式 ｜备注: 未提供时用兜底串 "Maintained by the {BRAND} project"
+
+## T0 测试基建改造（先于一切开发任务，Spec §8 T0）
+
+- [ ] `check` 脚本顺序改为 unit → build（含 prerender）→ verify-dist → e2e ｜开始: ｜完成: ｜证据:
+- [ ] Playwright 拆双 project：static（dist 静态服务器）/ app（npm run dev 含 API 中间件）｜开始: ｜完成: ｜证据:
+- [ ] `tests/e2e/seo.spec.js` 按 §5B 重写（非追加）｜开始: ｜完成: ｜证据:
+
+## P1 义务补齐（可单独合入；导航与 /about 必须随 P2 部署）
+
+- [ ] README 顶部补 MIT 上游署名（assafmo/glcalc.com）｜开始: ｜完成: ｜证据:
+- [ ] 移除 index.html GA4 hostname 门（第 23~25 行）｜开始: ｜完成: ｜证据:
+
+## P2 多页化（核心工程，Spec §4 P2 + §5A/§5B）
+
+- [ ] `src/site.config.js`：SITE_ORIGIN + BRAND 常量 ｜开始: ｜完成: ｜证据:
+- [ ] 引入 react-router v6，8 路由 + `src/pages/` 8 个页面组件 ｜开始: ｜完成: ｜证据:
+- [ ] `src/lib/formulas.js` 纯函数集 + `tests/unit/formulas.test.js`（T1 全表容差断言）｜开始: ｜完成: ｜证据:
+- [ ] 共享组件：NumberField / UnitToggle / ResultCard / ToolPageLayout / ToolFooter ｜开始: ｜完成: ｜证据:
+- [ ] 每路由独立 head + 拆除 index.html 硬编码页面级 head（§4 P2-3，防双 title/canonical）｜开始: ｜完成: ｜证据:
+- [ ] `scripts/prerender.mjs`（静态服务器须 SPA 回退到 dist/index.html）+ build 脚本接入 ｜开始: ｜完成: ｜证据:
+- [ ] sitemap（真源 `src/sitemap-lastmod.json`）+ robots 重写 + `dist/404.html` 生成 ｜开始: ｜完成: ｜证据:
+- [ ] `vercel.json`：cleanUrls + trailingSlash:false，禁 catch-all rewrite ｜开始: ｜完成: ｜证据:
+- [ ] `VITE_BUILD_DATE` 注入机制 ｜开始: ｜完成: ｜证据:
+
+## P3 内容页实现（Spec §5/§5A 逐页）
+
+- [ ] `/`（导航首页：6 工具卡片 + 品牌介绍 + 健康声明）｜开始: ｜完成: ｜证据:
+- [ ] `/glycemic-load-calculator`（App.jsx 主体迁移，勿迁 App.js；+ ?food= 预填 + 静态食物表）｜开始: ｜完成: ｜证据:
+- [ ] `/glycemic-index-calculator`（复用 FoodSearch/SearchWorker，GI 分档连续区间）｜开始: ｜完成: ｜证据:
+- [ ] `/gmi-calculator` ｜开始: ｜完成: ｜证据:
+- [ ] `/a1c-to-eag-calculator`（参考区间不匹配用户输入，红线 D4）｜开始: ｜完成: ｜证据:
+- [ ] `/blood-sugar-converter`（双向绑定）｜开始: ｜完成: ｜证据:
+- [ ] `/glucose-to-a1c-estimator`（只输出区间，端点各自舍入 0.1%）｜开始: ｜完成: ｜证据:
+- [ ] `/about`（DiOGenes 来源 + 公式出处 + MIT 署名 + 联系方式）｜开始: ｜完成: ｜证据:
+- [ ] 现有 app.spec.js 入口 URL 迁移（仅改 goto 目标，断言不变）｜开始: ｜完成: ｜证据:
+
+## P4 数据质量管道（Spec §6）
+
+- [ ] 展示层规则：carbs_per_100g < 2.5 → "GI: N/A · GL ≈ 0" ｜开始: ｜完成: ｜证据:
+- [ ] 静态表选择器（≥2.5 且非编码嫌疑 <10 ∧ GI∈{45,70}，≥20 条）｜开始: ｜完成: ｜证据:
+- [ ] `tests/unit/gi-data.test.js`（含低碳水蛋清回归锚点）｜开始: ｜完成: ｜证据:
+
+## 验收（Spec §8）
+
+- [ ] `scripts/verify-dist.mjs`（DOM 解析断言，P5 前 ①~⑨ + ⑩ SKIPPED）｜开始: ｜完成: ｜证据:
+- [ ] T4 e2e 全绿（static + app 双 project，含 404 状态断言、?food= 深链）｜开始: ｜完成: ｜证据:
+- [ ] `npm run check` 全绿 ｜开始: ｜完成: ｜证据:
+- [ ] T5 Rich Results Test + Lighthouse mobile ≥70（人工）｜开始: ｜完成: ｜证据:
+- [ ] Spec §9 红线逐条自查 ｜开始: ｜完成: ｜证据:
+
+## P5 域名切换（阻塞于 P0 域名购买）
+
+- [!] Vercel 绑定 glucomath.com + VITE_SITE_ORIGIN 重 build ｜备注: 等 P0
+- [!] 旧域全路径重定向（断言 status ∈ {301,308}）｜备注: 等 P0
+- [!] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜备注: 等 P0
+- [!] GSC 新资源 + sitemap 提交 ｜备注: 等 P0
+- [!] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜备注: 等 P0
+
+## 已完成（本会话，规划阶段）
+
+- [x] GSC 基线报告 ｜完成: 2026-09-09 ｜证据: docs/2026-09-09-gsc-baseline.md
+- [x] Spec v2.0（综合全部 comment）｜完成: 2026-09-10 ｜证据: docs/2026-09-10-seo-spec-v2.md
+- [x] 品牌决策 GlucoMath + 域名预算方案（≤$10/年，Spaceship $3.94 首年）｜完成: 2026-09-11 ｜证据: Spec v2.0 §3 D0-2
+- [x] 执行 Spec v2.1（功能规格 §5A + SEO 实现规格 §5B）｜完成: 2026-09-12 ｜证据: docs 文件
+- [x] 对抗性复审 + 修复 4 Critical / 15 Important → Spec v2.2 ｜完成: 2026-09-12 ｜证据: docs/2026-09-12-execution-spec-v2.2.md 版本注记

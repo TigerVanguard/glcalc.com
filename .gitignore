@@ -25,3 +25,10 @@ yarn-error.log*
 .vscode
 dist
 .cache
+.gstack/
+
+# agent/browser session artifacts
+.playwright-mcp/
+.tmp-audit-*.png
+glcalc-mobile-*.png
+https___glcalc.vercel.app_-*.zip
