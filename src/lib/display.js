@@ -34,6 +34,21 @@ export function formatEag(raw) {
   return (Math.round(scaled) / 10).toFixed(1);
 }
 
+// Estimated-A1C range display (ticket 09, Spec §5A.2 estimator / §1 D4).
+// formulas.a1cRange already performs the ONE spec-mandated rounding inside
+// formulas.js (each endpoint half-up to 0.1%), so this helper only fixes the
+// decimals and joins with an en dash. The output is deliberately a RANGE
+// string — there is no single-point formatter for this tool, and e2e +
+// verify-dist assert the "≈ X.X% – Y.Y%" shape:
+//   a1cRange(126)     = {low: 5.5, high: 6.6} → "≈ 5.5% – 6.6%"
+//   a1cRange(126.126) = {low: 5.5, high: 6.6} → "≈ 5.5% – 6.6%"  (7.0 mmol/L)
+//   a1cRange(180.18)  = {low: 7.4, high: 8.5} → "≈ 7.4% – 8.5%"  (10.0 mmol/L;
+//     note 180 mg/dL gives 8.4 — the discriminator that mmol input really is
+//     converted before entering a1cRange, not display-rounded to 180)
+export function formatA1cRange(range) {
+  return `≈ ${range.low.toFixed(1)}% – ${range.high.toFixed(1)}%`;
+}
+
 // Shared input parsing for the numeric tools (converter / a1c-to-eag /
 // glucose-to-a1c / gmi). Three states per §5A.1-4:
 // - "empty":   placeholder only — never 0, never NaN;

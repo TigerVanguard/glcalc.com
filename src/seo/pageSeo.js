@@ -18,6 +18,7 @@ import { SITE_ORIGIN, BRAND } from "../site.config.js";
 import { GL_FAQS } from "../data/glFaq.js";
 import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
 import { A1C_TO_EAG_FAQS } from "../data/a1cToEagFaq.js";
+import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
 
 export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
 
@@ -93,6 +94,16 @@ const a1cToEagPage = toolPage(
 );
 a1cToEagPage.jsonLd.push(faqPage(A1C_TO_EAG_FAQS));
 
+const glucoseToA1cPage = toolPage(
+  "/glucose-to-a1c-estimator",
+  "Average Glucose to A1C Estimator",
+  "Average Glucose to A1C Estimator",
+  "Estimate an A1C range from your average blood glucose. Shows a range, not a single number, and explains why reverse estimation has built-in uncertainty.",
+);
+// Visible FAQ added by ticket 09 (src/data/glucoseToA1cFaq.js) → FAQPage
+// allowed per §5B.2-3.
+glucoseToA1cPage.jsonLd.push(faqPage(GLUCOSE_TO_A1C_FAQS));
+
 export const PAGE_SEO = {
   "/": {
     pageTitle: "Free Blood Sugar & Glycemic Calculators",
@@ -117,12 +128,7 @@ export const PAGE_SEO = {
   ),
   "/a1c-to-eag-calculator": a1cToEagPage,
   "/blood-sugar-converter": converterPage,
-  "/glucose-to-a1c-estimator": toolPage(
-    "/glucose-to-a1c-estimator",
-    "Average Glucose to A1C Estimator",
-    "Average Glucose to A1C Estimator",
-    "Estimate an A1C range from your average blood glucose. Shows a range, not a single number, and explains why reverse estimation has built-in uncertainty.",
-  ),
+  "/glucose-to-a1c-estimator": glucoseToA1cPage,
   "/about": {
     pageTitle: "About – Data Sources, Formulas & Disclaimer",
     description: ABOUT_DESCRIPTION,

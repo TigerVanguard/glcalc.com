@@ -113,6 +113,32 @@ test("a1c page shows formula, applicability limits, reference table, and FAQ wit
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });
 
+// Ticket 09 (Spec §8 T4-2 / T3-④ runtime mirror): the estimator's static
+// content — the backwards formula with its approximation framing, the
+// range-not-a-point explanation (SD 15.7 mg/dL → ≈ ±0.5%), and the FAQ — is
+// served in the prerendered HTML and usable with JavaScript disabled. The
+// prerendered result area must NOT contain any percentage value (empty input
+// → placeholder only; a static % would be a hardcoded single-point output).
+test("estimator page shows formula, approximation copy, and FAQ without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/glucose-to-a1c-estimator");
+  const main = page.locator("main");
+  await expect(main).toContainText("A1C (%) ≈ (eAG + 46.7) ÷ 28.7");
+  await expect(main).toContainText("15.7");
+  await expect(main).toContainText("algebraic");
+  await expect(main).toContainText("asymmetric");
+
+  const panelText = await page.locator(".estimator-panel").textContent();
+  expect(panelText).not.toMatch(/\d(\.\d+)?\s*%/);
+  expect(panelText).not.toContain("ADAG formula");
+
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(3);
+  await faqEntries.first().locator("summary").click();
+  await expect(faqEntries.first().locator("p")).toBeVisible();
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

@@ -7,8 +7,14 @@
 // format* output IS the display contract.
 
 import { describe, expect, it } from "vitest";
-import { eag, eagMmol, mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
-import { formatEag, formatMgdl, formatMmol, parsePositiveNumber } from "../../src/lib/display.js";
+import { a1cRange, eag, eagMmol, mgdlToMmol, mmolToMgdl } from "../../src/lib/formulas.js";
+import {
+  formatA1cRange,
+  formatEag,
+  formatMgdl,
+  formatMmol,
+  parsePositiveNumber,
+} from "../../src/lib/display.js";
 
 describe("formatMmol (1 decimal, half-up)", () => {
   it("renders mgdlToMmol(100) = 5.5500… as 5.6", () => {
@@ -64,6 +70,40 @@ describe("formatEag (1 decimal, half-up, float-noise snapped — ticket 08)", ()
     expect(formatEag(eag(6.0))).toBe("125.5");
     expect(formatEag(eagMmol(6.0))).toBe("7.0");
     expect(formatEag(154)).toBe("154.0");
+  });
+});
+
+describe("formatA1cRange (always a range, never a point — ticket 09)", () => {
+  it("renders the §8 T1 golden value: a1cRange(126) → ≈ 5.5% – 6.6%", () => {
+    // Center (126+46.7)/28.7 = 6.0174, half-width 15.7/28.7 = 0.5470 →
+    // [5.4703, 6.5644] → endpoints rounded 0.1% each.
+    expect(formatA1cRange(a1cRange(126))).toBe("≈ 5.5% – 6.6%");
+  });
+
+  it("renders the mmol/L golden value: 7.0 mmol/L = 126.126 mg/dL → same range", () => {
+    // Center (126.126+46.7)/28.7 = 6.0218 → [5.4748, 6.5689] → 5.5 / 6.6.
+    expect(formatA1cRange(a1cRange(mmolToMgdl(7.0)))).toBe("≈ 5.5% – 6.6%");
+  });
+
+  it("discriminates 10.0 mmol/L (180.18 mg/dL → high 8.5) from plain 180 mg/dL (high 8.4)", () => {
+    // Proves mmol input must flow through mmolToMgdl BEFORE a1cRange: if a
+    // page display-rounded 10.0 mmol/L to 180 mg/dL first, the high endpoint
+    // would come out 8.4 instead of 8.5 (center 7.9052 vs 7.8990).
+    expect(formatA1cRange(a1cRange(mmolToMgdl(10.0)))).toBe("≈ 7.4% – 8.5%");
+    expect(formatA1cRange(a1cRange(180))).toBe("≈ 7.4% – 8.4%");
+  });
+
+  it("still renders a range below the ADAG window (50 mg/dL, outOfRange)", () => {
+    // Center (50+46.7)/28.7 = 3.3693 → [2.8223, 3.9164] → 2.8 / 3.9.
+    const range = a1cRange(50);
+    expect(range.outOfRange).toBe(true);
+    expect(formatA1cRange(range)).toBe("≈ 2.8% – 3.9%");
+  });
+
+  it("always matches the range shape and pads endpoints to one decimal", () => {
+    for (const mgdl of [50, 68.1, 100, 126, 154, 180, 240.3, 300]) {
+      expect(formatA1cRange(a1cRange(mgdl))).toMatch(/^≈ \d+\.\d% – \d+\.\d%$/);
+    }
   });
 });
 

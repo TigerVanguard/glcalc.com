@@ -5,7 +5,10 @@
 // ⑦ the 5-item footer disclaimer; extended in ticket 07 with the ④ converter
 // row: "18.018" formula string + static reference table content; extended in
 // ticket 08 with the ④ a1c-to-eag row: "28.7"/"Nathan" + static ADA table +
-// the D4 negative scan of the calculator panel).
+// the D4 negative scan of the calculator panel; extended in ticket 09 with the
+// ④ estimator row: "28.7" + backwards formula + approximation copy, plus the
+// negative scans — no prerendered single-point %, no "ADAG formula" label on
+// the backwards equation, no diagnostic verdicts in the panel).
 //
 // Still out of scope (later tickets): ④ formula strings for the other tool
 // pages, ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
@@ -84,8 +87,9 @@ const PAGES = [
     pageTitle: "Average Glucose to A1C Estimator",
     description:
       "Estimate an A1C range from your average blood glucose. Shows a range, not a single number, and explains why reverse estimation has built-in uncertainty.",
-    jsonLdTypes: ["WebApplication"],
+    jsonLdTypes: ["FAQPage", "WebApplication"],
     webAppName: "Average Glucose to A1C Estimator",
+    hasFaq: true,
   },
   {
     route: "/about",
@@ -376,6 +380,67 @@ for (const page of PAGES) {
     }
   }
 
+  // T3-④ (ticket 09 — glucose→A1C estimator row): the backwards formula +
+  // approximation copy must be prerendered, and three red lines must hold
+  // statically: ① the result area never carries a single-point percentage
+  // (prerendered input is empty, so ANY percentage in the panel would be a
+  // hardcoded point output — the range shape itself is asserted at runtime in
+  // tests/e2e/estimator.spec.js); ② the phrase "ADAG formula" is reserved for
+  // the related-tools link pointing at the forward-direction page and may not
+  // label the backwards equation; ③ no diagnostic verdicts in the panel
+  // (this page has no educational band table at all, per ticket 09).
+  if (route === "/glucose-to-a1c-estimator") {
+    const bodyText = root.querySelector("body")?.text ?? "";
+    check(bodyText.includes("28.7"), 'T3-④ estimator page body contains formula string "28.7"');
+    check(
+      bodyText.includes("(eAG + 46.7) ÷ 28.7"),
+      'T3-④ estimator page shows the backwards formula "(eAG + 46.7) ÷ 28.7"',
+    );
+    check(bodyText.includes("15.7"), "T3-④ estimator page states the ADAG error SD (15.7 mg/dL)");
+    check(
+      bodyText.toLowerCase().includes("algebraic"),
+      'T3-④ estimator page carries the approximation copy ("algebraic")',
+    );
+    check(
+      bodyText.toLowerCase().includes("asymmetric"),
+      'T3-④ estimator page explains regression asymmetry ("asymmetric")',
+    );
+
+    const panels = root.querySelectorAll(".estimator-panel");
+    check(panels.length === 1, `T3-④ exactly one .estimator-panel (found ${panels.length})`);
+    const panel = panels[0];
+    const panelText = panel?.text ?? "";
+    check(
+      (panel?.querySelectorAll(".result-card") ?? []).length === 1,
+      "T3-④ estimator panel has exactly one result card (a single RANGE card, no point cards)",
+    );
+    check(
+      !/\d(\.\d+)?\s*%/.test(panelText),
+      "T3-④ no percentage value prerendered in the estimator panel (no single-point output)",
+    );
+    for (const verdict of ["normal", "prediabetes", "diabetes"]) {
+      check(
+        !panelText.toLowerCase().includes(verdict),
+        `T3-④ D4: estimator panel contains no "${verdict}"`,
+      );
+    }
+
+    check(
+      !panelText.includes("ADAG formula"),
+      'T3-④ estimator panel never labels the backwards equation "ADAG formula"',
+    );
+    const related = root.querySelector(".related-tools");
+    const countAdagFormula = (s) => s.split("ADAG formula").length - 1;
+    check(
+      countAdagFormula(bodyText) === countAdagFormula(related?.text ?? ""),
+      '"ADAG formula" appears ONLY inside the related-tools context (forward-direction link)',
+    );
+    check(
+      (related?.querySelectorAll('a[href="/a1c-to-eag-calculator"]') ?? []).length >= 1,
+      'the related-tools "ADAG formula" context links to /a1c-to-eag-calculator',
+    );
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -475,5 +540,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );
