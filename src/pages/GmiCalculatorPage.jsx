@@ -44,8 +44,8 @@ export default function GmiCalculatorPage() {
 
   // Sanity window, NOT a validity gate: CGM sensors report roughly
   // 40–400 mg/dL (Dexcom and Libre both cap near 400), so a true CGM AVERAGE
-  // outside that window cannot come from real sensor data. The ticket allows
-  // any reasonable threshold ("~>600 warn, don't block"); the sensor
+  // outside that window cannot come from real sensor data. The spec leaves the
+  // threshold to implementer judgment (warn, don't block); the sensor
   // reporting range is the tightest defensible one, and the warning never
   // blocks the result.
   const outOfSensorRange =

@@ -765,6 +765,13 @@ h3 {
   border-color: rgba(171, 70, 60, 0.16);
 }
 
+/* Ticket 11: neutral pill for "GI: N/A" search results (§6.1 display rule). */
+.pill--na {
+  color: var(--muted);
+  background: rgba(90, 90, 90, 0.08);
+  border-color: rgba(90, 90, 90, 0.14);
+}
+
 .notice {
   background: rgba(250, 246, 238, 0.92);
   color: var(--muted);

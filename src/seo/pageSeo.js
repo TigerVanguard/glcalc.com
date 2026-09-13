@@ -20,6 +20,7 @@ import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
 import { A1C_TO_EAG_FAQS } from "../data/a1cToEagFaq.js";
 import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
 import { GMI_FAQS } from "../data/gmiFaq.js";
+import { GI_FAQS } from "../data/giFaq.js";
 
 export const OG_IMAGE_URL = `${SITE_ORIGIN}/og-cover.png`;
 
@@ -105,6 +106,16 @@ const glucoseToA1cPage = toolPage(
 // allowed per §5B.2-3.
 glucoseToA1cPage.jsonLd.push(faqPage(GLUCOSE_TO_A1C_FAQS));
 
+const giPage = toolPage(
+  "/glycemic-index-calculator",
+  "Glycemic Index Calculator – Look Up Food GI",
+  "Glycemic Index Calculator",
+  "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
+);
+// Visible FAQ added by ticket 11 (src/data/giFaq.js) → FAQPage allowed per
+// §5B.2-3.
+giPage.jsonLd.push(faqPage(GI_FAQS));
+
 const gmiPage = toolPage(
   "/gmi-calculator",
   "GMI Calculator – Glucose Management Indicator",
@@ -125,12 +136,7 @@ export const PAGE_SEO = {
     ],
   },
   "/glycemic-load-calculator": glPage,
-  "/glycemic-index-calculator": toolPage(
-    "/glycemic-index-calculator",
-    "Glycemic Index Calculator – Look Up Food GI",
-    "Glycemic Index Calculator",
-    "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
-  ),
+  "/glycemic-index-calculator": giPage,
   "/gmi-calculator": gmiPage,
   "/a1c-to-eag-calculator": a1cToEagPage,
   "/blood-sugar-converter": converterPage,

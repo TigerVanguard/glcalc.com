@@ -10,7 +10,10 @@
 // negative scans — no prerendered single-point %, no "ADAG formula" label on
 // the backwards equation, no diagnostic verdicts in the panel; extended in
 // ticket 10 with the ④ gmi row: "0.02392"/"Bergenstal" + the ±0.5 difference
-// explainer + the .gmi-panel negative scans).
+// explainer + the .gmi-panel negative scans; extended in ticket 11 with the
+// ④ gi row: static table exactly 27 rows + two hardcoded spot checks + honest
+// provenance keywords + no "N/A" inside the table, and the FAQPage whitelist
+// gains the gi page).
 //
 // Still out of scope (later tickets): ④ GL formula string on the GL page,
 // ⑨'s positive /about assertions (DiOGenes/MIT — /about is ticket 13).
@@ -55,8 +58,9 @@ const PAGES = [
     pageTitle: "Glycemic Index Calculator – Look Up Food GI",
     description:
       "Look up the glycemic index of common foods and see low, medium, or high GI at a glance. Includes carbs per 100 g and a direct link to calculate glycemic load.",
-    jsonLdTypes: ["WebApplication"],
+    jsonLdTypes: ["FAQPage", "WebApplication"],
     webAppName: "Glycemic Index Calculator",
+    hasFaq: true,
   },
   {
     route: "/gmi-calculator",
@@ -482,6 +486,59 @@ for (const page of PAGES) {
     }
   }
 
+  // T3-④ (ticket 11 — GI lookup row): the static reference table must hold
+  // EXACTLY the 27 fixed, eligibility-checked foods (Spec §6.2 via
+  // giData.selectStaticTable — a shrunken table means the selector silently
+  // failed), spot-checked against two known gi.json values hardcoded HERE
+  // (independent of src/lib/giData.js, so a data/selector bug cannot
+  // self-certify). The honest provenance note (category-level DiOGenes
+  // assignments, not individually measured) must be prerendered, and the §6.1
+  // N/A display string must NEVER appear inside the static table — every row
+  // in it is an eligible, measurable-carbs entry by construction. The GI vs GL
+  // section is this page's mandated §5 content.
+  if (route === "/glycemic-index-calculator") {
+    const tables = root.querySelectorAll(".gi-static-table");
+    check(tables.length === 1, `T3-④ exactly one .gi-static-table (found ${tables.length})`);
+    const rows = tables[0]?.querySelectorAll("tbody tr") ?? [];
+    check(rows.length === 27, `T3-④ GI static table has exactly 27 rows (found ${rows.length})`);
+    const rowCells = rows.map((tr) =>
+      tr.querySelectorAll("th,td").map((cell) => cell.text.trim()),
+    );
+    // Spot checks: [name, gi, band, carbs_per_100g] straight from gi.json.
+    const expectedRows = [
+      ["Rye bread", "89", "High", "47"],
+      ["Apple", "38", "Low", "11.1"],
+    ];
+    for (const [name, gi, band, carbs] of expectedRows) {
+      check(
+        rowCells.some(
+          (cells) => cells[0] === name && cells[1] === gi && cells[2] === band && cells[3] === carbs,
+        ),
+        `T3-④ GI static table row: ${name} → GI ${gi} / ${band} / ${carbs} g carbs`,
+      );
+    }
+    const tableText = tables[0]?.text ?? "";
+    check(
+      !tableText.includes("N/A"),
+      "T3-④ §6.1 N/A display string never appears inside the static table",
+    );
+
+    const bodyText = root.querySelector("body")?.text ?? "";
+    check(bodyText.includes("DiOGenes"), 'T3-④ gi page names the data source "DiOGenes"');
+    check(
+      bodyText.includes("category-level"),
+      'T3-④ gi page carries the provenance copy ("category-level" assignments)',
+    );
+    check(
+      bodyText.includes("not individually measured"),
+      'T3-④ gi page states values are "not individually measured"',
+    );
+    check(
+      bodyText.includes("Glycemic index vs glycemic load"),
+      "T3-④ gi page carries the GI vs GL difference section",
+    );
+  }
+
   // T3-⑦ (ticket 06): unified 5-item footer disclaimer on all 8 pages
   // (Spec §7 template) — ①②③⑤ literal, ④ by date regex.
   const footers = root.querySelectorAll(".tool-footer");
@@ -581,5 +638,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi)⑤⑥⑦⑧⑨ + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
 );

@@ -164,6 +164,40 @@ test("gmi page shows formula, difference copy, and FAQ without JavaScript", asyn
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });
 
+// Ticket 11 (Spec §8 T4-2 / T3-④ runtime mirror): the GI page's static
+// content — the 27-row reference table from giData.selectStaticTable, the
+// honest provenance note (category-level DiOGenes assignments, not
+// individually measured), the GI vs GL section, and the FAQ — is served in
+// the prerendered HTML with JavaScript disabled. The prerendered result panel
+// must show only the placeholder (no selection can exist without JS), and the
+// static table must never contain the §6.1 "N/A" display string (every row is
+// an eligible measurable-carbs entry).
+test("gi page shows static table, provenance note, GI vs GL copy, and FAQ without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/glycemic-index-calculator");
+  const main = page.locator("main");
+
+  const rows = page.locator(".gi-static-table tbody tr");
+  await expect(rows).toHaveCount(27);
+  const table = page.locator(".gi-static-table");
+  await expect(table).toContainText("Rye bread");
+  await expect(table).toContainText("89");
+  expect(await table.textContent()).not.toContain("N/A");
+
+  await expect(main).toContainText("DiOGenes");
+  await expect(main).toContainText("category-level");
+  await expect(main).toContainText("not individually measured");
+  await expect(main).toContainText("Glycemic index vs glycemic load");
+
+  await expect(page.locator(".gi-result-panel .result-card__placeholder")).toBeVisible();
+
+  const faqEntries = page.locator(".faq-list details");
+  await expect(faqEntries).toHaveCount(4);
+  await faqEntries.first().locator("summary").click();
+  await expect(faqEntries.first().locator("p")).toBeVisible();
+});
+
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
   const response = await request.get("/no-such-page");
   expect(response.status()).toBe(404);

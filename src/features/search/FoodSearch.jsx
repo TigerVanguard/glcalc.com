@@ -15,7 +15,18 @@ function normalizeQuery(value) {
   return value.trim().toLowerCase();
 }
 
-export default function FoodSearch({ onSelectSelection }) {
+// Default result pill — the GL page's historical rendering, byte-for-byte
+// (app.spec.js asserts accessible names like "Blueberries GI 45 - Low").
+// Ticket 11 made it overridable so the GI lookup page can apply the §6.1
+// display rule (giData.giDisplayRule) to its own result list without touching
+// this default or the worker. A null return renders no pill.
+function defaultResultPill(result) {
+  const label = getGiLabel(Number(result.gi));
+
+  return { text: `GI ${result.gi} - ${label}`, tone: label.toLowerCase() };
+}
+
+export default function FoodSearch({ onSelectSelection, resultPill = defaultResultPill }) {
   const workerRef = useRef(null);
   const latestRequestIdRef = useRef(0);
   const latestQueryRef = useRef("");
@@ -104,20 +115,24 @@ export default function FoodSearch({ onSelectSelection }) {
 
       {results.length > 0 ? (
         <ul className="search-results" aria-label="Food search results">
-          {results.map((result) => (
-            <li key={result.title}>
-              <button
-                type="button"
-                className="search-result"
-                onClick={() => handlePick(result)}
-              >
-                <span className="search-result__title">{result.title}</span>
-                <span className={`pill pill--${getGiLabel(Number(result.gi)).toLowerCase()}`}>
-                  GI {result.gi} - {getGiLabel(Number(result.gi))}
-                </span>
-              </button>
-            </li>
-          ))}
+          {results.map((result) => {
+            const pill = resultPill(result);
+
+            return (
+              <li key={result.title}>
+                <button
+                  type="button"
+                  className="search-result"
+                  onClick={() => handlePick(result)}
+                >
+                  <span className="search-result__title">{result.title}</span>
+                  {pill ? (
+                    <span className={`pill pill--${pill.tone}`}>{pill.text}</span>
+                  ) : null}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
     </section>
