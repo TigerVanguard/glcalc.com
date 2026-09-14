@@ -1,4 +1,5 @@
 {
+  "installCommand": "npm install && npx playwright install chromium --only-shell",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
