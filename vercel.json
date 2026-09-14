@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm install && npx playwright install chromium --only-shell",
+  "installCommand": "yum install -y nss nspr dbus-libs atk at-spi2-atk cups-libs libdrm libxkbcommon libXcomposite libXdamage libXfixes libXrandr mesa-libgbm alsa-lib pango expat && npm install && npx playwright install chromium --only-shell",
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
