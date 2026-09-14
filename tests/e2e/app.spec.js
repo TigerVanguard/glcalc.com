@@ -62,7 +62,7 @@ test("loads the app shell", async ({ page }) => {
 
   // Title = §5B.1 final copy (ticket 04 head layer): the pre-rebuild hardcoded
   // index.html title no longer exists. Still an exact-match assertion.
-  await expect(page).toHaveTitle("Glycemic Load Calculator – GL by Food & Serving | GL Calc");
+  await expect(page).toHaveTitle("Glycemic Load Calculator – GL by Food & Serving | GlucoMath");
   await expect(page.getByRole("heading", { name: "Glycemic Load Calculator", exact: true })).toBeVisible();
   const startCta = page.locator(".hero__cta");
   await expect(startCta).toBeVisible();

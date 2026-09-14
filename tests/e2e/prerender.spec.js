@@ -4,7 +4,7 @@
 
 import { test, expect } from "@playwright/test";
 
-const BRAND = process.env.VITE_BRAND ?? "GL Calc";
+const BRAND = process.env.VITE_BRAND ?? "GlucoMath";
 
 const ROUTES = [
   { path: "/", h1: "Free Blood Sugar & Glycemic Calculators" },

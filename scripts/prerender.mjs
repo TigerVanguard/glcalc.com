@@ -18,10 +18,9 @@ import { chromium } from "@playwright/test";
 import { createDistServer } from "./serve-dist.mjs";
 
 const DIST = join(process.cwd(), "dist");
-const BRAND = process.env.VITE_BRAND || "GL Calc";
-// Node-side mirror of src/site.config.js (that module uses import.meta.env and
-// cannot be imported here); same env var, same default.
-const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glcalc.vercel.app";
+const BRAND = process.env.VITE_BRAND || "GlucoMath";
+// Node-side mirror of src/site.config.js; same env var, same default.
+const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glucomath.com";
 
 const ROUTES = [
   { path: "/", label: "Home", h1: "Free Blood Sugar & Glycemic Calculators" },

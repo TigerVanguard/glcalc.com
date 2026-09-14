@@ -7,8 +7,8 @@
 
 import { test, expect } from "@playwright/test";
 
-const BRAND = process.env.VITE_BRAND ?? "GL Calc";
-const ORIGIN = process.env.VITE_SITE_ORIGIN ?? "https://glcalc.vercel.app";
+const BRAND = process.env.VITE_BRAND ?? "GlucoMath";
+const ORIGIN = process.env.VITE_SITE_ORIGIN ?? "https://glucomath.com";
 
 const ALL_ROUTES = [
   "/",

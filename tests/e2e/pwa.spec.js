@@ -1,4 +1,7 @@
 import { test, expect } from "@playwright/test";
+// Brand assertions read the site constant (Spec §4 P5-3): a future rename only
+// touches src/site.config.js + the static assets, never this spec.
+import { BRAND } from "../../src/site.config.js";
 
 test("exposes installable PWA metadata and icon assets", async ({ page, request }) => {
   await page.goto("/");
@@ -13,7 +16,7 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   await expect(appleCapable).toHaveAttribute("content", "yes");
 
   const appleTitle = page.locator('meta[name="apple-mobile-web-app-title"]');
-  await expect(appleTitle).toHaveAttribute("content", "GL Calc");
+  await expect(appleTitle).toHaveAttribute("content", BRAND);
 
   const appleTouchIcon = page.locator('link[rel="apple-touch-icon"]');
   await expect(appleTouchIcon).toHaveAttribute("href", "/icons/apple-touch-icon.png");
@@ -22,8 +25,8 @@ test("exposes installable PWA metadata and icon assets", async ({ page, request 
   expect(manifest.ok()).toBeTruthy();
 
   const manifestJson = await manifest.json();
-  expect(manifestJson.name).toBe("Glycemic Load Calculator");
-  expect(manifestJson.short_name).toBe("GL Calc");
+  expect(manifestJson.name).toBe(BRAND);
+  expect(manifestJson.short_name).toBe(BRAND);
   expect(manifestJson.theme_color).toBe("#f4f0e5");
   expect(manifestJson.background_color).toBe("#f4f0e5");
   expect(manifestJson.icons).toEqual(

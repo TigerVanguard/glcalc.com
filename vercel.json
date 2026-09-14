@@ -1,4 +1,12 @@
 {
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "glcalc.vercel.app" }],
+      "destination": "https://glucomath.com/$1",
+      "permanent": true
+    }
+  ]
 }

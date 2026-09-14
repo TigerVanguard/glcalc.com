@@ -21,21 +21,26 @@
 // provenance, formula citations (Nathan/Bergenstal), MIT upstream attribution
 // (assafmo repo link), GitHub Issues contact link (visible + Organization
 // contactPoint), and the Atkinson 2021 upgrade-path mention. The ⑨ negative
-// scans (no "Harvard" / no "works offline", site-wide) are unchanged.
+// scans (no "Harvard" / no "works offline", site-wide) are unchanged; extended
+// in ticket 15 (P5 domain cutover) with the ⑩ dist-wide old-domain zero-hit
+// scan (replacing the pre-P5 SKIPPED marker) and the vercel.json
+// host-conditional old-domain redirect invariant.
 //
 // The §5B.1 title/description copy below is intentionally HARDCODED here
 // (independent of src/seo/pageSeo.js): if both sides imported one module, a
 // typo in that module would self-certify. Assertions use a DOM parser
 // (node-html-parser), never grep line counts.
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import { parse } from "node-html-parser";
 
 const DIST = join(process.cwd(), "dist");
-const BRAND = process.env.VITE_BRAND || "GL Calc";
-const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glcalc.vercel.app";
+// Independent hardcodes (NOT imported from src/site.config.js — see above):
+// same env vars, same defaults, so a build-time override stays consistent.
+const BRAND = process.env.VITE_BRAND || "GlucoMath";
+const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glucomath.com";
 
 // §5B.1 final copy, verbatim (title = `${pageTitle} | ${BRAND}`), plus the
 // §5B.2 JSON-LD distribution per page (webAppName = page H1; hasFaq = page has
@@ -672,10 +677,40 @@ for (const page of PAGES) {
   );
 }
 
-// T3-⑩ — enabled only after P5 (domain switch): dist-wide grep for
-// "glcalc.vercel.app" zero hits. Before P5 the origin legitimately IS
-// glcalc.vercel.app, so:
-console.log("[verify-dist] T3-⑩ glcalc.vercel.app zero-hit scan: SKIPPED (P5 前)");
+// T3-⑩ — enabled by P5 (ticket 15, domain switch): recursive dist-wide scan
+// for the OLD deployment domain "glcalc.vercel.app" — zero hits allowed
+// (github.com/*/glcalc.com repo links are a different string and untouched by
+// this scan; red line 8 upstream attribution stays intact). Conditionally
+// enabled: if a build is ever pinned back to a *.vercel.app origin via
+// VITE_SITE_ORIGIN, the origin legitimately IS glcalc.vercel.app and the scan
+// is skipped. The companion GA4 no-hostname-gate assertion runs per page
+// above, unconditionally.
+console.log("[verify-dist] T3-⑩ old-domain (glcalc.vercel.app) zero-hit scan");
+let t10Status;
+if (SITE_ORIGIN.includes("vercel.app")) {
+  t10Status = "SKIPPED (SITE_ORIGIN still on vercel.app)";
+  console.log(`  ${t10Status}`);
+} else {
+  const oldDomainHits = [];
+  async function scanForOldDomain(dir) {
+    for (const entry of await readdir(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await scanForOldDomain(full);
+      } else if ((await readFile(full)).includes("glcalc.vercel.app")) {
+        oldDomainHits.push(relative(DIST, full));
+      }
+    }
+  }
+  await scanForOldDomain(DIST);
+  check(
+    oldDomainHits.length === 0,
+    `T3-⑩ "glcalc.vercel.app" has zero hits across all dist/ files${
+      oldDomainHits.length ? ` (hits: ${oldDomainHits.join(", ")})` : ""
+    }`,
+  );
+  t10Status = oldDomainHits.length === 0 ? "PASS" : "FAIL";
+}
 
 console.log("[verify-dist] dist/sitemap.xml");
 const sitemapFile = join(DIST, "sitemap.xml");
@@ -731,6 +766,19 @@ if (vercelExists) {
   check(vercel.cleanUrls === true, "cleanUrls is true");
   check(vercel.trailingSlash === false, "trailingSlash is false");
   check(!vercel.rewrites && !vercel.routes, "no rewrites/routes (catch-all rewrite forbidden)");
+  // P5 (ticket 15): the old deployment domain must 308 every path to the new
+  // origin. Host-conditional redirect (NOT a rewrite), values hardcoded here.
+  const hostRedirect = (vercel.redirects ?? []).find(
+    (r) =>
+      r.source === "/(.*)" &&
+      r.destination === "https://glucomath.com/$1" &&
+      r.permanent === true &&
+      (r.has ?? []).some((c) => c.type === "host" && c.value === "glcalc.vercel.app"),
+  );
+  check(
+    Boolean(hostRedirect),
+    "host-conditional permanent redirect glcalc.vercel.app/(.*) → https://glucomath.com/$1 present",
+  );
 }
 
 if (failures > 0) {
@@ -738,5 +786,5 @@ if (failures > 0) {
   process.exit(1);
 }
 console.log(
-  "[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨(incl. /about positives) + sitemap/robots/404/vercel; ⑩ SKIPPED pre-P5).",
+  `[verify-dist] all assertions passed (T3 ①②③④(converter+a1c+estimator+gmi+gi+gl)⑤⑥⑦⑧⑨(incl. /about positives)⑩(${t10Status}) + sitemap/robots/404/vercel).`,
 );

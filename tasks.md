@@ -8,7 +8,7 @@
 
 ## P0 人类依赖（Agent 无法代办，只登记状态）
 
-- [!] 购买 glucomath.com（Spaceship；溢价则备选 glucoconvert → glycocalc → a1cmate）｜备注: 等站长确认，不阻塞 P1~P4
+- [x] 购买 glucomath.com（Spaceship）｜完成: 2026-09-14 ｜证据: 站长截图确认——1 年注册 + Auto-renew On + 免费隐私，首年 $8.88，续费价 $9.98/年（≤$10 预算达标）
 - [!] GSC 域名验证 DNS TXT ｜备注: 等站长
 - [!] 提供维护者署名与联系方式 ｜备注: 未提供时用兜底串 "Maintained by the {BRAND} project"
 
@@ -72,11 +72,12 @@
 
 ## P5 域名切换（阻塞于 P0 域名购买）
 
-- [!] Vercel 绑定 glucomath.com + VITE_SITE_ORIGIN 重 build ｜备注: 等 P0
-- [!] 旧域全路径重定向（断言 status ∈ {301,308}）｜备注: 等 P0
-- [!] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜备注: 等 P0
-- [!] GSC 新资源 + sitemap 提交 ｜备注: 等 P0
-- [!] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜备注: 等 P0
+- [x] ticket 15 代码侧：品牌/域名切换（BRAND+SITE_ORIGIN 默认值、manifest、og-cover、pwa.spec、旧域重定向、verify-dist ⑩）｜开始: 2026-09-14 06:50 ｜完成: 2026-09-14 07:00 ｜证据: `npm run check` 全绿（.scratch/ticket15-check.log）：unit 7 文件 74/74 → build+prerender 8 路由（canonical/sitemap/og:url/og:image 全 glucomath.com）→ verify-dist 全 PASS 含 **⑩ 从 SKIPPED 变 PASS**（dist 递归全文件 grep glcalc.vercel.app 零命中，独立 rg 复核 exit 1 无匹配；新增 vercel.json host 条件重定向断言 PASS）→ e2e 90/90（pwa.spec 品牌断言改 import site.config BRAND，Node 侧经 `import.meta.env ?? process.env` 回退可加载）。site.config 默认翻转 GlucoMath/https://glucomath.com（env 覆盖保留）；prerender/verify-dist/seo.spec/prerender.spec 同步默认（verify-dist 保持独立硬编码不 import）；manifest name/short_name + index.html application-name/apple-mobile-web-app-title = GlucoMath；og-cover.png 重制（1200×630 图内 GlucoMath）；vercel.json redirects: host=glcalc.vercel.app source /(.*) → https://glucomath.com/$1 permanent（非 rewrite，红线不触）；public/robots+sitemap 源文件域名同步（build 时被 prerender 重写，仅防混淆）；README 部署 URL 换新域（assafmo/TigerVanguard github 链接零改动，红线 8）。未 commit（编排者统一提交）
+- [!] Vercel 绑定 glucomath.com + 生产部署 ｜备注: 站长操作（域名已购），见下方手动清单
+- [!] 旧域全路径重定向（断言 status ∈ {301,308}）｜备注: vercel.json host 条件 308 配置已就绪（ticket 15）；线上抽查 ≥3 路径待站长绑定域名并部署后执行
+- [x] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜完成: 2026-09-14 07:00 ｜证据: ticket 15 代码侧条目
+- [!] GSC 新资源 + sitemap 提交 ｜备注: 等站长（DNS TXT 验证）
+- [x] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜完成: 2026-09-14 07:00 ｜证据: 条件启用（SITE_ORIGIN 含 vercel.app 时 SKIPPED），默认构建 PASS，见 ticket 15 条目
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 

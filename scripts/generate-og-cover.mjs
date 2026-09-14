@@ -11,7 +11,7 @@
 import { join } from "node:path";
 import { chromium } from "@playwright/test";
 
-const BRAND = process.env.VITE_BRAND || "GL Calc";
+const BRAND = process.env.VITE_BRAND || "GlucoMath";
 const OUT = join(process.cwd(), "public", "og-cover.png");
 
 // System serif stack: hermetic (no webfont fetch), close to the site's
