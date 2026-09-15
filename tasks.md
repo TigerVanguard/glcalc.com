@@ -9,7 +9,7 @@
 ## P0 人类依赖（Agent 无法代办，只登记状态）
 
 - [x] 购买 glucomath.com（Spaceship）｜完成: 2026-09-14 ｜证据: 站长截图确认——1 年注册 + Auto-renew On + 免费隐私，首年 $8.88，续费价 $9.98/年（≤$10 预算达标）
-- [!] GSC 域名验证 DNS TXT ｜备注: 等站长
+- [x] GSC 域名验证 DNS TXT ｜完成: 2026-09-15 ｜证据: 站长确认 glucomath.com 资源已验证并完成 sitemap 提交（"GSC 完成"）
 - [!] 提供维护者署名与联系方式 ｜备注: 未提供时用兜底串 "Maintained by the {BRAND} project"
 
 ## T0 测试基建改造（先于一切开发任务，Spec §8 T0）
@@ -77,12 +77,12 @@
 - [x] ticket 15 部署侧：修复 Vercel 生产构建失败 ｜开始: 2026-09-14 07:45 ｜完成: 2026-09-14 08:20 ｜证据: 共 4 次修复迭代（≤5 循环上限内）：①`.npmrc` legacy-peer-deps=true（26bf9f0）；②installCommand 装 Playwright headless shell（26bf9f0）；③删除遗留 yarn.lock 强制 npm（a4883cf）；④**根因**（站长贴出 Build Logs）：Vercel 构建机（Amazon Linux）缺 Chromium 系统库 `libnspr4.so`，chrome-headless-shell 启动即崩 exit 127 → installCommand 前置 `yum install -y nss nspr dbus-libs atk at-spi2-atk cups-libs libdrm libxkbcommon libXcomposite libXdamage libXfixes libXrandr mesa-libgbm alsa-lib pango expat`（695f56f）。推送后构建成功，线上全量验收 PASS（见下条）
 - [x] 旧域全路径重定向（断言 status ∈ {301,308}）｜完成: 2026-09-14 08:22 ｜证据: 线上实测 3 路径全 308 且保路径：`glcalc.vercel.app/` → `glucomath.com/`；`/a1c-to-eag-calculator` → 同路径；`/glycemic-index-calculator` → 同路径
 - [x] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜完成: 2026-09-14 07:00 ｜证据: ticket 15 代码侧条目
-- [!] GSC 新资源 + sitemap 提交 ｜备注: 等站长（DNS TXT 验证）
+- [x] GSC 新资源 + sitemap 提交 ｜完成: 2026-09-15 ｜证据: 站长确认提交 https://glucomath.com/sitemap.xml + 8 URL 请求编入索引（"GSC 完成"）。P5 全部关闭
 - [x] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜完成: 2026-09-14 07:00 ｜证据: 条件启用（SITE_ORIGIN 含 vercel.app 时 SKIPPED），默认构建 PASS，见 ticket 15 条目
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
-- [!] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 阻塞于上线（P0 域名/GSC 验证 + P5 切换，ticket 17 启动）
+- [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 2026-09-15 解除阻塞（P5 关闭，ticket 17 启动）；首次导出建议 2026-09-22 起（GSC 数据延迟约 2 天）
 - [ ] 第 2 个月门槛：索引报告 ≥5 页 ｜备注: 未达标须回查预渲染/内链
 - [ ] 第 3 个月门槛：平均排名 ≤35 且季度展示 ≥2,000 ｜备注:
 - [ ] 第 6 个月门槛：季度 clicks ≥40 ｜备注:
