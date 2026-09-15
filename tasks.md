@@ -77,7 +77,7 @@
 - [x] ticket 15 部署侧：修复 Vercel 生产构建失败 ｜开始: 2026-09-14 07:45 ｜完成: 2026-09-14 08:20 ｜证据: 共 4 次修复迭代（≤5 循环上限内）：①`.npmrc` legacy-peer-deps=true（26bf9f0）；②installCommand 装 Playwright headless shell（26bf9f0）；③删除遗留 yarn.lock 强制 npm（a4883cf）；④**根因**（站长贴出 Build Logs）：Vercel 构建机（Amazon Linux）缺 Chromium 系统库 `libnspr4.so`，chrome-headless-shell 启动即崩 exit 127 → installCommand 前置 `yum install -y nss nspr dbus-libs atk at-spi2-atk cups-libs libdrm libxkbcommon libXcomposite libXdamage libXfixes libXrandr mesa-libgbm alsa-lib pango expat`（695f56f）。推送后构建成功，线上全量验收 PASS（见下条）
 - [x] 旧域全路径重定向（断言 status ∈ {301,308}）｜完成: 2026-09-14 08:22 ｜证据: 线上实测 3 路径全 308 且保路径：`glcalc.vercel.app/` → `glucomath.com/`；`/a1c-to-eag-calculator` → 同路径；`/glycemic-index-calculator` → 同路径
 - [x] 品牌名切换（BRAND + manifest + pwa.spec.js 断言 + og-cover 重制）｜完成: 2026-09-14 07:00 ｜证据: ticket 15 代码侧条目
-- [x] GSC 新资源 + sitemap 提交 ｜完成: 2026-09-15 ｜证据: 站长确认提交 https://glucomath.com/sitemap.xml + 8 URL 请求编入索引（"GSC 完成"）。P5 全部关闭
+- [x] GSC 新资源 + sitemap 提交 ｜完成: 2026-09-15 ｜证据: 站长确认提交 https://glucomath.com/sitemap.xml + 7/8 URL 请求编入索引（/about 遇当日配额限制，2026-09-16 补交；已在 sitemap 内，不阻塞）。P5 全部关闭
 - [x] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜完成: 2026-09-14 07:00 ｜证据: 条件启用（SITE_ORIGIN 含 vercel.app 时 SKIPPED），默认构建 PASS，见 ticket 15 条目
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
