@@ -80,6 +80,10 @@
 - [x] GSC 新资源 + sitemap 提交 ｜完成: 2026-09-15 ｜证据: 站长确认提交 https://glucomath.com/sitemap.xml + 7/8 URL 请求编入索引（/about 遇当日配额限制，2026-09-16 补交；已在 sitemap 内，不阻塞）。P5 全部关闭
 - [x] verify-dist ⑩ 启用（glcalc.vercel.app 零命中）｜完成: 2026-09-14 07:00 ｜证据: 条件启用（SITE_ORIGIN 含 vercel.app 时 SKIPPED），默认构建 PASS，见 ticket 15 条目
 
+## 上线后追加任务
+
+- [~] index.html 加入 Cloudflare Web Analytics beacon（token 2c05a228…，无条件加载与 GA4 口径一致）｜开始: 2026-09-16 07:22 ｜验收: `npm run check` 全绿 + dist 每页含 beacon 标签
+
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
 - [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 2026-09-15 解除阻塞（P5 关闭，ticket 17 启动）；首次导出建议 2026-09-22 起（GSC 数据延迟约 2 天）
