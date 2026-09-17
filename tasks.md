@@ -84,6 +84,8 @@
 
 - [x] index.html 加入 Cloudflare Web Analytics beacon（token 2c05a228…，无条件加载与 GA4 口径一致）｜开始: 2026-09-16 07:22 ｜完成: 2026-09-16 07:30 ｜证据: `npm run check` 全绿（unit 74/74、verify-dist 全 PASS、e2e 90/90，.scratch/cf-beacon-check.log）；dist 8 页全含 beacon（404.html 无，与 GA4 口径一致）；prerender 拦截外部请求故构建不打点；线上抽查 / 与 /a1c-to-eag-calculator 均含 beacon（commit 39bcc44）
 
+- [~] P1 内容优化（外部审稿①③）：①首页加 2~3 段实质正文（自然带 glycemic load calculator / gmi calculator / a1c 目标词，不与 GL 页复制）；③GL 页顶部加参考表锚链接 + 表前引言 ｜开始: 2026-09-17 04:50 ｜备注: 审稿②（工具页缺 FAQ/HowTo Schema）已证伪——dist 实测 6 工具页全有 FAQPage、GL 页有 HowTo，无需改动 ｜验收: `npm run check` 全绿 + 线上抽查
+
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
 - [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 2026-09-15 解除阻塞（P5 关闭，ticket 17 启动）；首次导出建议 2026-09-22 起（GSC 数据延迟约 2 天）

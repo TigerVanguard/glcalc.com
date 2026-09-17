@@ -164,6 +164,14 @@ export default function GlCalculatorPage() {
   return (
     <>
       <SiteNav />
+      <div className="app-shell app-shell--append">
+        <p className="muted gl-jump-note">
+          Just browsing?{" "}
+          <a href="#gl-table-heading">Jump to the GL reference table</a> —{" "}
+          {GL_STATIC_TABLE.length} everyday servings with precomputed loads,
+          no input needed.
+        </p>
+      </div>
       <App initialSelection={initialSelection} />
       <div className="app-shell app-shell--append">
         <GlReferenceContent />

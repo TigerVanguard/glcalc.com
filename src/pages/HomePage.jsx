@@ -69,6 +69,39 @@ export default function HomePage() {
         ))}
       </section>
 
+      <section className="panel seo-panel" aria-labelledby="home-usecases-heading">
+        <h2 id="home-usecases-heading">What these tools help with</h2>
+        <p>
+          <strong>Planning meals around steadier blood sugar.</strong> The{" "}
+          <Link to="/glycemic-load-calculator">glycemic load calculator</Link>{" "}
+          combines a food&apos;s glycemic index with the serving you actually
+          eat, so two foods can be compared on the plate instead of in the
+          abstract. When you only need the raw GI number for a food, the{" "}
+          <Link to="/glycemic-index-calculator">glycemic index lookup</Link>{" "}
+          covers close to five thousand foods in one search.
+        </p>
+        <p>
+          <strong>Making sense of CGM data.</strong> If you wear a continuous
+          glucose monitor, the{" "}
+          <Link to="/gmi-calculator">GMI calculator</Link> converts your
+          sensor&apos;s average glucose into a Glucose Management Indicator —
+          the CGM-era counterpart to a lab A1C — so you can sanity-check
+          trends between lab draws instead of waiting months for the next
+          blood test.
+        </p>
+        <p>
+          <strong>Translating lab reports and meter units.</strong> The{" "}
+          <Link to="/a1c-to-eag-calculator">A1C to eAG calculator</Link> turns
+          the percentage on a lab report into the everyday glucose units a
+          meter shows, the{" "}
+          <Link to="/glucose-to-a1c-estimator">glucose to A1C estimator</Link>{" "}
+          runs the same relationship in reverse as a range, and the{" "}
+          <Link to="/blood-sugar-converter">blood sugar converter</Link> moves
+          any reading between mg/dL and mmol/L — handy when your clinic and
+          your device disagree on units.
+        </p>
+      </section>
+
       <section className="panel home-health-note" aria-labelledby="home-health-heading">
         <h2 id="home-health-heading">A note on health decisions</h2>
         <p>
