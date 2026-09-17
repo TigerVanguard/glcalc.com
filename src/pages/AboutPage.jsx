@@ -115,13 +115,74 @@ export default function AboutPage() {
           <a href={CONTACT_URL} rel="noopener noreferrer">
             GitHub Issues
           </a>
-          .
+          , by email at{" "}
+          <a href="mailto:feedback@glucomath.com">feedback@glucomath.com</a>,
+          or through the feedback form below.
         </p>
         <p>
           This tool has not been reviewed by a medical professional. Sources
           are cited above so you can verify every formula and data point
           yourself.
         </p>
+      </section>
+
+      <section className="panel seo-panel" aria-labelledby="about-feedback-heading" id="feedback">
+        <div className="section-heading">
+          <p className="eyebrow">Feedback</p>
+          <h2 id="about-feedback-heading">Send feedback</h2>
+        </div>
+        <p>
+          Spotted a wrong number, a confusing explanation, or a tool you wish
+          existed? Tell us here — no account needed. Leave your email only if
+          you would like a reply.
+        </p>
+        {/* Native HTML POST to Web3Forms: works with JavaScript disabled
+            (this page must stay fully functional JS-off). The access key is
+            designed to be public; the recipient address it maps to is not
+            exposed. The hidden botcheck checkbox is Web3Forms' honeypot. */}
+        <form action="https://api.web3forms.com/submit" method="POST">
+          <input
+            type="hidden"
+            name="access_key"
+            value="f3482560-20ed-4ae1-a720-1a601568b13c"
+          />
+          <input type="hidden" name="subject" value="GlucoMath feedback" />
+          <input
+            type="checkbox"
+            name="botcheck"
+            tabIndex={-1}
+            autoComplete="off"
+            style={{ display: "none" }}
+            aria-hidden="true"
+          />
+          <div className="field">
+            <label className="field-label" htmlFor="feedback-message">
+              Your feedback
+            </label>
+            <textarea
+              id="feedback-message"
+              name="message"
+              rows={5}
+              required
+              placeholder="What should we fix or add?"
+            />
+          </div>
+          <div className="field">
+            <label className="field-label" htmlFor="feedback-email">
+              Your email (optional)
+            </label>
+            <input
+              id="feedback-email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+            />
+          </div>
+          <button className="primary-button" type="submit">
+            Send feedback
+          </button>
+        </form>
       </section>
 
       <section className="panel seo-panel" aria-labelledby="about-disclaimer-heading">
