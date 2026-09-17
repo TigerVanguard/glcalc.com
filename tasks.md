@@ -10,7 +10,7 @@
 
 - [x] 购买 glucomath.com（Spaceship）｜完成: 2026-09-14 ｜证据: 站长截图确认——1 年注册 + Auto-renew On + 免费隐私，首年 $8.88，续费价 $9.98/年（≤$10 预算达标）
 - [x] GSC 域名验证 DNS TXT ｜完成: 2026-09-15 ｜证据: 站长确认 glucomath.com 资源已验证并完成 sitemap 提交（"GSC 完成"）
-- [!] 提供维护者署名与联系方式 ｜备注: 未提供时用兜底串 "Maintained by the {BRAND} project"
+- [x] 提供维护者署名与联系方式 ｜完成: 2026-09-17 06:42 ｜证据: 署名维持 "Maintained by the {BRAND} project"（站长认可）；联系方式落地三通道：GitHub Issues + feedback@glucomath.com（Spaceship 转发）+ About 页 Web3Forms 表单
 
 ## T0 测试基建改造（先于一切开发任务，Spec §8 T0）
 
@@ -86,7 +86,7 @@
 
 - [x] P1 内容优化（外部审稿①③）：①首页加 "What these tools help with" 三段正文（GL/GI 选食、GMI 解读 CGM、A1C/换算翻译化验单，自然带目标词+6 内链，零复制 GL 页文案）；③GL 页顶部加 "Jump to the GL reference table" 锚链接（表前引言原已存在）｜开始: 2026-09-17 04:50 ｜完成: 2026-09-17 04:58 ｜证据: `npm run check` 全绿（74/74 unit、verify-dist 全 PASS、90/90 e2e，.scratch/content-p1-check.log）；sitemap lastmod / 与 /glycemic-load-calculator 更新 2026-09-17；线上抽查三项全 True（commit 69b2f29）｜备注: 审稿②（缺 FAQ/HowTo Schema）已证伪——dist 实测 6 工具页全有 FAQPage、GL 页有 HowTo，零改动
 
-- [~] 用户反馈渠道：About 页加 Web3Forms 反馈表单（access key f3482560…，直送站长个人邮箱）+ feedback@glucomath.com mailto（Spaceship 免费转发）；关闭 P0「维护者联系方式」｜开始: 2026-09-17 06:30 ｜验收: `npm run check` 全绿 + 线上表单可见
+- [x] 用户反馈渠道：About 页加 Web3Forms 反馈表单（原生 POST 禁 JS 可用，honeypot 防垃圾，access key 直送站长个人邮箱）+ feedback@glucomath.com mailto + #feedback 锚点；GitHub Issues 链接保留（verify-dist 断言不动）｜开始: 2026-09-17 06:30 ｜完成: 2026-09-17 06:42 ｜证据: `npm run check` 全绿（74/74、verify-dist 全 PASS、90/90，.scratch/feedback-check.log）；/about sitemap lastmod → 2026-09-17；线上三项验证全 True（commit f8434e5）｜依赖: 站长需在 Spaceship 配 feedback@ 转发规则（mailto 通道生效前提，表单通道不依赖）
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
