@@ -92,7 +92,7 @@
 - [x] SA-01 分享卡片基建 ｜ticket: .scratch/shareable-assets/issues/01 ｜开始: 2026-09-20 06:56 ｜完成: 2026-09-20 07:10 ｜证据: 循环 1 次过。执行: shareCard.js（buildCardLines 纯函数/drawCard/downloadCard）+ ShareCardButton.jsx + share-card.test.js，unit 80/80（74+6）。独立验收 ACCEPT：npm run check 全绿（unit 80、verify-dist 全 PASS、e2e 90）、零依赖零现有文件改动、域名派生自 site.config、gtag 存在性检查、无禁词、未接线页面（.scratch/sa01-verify.log）
 - [x] SA-02 GMI 页分享卡 ｜ticket: issues/02 ｜开始: 2026-09-20 07:12 ｜完成: 2026-09-20 07:25 ｜证据: 循环 1 次过。GmiCalculatorPage 接线 ShareCardButton（值取页面显示字符串）+ tests/e2e/share-gmi.spec.js 两条。独立验收 ACCEPT：check 全绿（unit 80/verify-dist PASS/e2e 92=90+2）、gmi.spec.js 与 SA-01 文件零 diff、无禁词（.scratch/sa02-verify.log）
 - [x] SA-03 A1C→eAG + estimator 页分享卡 ｜ticket: issues/03 ｜开始: 2026-09-20 07:27 ｜完成: 2026-09-20 07:42 ｜证据: 循环 1 次过。两页接线 + share-a1c.spec.js/share-estimator.spec.js（5 条新 e2e）。独立验收 ACCEPT：check 全绿（unit 80/e2e 97=92+5/verify-dist PASS）；D5 红线经 data-share-range 与页面区间逐字相等断言实证；受保护文件零 diff（.scratch/sa03-verify.log）
-- [ ] SA-04 换算页速查卡 ｜ticket: issues/04 ｜Blocked by: SA-01
+- [x] SA-04 换算页速查卡 ｜ticket: issues/04 ｜开始: 2026-09-20 07:44 ｜完成: 2026-09-20 07:58 ｜证据: 循环 1 次过。BloodSugarConverterPage +23 行纯增量接线 + share-converter.spec.js（2 条）。独立验收 ACCEPT：check 全绿（unit 80/e2e 99=97+2/verify-dist PASS）；值直取双向绑定显示串零重算、规则行与页面公式框逐字一致；受保护文件零 diff（.scratch/sa04-verify.log）
 - [ ] SA-05 /glycemic-load-chart 可引用速查页（不含打印按钮）｜ticket: issues/05 ｜无阻塞（frontier）
 - [ ] SA-06 打印报告（GMI+chart 打印按钮 + @media print，chart 打印按钮自 Spec BL-04 挪入）｜ticket: issues/06 ｜Blocked by: SA-05
 

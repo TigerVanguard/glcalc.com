@@ -3,6 +3,7 @@ import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
 import NumberField from "../features/common/NumberField.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
+import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { mgdlToMmol, mmolToMgdl } from "../lib/formulas.js";
 import { formatMgdl, formatMmol, parsePositiveNumber } from "../lib/display.js";
@@ -163,6 +164,28 @@ export default function BloodSugarConverterPage() {
           note="Same glucose level expressed in both reporting units."
           placeholder="Enter a blood sugar value above to see it in both units."
         />
+
+        {isValid ? (
+          // Share card (shareable-assets BL-06, Spec D5/D6): both values are
+          // the strings ALREADY shown in the two bound fields this render —
+          // mgdlText / mmolText verbatim (the edited side's raw text, the
+          // derived side's display-rounded conversion). No recomputation, no
+          // re-rounding. The rule row is the fixed string matching the
+          // formula-box wording below ("mmol/L = mg/dL ÷ 18.018"). Rendered
+          // only when a valid conversion is visible, so the prerendered
+          // (empty-input) panel never contains the button.
+          <ShareCardButton
+            cardSpec={{
+              title: "Blood Sugar Conversion",
+              rows: [
+                { label: "mg/dL", value: mgdlText.trim() },
+                { label: "mmol/L", value: mmolText.trim() },
+                { label: "Rule", value: "mmol/L = mg/dL ÷ 18.018" },
+              ],
+            }}
+            filename="glucomath-conversion.png"
+          />
+        ) : null}
       </section>
 
       <section className="panel seo-panel converter-guide" aria-labelledby="converter-guide-heading">
