@@ -89,7 +89,7 @@
 - [x] 用户反馈渠道：About 页加 Web3Forms 反馈表单（原生 POST 禁 JS 可用，honeypot 防垃圾，access key 直送站长个人邮箱）+ feedback@glucomath.com mailto + #feedback 锚点；GitHub Issues 链接保留（verify-dist 断言不动）｜开始: 2026-09-17 06:30 ｜完成: 2026-09-17 06:42 ｜证据: `npm run check` 全绿（74/74、verify-dist 全 PASS、90/90，.scratch/feedback-check.log）；/about sitemap lastmod → 2026-09-17；线上三项验证全 True（commit f8434e5）｜依赖: 站长需在 Spaceship 配 feedback@ 转发规则（mailto 通道生效前提，表单通道不依赖）
 
 - [x] 撰写「可传播资产」执行 Spec（外链建议落地）｜开始: 2026-09-20 05:40 ｜完成: 2026-09-20 05:55 ｜证据: docs/2026-09-20-shareable-assets-spec-v1.md——自包含（§0 仓库实况+不变量清单）、8 项锁定决策（Canvas 零依赖/print 代 PDF/新路由 /glycemic-load-chart 不动旧表/导航保持 8 项）、6 张 ticket（BL-01~06 含依赖序与验收命令）、§6 站长手动 playbook 与 agent 任务严格隔离；关键仓库事实已核验（GL 表 27 行、GI 页有 RelatedTools、全局样式 src/index.css、verify-dist nav===8 断言、prerender 外部请求拦截）
-- [ ] SA-01 分享卡片基建 ｜ticket: .scratch/shareable-assets/issues/01 ｜无阻塞（frontier）
+- [x] SA-01 分享卡片基建 ｜ticket: .scratch/shareable-assets/issues/01 ｜开始: 2026-09-20 06:56 ｜完成: 2026-09-20 07:10 ｜证据: 循环 1 次过。执行: shareCard.js（buildCardLines 纯函数/drawCard/downloadCard）+ ShareCardButton.jsx + share-card.test.js，unit 80/80（74+6）。独立验收 ACCEPT：npm run check 全绿（unit 80、verify-dist 全 PASS、e2e 90）、零依赖零现有文件改动、域名派生自 site.config、gtag 存在性检查、无禁词、未接线页面（.scratch/sa01-verify.log）
 - [ ] SA-02 GMI 页分享卡 ｜ticket: issues/02 ｜Blocked by: SA-01
 - [ ] SA-03 A1C→eAG + estimator 页分享卡 ｜ticket: issues/03 ｜Blocked by: SA-01
 - [ ] SA-04 换算页速查卡 ｜ticket: issues/04 ｜Blocked by: SA-01
