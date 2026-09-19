@@ -90,7 +90,7 @@
 
 - [x] 撰写「可传播资产」执行 Spec（外链建议落地）｜开始: 2026-09-20 05:40 ｜完成: 2026-09-20 05:55 ｜证据: docs/2026-09-20-shareable-assets-spec-v1.md——自包含（§0 仓库实况+不变量清单）、8 项锁定决策（Canvas 零依赖/print 代 PDF/新路由 /glycemic-load-chart 不动旧表/导航保持 8 项）、6 张 ticket（BL-01~06 含依赖序与验收命令）、§6 站长手动 playbook 与 agent 任务严格隔离；关键仓库事实已核验（GL 表 27 行、GI 页有 RelatedTools、全局样式 src/index.css、verify-dist nav===8 断言、prerender 外部请求拦截）
 - [x] SA-01 分享卡片基建 ｜ticket: .scratch/shareable-assets/issues/01 ｜开始: 2026-09-20 06:56 ｜完成: 2026-09-20 07:10 ｜证据: 循环 1 次过。执行: shareCard.js（buildCardLines 纯函数/drawCard/downloadCard）+ ShareCardButton.jsx + share-card.test.js，unit 80/80（74+6）。独立验收 ACCEPT：npm run check 全绿（unit 80、verify-dist 全 PASS、e2e 90）、零依赖零现有文件改动、域名派生自 site.config、gtag 存在性检查、无禁词、未接线页面（.scratch/sa01-verify.log）
-- [ ] SA-02 GMI 页分享卡 ｜ticket: issues/02 ｜Blocked by: SA-01
+- [x] SA-02 GMI 页分享卡 ｜ticket: issues/02 ｜开始: 2026-09-20 07:12 ｜完成: 2026-09-20 07:25 ｜证据: 循环 1 次过。GmiCalculatorPage 接线 ShareCardButton（值取页面显示字符串）+ tests/e2e/share-gmi.spec.js 两条。独立验收 ACCEPT：check 全绿（unit 80/verify-dist PASS/e2e 92=90+2）、gmi.spec.js 与 SA-01 文件零 diff、无禁词（.scratch/sa02-verify.log）
 - [ ] SA-03 A1C→eAG + estimator 页分享卡 ｜ticket: issues/03 ｜Blocked by: SA-01
 - [ ] SA-04 换算页速查卡 ｜ticket: issues/04 ｜Blocked by: SA-01
 - [ ] SA-05 /glycemic-load-chart 可引用速查页（不含打印按钮）｜ticket: issues/05 ｜无阻塞（frontier）

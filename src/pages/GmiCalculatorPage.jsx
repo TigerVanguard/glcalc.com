@@ -4,6 +4,7 @@ import RelatedTools from "../features/common/RelatedTools.jsx";
 import NumberField from "../features/common/NumberField.jsx";
 import UnitToggle from "../features/common/UnitToggle.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
+import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { gmi, mgdlToMmol, mmolToMgdl } from "../lib/formulas.js";
 import {
@@ -175,6 +176,31 @@ export default function GmiCalculatorPage() {
           note="An estimate of where a laboratory A1C might land — not a measurement. GMI and lab A1C commonly differ by around half a percentage point in either direction; a gap between them does not mean either number is wrong."
           placeholder="Enter your CGM average above to see the GMI."
         />
+
+        {isValid ? (
+          // Share card (shareable-assets BL-02, Spec D5/D6): every value is
+          // the string ALREADY on screen this render — the raw input text as
+          // shown in the field (plus its unit suffix) and gmiValue verbatim.
+          // No recomputation, no re-rounding. The footnote reuses the page's
+          // existing citation wording ("Bergenstal et al., Diabetes Care
+          // 2018" in the formula section below). Rendered only when a valid
+          // result is visible, so the prerendered (empty-input) panel never
+          // contains the button.
+          <ShareCardButton
+            cardSpec={{
+              title: "GMI Result",
+              rows: [
+                {
+                  label: "Average glucose",
+                  value: `${text.trim()} ${unit === "mmol" ? "mmol/L" : "mg/dL"}`,
+                },
+                { label: "GMI", value: gmiValue },
+              ],
+              footnote: "Formula: Bergenstal et al., Diabetes Care 2018",
+            }}
+            filename="glucomath-gmi-result.png"
+          />
+        ) : null}
       </section>
 
       <section
