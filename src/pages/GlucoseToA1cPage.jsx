@@ -4,6 +4,7 @@ import RelatedTools from "../features/common/RelatedTools.jsx";
 import NumberField from "../features/common/NumberField.jsx";
 import UnitToggle from "../features/common/UnitToggle.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
+import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { a1cRange, mmolToMgdl } from "../lib/formulas.js";
 import { formatA1cRange, parsePositiveNumber } from "../lib/display.js";
@@ -37,6 +38,12 @@ export default function GlucoseToA1cPage() {
       : parsed.value
     : null;
   const range = isValid ? a1cRange(glucoseMgdl) : null;
+
+  // The range DISPLAY string, computed ONCE per render and shared verbatim by
+  // the result card and the share card (shareable-assets BL-03, red line D5):
+  // the card must carry the exact range string shown on screen — never a
+  // single-point A1C value, never a diagnostic band word.
+  const rangeText = range ? formatA1cRange(range) : null;
 
   return (
     <ToolPageLayout
@@ -143,10 +150,37 @@ export default function GlucoseToA1cPage() {
 
         <ResultCard
           label="Estimated A1C range"
-          value={range ? formatA1cRange(range) : null}
+          value={rangeText}
           note="An algebraic approximation built on ADAG study data — not the direction the ADAG regression was published for. The regression is asymmetric, so deviations grow near clinically important cut-offs; that uncertainty is why you see a range."
           placeholder="Enter an average glucose above to see the estimated A1C range."
         />
+
+        {isValid ? (
+          // Share card (shareable-assets BL-03, red line D5): the card rows
+          // are the strings ALREADY on screen this render — the raw input
+          // text (plus its unit suffix) and rangeText verbatim, so the card
+          // can only ever show the range, never a single-point A1C or a
+          // diagnostic word. The wrapper's data-share-range attribute exposes
+          // the exact string handed to the card so the e2e suite can assert
+          // it equals the on-screen range (share-estimator.spec.js). Rendered
+          // only when a valid result is visible, so the prerendered
+          // (empty-input) panel never contains the button or any percentage.
+          <div data-share-range={rangeText}>
+            <ShareCardButton
+              cardSpec={{
+                title: "Estimated A1C Range",
+                rows: [
+                  {
+                    label: "Average glucose",
+                    value: `${text.trim()} ${unit === "mmol" ? "mmol/L" : "mg/dL"}`,
+                  },
+                  { label: "Estimated A1C", value: rangeText },
+                ],
+              }}
+              filename="glucomath-a1c-estimate.png"
+            />
+          </div>
+        ) : null}
       </section>
 
       <section

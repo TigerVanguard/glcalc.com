@@ -3,6 +3,7 @@ import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
 import NumberField from "../features/common/NumberField.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
+import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { eag, eagMmol } from "../lib/formulas.js";
 import { formatEag, parsePositiveNumber } from "../lib/display.js";
@@ -41,6 +42,15 @@ export default function A1cToEagPage() {
   const invalid = parsed.state === "invalid";
   const outOfAdagRange =
     isValid && (parsed.value < ADAG_MIN_A1C || parsed.value > ADAG_MAX_A1C);
+
+  // Display strings computed ONCE per render and shared verbatim by the
+  // result cards and the share card (shareable-assets BL-03, Spec D5/D6):
+  // the share card must show character-for-character what the page shows, so
+  // both consumers read the same string — no recomputation, no re-rounding.
+  const eagMgdlValue = isValid ? `${formatEag(eag(parsed.value))} mg/dL` : null;
+  const eagMmolValue = isValid
+    ? `${formatEag(eagMmol(parsed.value))} mmol/L`
+    : null;
 
   // NOTE (red line D4): nothing inside the calculator panel below may contain
   // the strings "normal", "prediabetes", or "diabetes" (case-insensitive) —
@@ -135,17 +145,41 @@ export default function A1cToEagPage() {
         <div className="converter-fields">
           <ResultCard
             label="eAG in mg/dL"
-            value={isValid ? `${formatEag(eag(parsed.value))} mg/dL` : null}
+            value={eagMgdlValue}
             note="Estimated average glucose over roughly the past three months."
             placeholder="Enter an A1C value above to see the mg/dL estimate."
           />
           <ResultCard
             label="eAG in mmol/L"
-            value={isValid ? `${formatEag(eagMmol(parsed.value))} mmol/L` : null}
+            value={eagMmolValue}
             note="The same estimate expressed in mmol/L."
             placeholder="Enter an A1C value above to see the mmol/L estimate."
           />
         </div>
+
+        {isValid ? (
+          // Share card (shareable-assets BL-03, Spec D5/D6): every value is
+          // the string ALREADY on screen this render — the raw input text as
+          // shown in the field (plus its % suffix) and both eAG display
+          // strings verbatim. The footnote reuses the page's existing
+          // citation wording ("Nathan et al., Diabetes Care 2008" / ADAG in
+          // the formula section below). Rendered only when a valid result is
+          // visible, so the prerendered (empty-input) panel never contains
+          // the button — and no diagnostic word ever enters this panel
+          // (red line D4; verify-dist scans .a1c-calculator-panel).
+          <ShareCardButton
+            cardSpec={{
+              title: "A1C to eAG",
+              rows: [
+                { label: "A1C", value: `${text.trim()}%` },
+                { label: "eAG", value: eagMgdlValue },
+                { label: "eAG", value: eagMmolValue },
+              ],
+              footnote: "Formula: Nathan et al., Diabetes Care 2008 (ADAG)",
+            }}
+            filename="glucomath-a1c-eag.png"
+          />
+        ) : null}
       </section>
 
       <section className="panel seo-panel" aria-labelledby="a1c-formula-heading">
