@@ -13,6 +13,7 @@ const ORIGIN = process.env.VITE_SITE_ORIGIN ?? "https://glucomath.com";
 const ALL_ROUTES = [
   "/",
   "/glycemic-load-calculator",
+  "/glycemic-load-chart",
   "/glycemic-index-calculator",
   "/gmi-calculator",
   "/a1c-to-eag-calculator",
@@ -41,6 +42,14 @@ const SPOT_CHECKS = [
     title: `GMI Calculator – Glucose Management Indicator | ${BRAND}`,
     canonical: `${ORIGIN}/gmi-calculator`,
     jsonLdTypes: ["FAQPage", "WebApplication"],
+  },
+  {
+    // Shareable-assets BL-04: dataset page → WebPage + Dataset, no
+    // WebApplication and no FAQPage.
+    path: "/glycemic-load-chart",
+    title: `Glycemic Load Chart — GL of 27 Common Foods at Real Servings | ${BRAND}`,
+    canonical: `${ORIGIN}/glycemic-load-chart`,
+    jsonLdTypes: ["Dataset", "WebPage"],
   },
   {
     path: "/about",
@@ -103,7 +112,7 @@ test("FAQPage JSON-LD appears exactly on the pages with a visible FAQ", async ({
   }
 });
 
-test("robots.txt and sitemap.xml are served with the 8-route map", async ({ request }) => {
+test("robots.txt and sitemap.xml are served with the full route map", async ({ request }) => {
   const robots = await request.get("/robots.txt");
   expect(robots.ok()).toBeTruthy();
   expect(await robots.text()).toContain(`Sitemap: ${ORIGIN}/sitemap.xml`);
@@ -114,7 +123,8 @@ test("robots.txt and sitemap.xml are served with the 8-route map", async ({ requ
   for (const path of ALL_ROUTES) {
     expect(xml).toContain(`<loc>${path === "/" ? `${ORIGIN}/` : `${ORIGIN}${path}`}</loc>`);
   }
-  expect(xml.match(/<url>/g)).toHaveLength(8);
+  // 9 since shareable-assets BL-04 added /glycemic-load-chart.
+  expect(xml.match(/<url>/g)).toHaveLength(9);
 });
 
 test("GA4 config is unconditional (no hostname gate)", async ({ request }) => {

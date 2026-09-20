@@ -106,6 +106,35 @@ const glucoseToA1cPage = toolPage(
 // allowed per §5B.2-3.
 glucoseToA1cPage.jsonLd.push(faqPage(GLUCOSE_TO_A1C_FAQS));
 
+// /glycemic-load-chart (shareable-assets BL-04): a reference DATASET page,
+// not a calculator — so its JSON-LD is WebPage + Dataset (creator =
+// Organization {BRAND}, isBasedOn = DiOGenes), never WebApplication. Not in
+// SiteNav (D4); title/description carry the printable/CSV hook.
+const CHART_DESCRIPTION =
+  "Glycemic load of 27 common foods at 50 g, 100 g, and typical servings, in one printable chart. Free to cite with a link, plus a one-click CSV download.";
+
+const glChartPage = {
+  pageTitle: "Glycemic Load Chart — GL of 27 Common Foods at Real Servings",
+  description: CHART_DESCRIPTION,
+  jsonLd: [
+    {
+      "@type": "WebPage",
+      name: "Glycemic Load Chart: 27 Common Foods",
+      url: canonicalFor("/glycemic-load-chart"),
+      description: CHART_DESCRIPTION,
+    },
+    {
+      "@type": "Dataset",
+      name: "Glycemic load of 27 common foods at three serving sizes",
+      description:
+        "GI, carbohydrates per 100 g, and computed glycemic load (GL = GI × carbs ÷ 100) for 27 everyday foods at 50 g, 100 g, and a typical household serving, each with its Low/Medium/High band.",
+      url: canonicalFor("/glycemic-load-chart"),
+      isBasedOn: "DiOGenes GI database (category-level GI assignments)",
+      creator: { "@type": "Organization", name: BRAND, url: `${SITE_ORIGIN}/` },
+    },
+  ],
+};
+
 const giPage = toolPage(
   "/glycemic-index-calculator",
   "Glycemic Index Calculator – Look Up Food GI",
@@ -136,6 +165,7 @@ export const PAGE_SEO = {
     ],
   },
   "/glycemic-load-calculator": glPage,
+  "/glycemic-load-chart": glChartPage,
   "/glycemic-index-calculator": giPage,
   "/gmi-calculator": gmiPage,
   "/a1c-to-eag-calculator": a1cToEagPage,

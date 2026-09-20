@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import App from "../App.jsx";
 import glycemicIndex from "../data/gi.json";
 import SiteNav from "../features/common/SiteNav.jsx";
@@ -133,6 +133,14 @@ function GlReferenceContent() {
           orient yourself, then run your actual portion through the
           calculator above.
         </p>
+        <p>
+          Need every food at more than one portion? The{" "}
+          <Link to="/glycemic-load-chart">
+            full glycemic load chart shows all {GL_STATIC_TABLE.length} foods
+            at 50 g, 100 g, and their typical serving
+          </Link>{" "}
+          on one citable page, with a CSV download.
+        </p>
       </section>
     </section>
   );
@@ -188,6 +196,12 @@ export default function GlCalculatorPage() {
               href: "/blood-sugar-converter",
               anchor: "Convert readings between mg/dL and mmol/L",
               after: " without leaving the site.",
+            },
+            {
+              before: "Just want precomputed numbers? ",
+              href: "/glycemic-load-chart",
+              anchor: "Browse the GL chart of 27 foods at three serving sizes",
+              after: " — printable and citable.",
             },
           ]}
         />

@@ -25,6 +25,7 @@ const SITE_ORIGIN = process.env.VITE_SITE_ORIGIN || "https://glucomath.com";
 const ROUTES = [
   { path: "/", label: "Home", h1: "Free Blood Sugar & Glycemic Calculators" },
   { path: "/glycemic-load-calculator", label: "Glycemic Load Calculator", h1: "Glycemic Load Calculator" },
+  { path: "/glycemic-load-chart", label: "Glycemic Load Chart", h1: "Glycemic Load Chart: 27 Common Foods" },
   { path: "/glycemic-index-calculator", label: "Glycemic Index Calculator", h1: "Glycemic Index Calculator" },
   { path: "/gmi-calculator", label: "GMI Calculator", h1: "GMI Calculator (Glucose Management Indicator)" },
   { path: "/a1c-to-eag-calculator", label: "A1C to eAG Calculator", h1: "A1C to eAG Calculator" },

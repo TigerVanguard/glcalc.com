@@ -78,7 +78,10 @@ export default function HomePage() {
           eat, so two foods can be compared on the plate instead of in the
           abstract. When you only need the raw GI number for a food, the{" "}
           <Link to="/glycemic-index-calculator">glycemic index lookup</Link>{" "}
-          covers close to five thousand foods in one search.
+          covers close to five thousand foods in one search. And if you would
+          rather scan than search, the{" "}
+          <Link to="/glycemic-load-chart">glycemic load chart</Link> lays out
+          27 everyday foods at three serving sizes on a single page.
         </p>
         <p>
           <strong>Making sense of CGM data.</strong> If you wear a continuous

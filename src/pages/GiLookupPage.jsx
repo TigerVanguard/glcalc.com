@@ -102,6 +102,12 @@ export default function GiLookupPage() {
               anchor: "Switch blood sugar values between the two units",
               after: " in one step.",
             },
+            {
+              before: "Rather compare loads than look up one food? ",
+              href: "/glycemic-load-chart",
+              anchor: "Open the glycemic load quick-reference chart",
+              after: " for 27 foods at three portions each.",
+            },
           ]}
         />
       }

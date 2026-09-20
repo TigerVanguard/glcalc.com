@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./styles/app.css";
 import HomePage from "./pages/HomePage.jsx";
 import GlCalculatorPage from "./pages/GlCalculatorPage.jsx";
+import GlChartPage from "./pages/GlChartPage.jsx";
 import GiLookupPage from "./pages/GiLookupPage.jsx";
 import GmiCalculatorPage from "./pages/GmiCalculatorPage.jsx";
 import A1cToEagPage from "./pages/A1cToEagPage.jsx";
@@ -24,6 +25,7 @@ ReactDOM.render(
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route path="/glycemic-load-calculator" element={<GlCalculatorPage />} />
+      <Route path="/glycemic-load-chart" element={<GlChartPage />} />
       <Route path="/glycemic-index-calculator" element={<GiLookupPage />} />
       <Route path="/gmi-calculator" element={<GmiCalculatorPage />} />
       <Route path="/a1c-to-eag-calculator" element={<A1cToEagPage />} />

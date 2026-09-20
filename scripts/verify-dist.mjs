@@ -64,6 +64,17 @@ const PAGES = [
     hasFaq: true,
   },
   {
+    // shareable-assets BL-04: a dataset page, not a calculator — JSON-LD is
+    // WebPage + Dataset (asserted in detail in its T3-④ block below), and it
+    // is deliberately NOT in SiteNav (D4: nav stays at 8; notInNav below).
+    route: "/glycemic-load-chart",
+    pageTitle: "Glycemic Load Chart — GL of 27 Common Foods at Real Servings",
+    description:
+      "Glycemic load of 27 common foods at 50 g, 100 g, and typical servings, in one printable chart. Free to cite with a link, plus a one-click CSV download.",
+    jsonLdTypes: ["Dataset", "WebPage"],
+    notInNav: true,
+  },
+  {
     route: "/glycemic-index-calculator",
     pageTitle: "Glycemic Index Calculator – Look Up Food GI",
     description:
@@ -118,6 +129,10 @@ const PAGES = [
 ];
 
 const ROUTES = PAGES.map((page) => page.route);
+// D4 (shareable-assets): SiteNav keeps exactly the original 8 routes; pages
+// flagged notInNav (the chart page) are prerendered/sitemapped but NOT in the
+// header nav.
+const NAV_ROUTES = PAGES.filter((page) => !page.notInNav).map((page) => page.route);
 
 let failures = 0;
 
@@ -295,8 +310,12 @@ for (const page of PAGES) {
   check(navLinks.length === 8, `T3-⑤ SiteNav has exactly 8 links (found ${navLinks.length})`);
   const navHrefs = new Set(navLinks.map((a) => a.getAttribute("href")));
   check(
-    ROUTES.every((r) => navHrefs.has(r)),
-    "T3-⑤ SiteNav covers all 8 routes",
+    NAV_ROUTES.length === 8 && NAV_ROUTES.every((r) => navHrefs.has(r)),
+    "T3-⑤ SiteNav covers all 8 nav routes",
+  );
+  check(
+    !navHrefs.has("/glycemic-load-chart"),
+    "T3-⑤ D4: /glycemic-load-chart is NOT in SiteNav (nav stays at the 8 tool routes)",
   );
 
   const isInternal = (a) => (a.getAttribute("href") ?? "").startsWith("/");
@@ -309,6 +328,12 @@ for (const page of PAGES) {
     check(
       bodyInternal.length >= 7,
       `T3-⑤ home has ≥7 in-body internal links outside nav/footer (found ${bodyInternal.length})`,
+    );
+    // shareable-assets BL-04 internal link ①: the "What these tools help
+    // with" section links to the chart page from the home page body.
+    check(
+      bodyInternal.some((a) => a.getAttribute("href") === "/glycemic-load-chart"),
+      "BL-04 home body links to /glycemic-load-chart",
     );
   } else if (route !== "/about") {
     // 6 tool pages: the in-body related-tools container holds ≥2 internal
@@ -547,6 +572,13 @@ for (const page of PAGES) {
       bodyText.includes("Glycemic index vs glycemic load"),
       "T3-④ gi page carries the GI vs GL difference section",
     );
+
+    // shareable-assets BL-04 internal link ③: the GI page's related-tools
+    // block links to the chart page — pure addition, existing items untouched.
+    check(
+      root.querySelectorAll('.related-tools a[href="/glycemic-load-chart"]').length >= 1,
+      "BL-04 gi related-tools links to /glycemic-load-chart",
+    );
   }
 
   // T3-④ (ticket 12 — GL row): the static serving-level GL table must hold
@@ -602,6 +634,110 @@ for (const page of PAGES) {
     check(bodyText.includes("≥ 20"), 'T3-④ GL band boundary semantics: "≥ 20" (High) prerendered');
     check(bodyText.includes("glycaemic"), 'T3-④ GL page covers the British spelling "glycaemic"');
     check(bodyText.includes("DiOGenes"), 'T3-④ GL page names the data source "DiOGenes"');
+
+    // shareable-assets BL-04 internal link ②: the table section links to the
+    // chart page (plus one more inside related-tools) — pure additions, the
+    // assertions above are untouched.
+    check(
+      root.querySelectorAll('a[href="/glycemic-load-chart"]').length >= 2,
+      "BL-04 GL page links to /glycemic-load-chart (table section + related-tools)",
+    );
+  }
+
+  // T3-④ (shareable-assets BL-04 — /glycemic-load-chart): the citable
+  // quick-reference page. The 27-row table must carry THREE GL tiers per food
+  // (50 g / 100 g / typical serving), each cell in the fixed
+  // "<display> (<band>)" shape, spot-checked against two golden rows
+  // hand-computed HERE from gi.json + the hardcoded typical servings
+  // (independent of src/data/glChartTable.js, so a data or rounding bug
+  // cannot self-certify):
+  //   Rye bread   gi 89, carbs 47 g/100 g:
+  //               50 g → 23.5 g carbs → GL 20.915 → "20.9" High
+  //               100 g → 47 g carbs  → GL 41.83  → "41.8" High
+  //               30 g slice → 14.1 g → GL 12.549 → "12.5" Medium
+  //   Watermelon  gi 76, carbs 8.1 g/100 g:
+  //               50 g → 4.05 g carbs → GL 3.078  → "3.1" Low
+  //               100 g → 8.1 g carbs → GL 6.156  → "6.2" Low
+  //               120 g slice → 9.72 g → GL 7.3872 → "7.4" Low
+  // Plus: the band boundary semantics (≤ 10 / ≥ 20), the "How to cite this
+  // table" block, the honest DiOGenes category-level provenance, the Dataset
+  // JSON-LD detail (isBasedOn DiOGenes, creator Organization {BRAND}), and
+  // the same negative scans as the other static tables (no N/A, no egg
+  // white). Everything here is JS-free content read from raw dist/ HTML.
+  if (route === "/glycemic-load-chart") {
+    const bodyText = root.querySelector("body")?.text ?? "";
+
+    const tables = root.querySelectorAll(".gl-chart-table");
+    check(tables.length === 1, `T3-④ exactly one .gl-chart-table (found ${tables.length})`);
+
+    const headers = (tables[0]?.querySelectorAll("thead th") ?? []).map((th) => th.text.trim());
+    for (const tier of ["GL (50 g)", "GL (100 g)", "GL (typical serving)"]) {
+      check(headers.includes(tier), `T3-④ chart table has tier column header "${tier}"`);
+    }
+
+    const rows = tables[0]?.querySelectorAll("tbody tr") ?? [];
+    check(rows.length === 27, `T3-④ chart table has exactly 27 rows (found ${rows.length})`);
+    const rowCells = rows.map((tr) =>
+      tr.querySelectorAll("th,td").map((cell) => cell.text.trim()),
+    );
+    // [name, gi, carbs, GL@50g, GL@100g, serving label, GL@typical]
+    const expectedChartRows = [
+      ["Rye bread", "89", "47", "20.9 (High)", "41.8 (High)", "1 slice (30 g)", "12.5 (Medium)"],
+      ["Watermelon", "76", "8.1", "3.1 (Low)", "6.2 (Low)", "1 slice (120 g)", "7.4 (Low)"],
+    ];
+    for (const expected of expectedChartRows) {
+      check(
+        rowCells.some((cells) => expected.every((value, i) => cells[i] === value)),
+        `T3-④ chart table row: ${expected[0]} → ${expected[3]} / ${expected[4]} / ${expected[6]}`,
+      );
+    }
+
+    const tableText = tables[0]?.text ?? "";
+    check(
+      !tableText.includes("N/A"),
+      "T3-④ §6.1 N/A display string never appears inside the chart table",
+    );
+    check(
+      !tableText.includes("Egg"),
+      "T3-④ no encoding-suspect entry (egg white) inside the chart table",
+    );
+
+    check(bodyText.includes("≤ 10"), 'T3-④ chart band boundary semantics: "≤ 10" (Low) prerendered');
+    check(bodyText.includes("≥ 20"), 'T3-④ chart band boundary semantics: "≥ 20" (High) prerendered');
+    check(
+      bodyText.includes("How to cite this table"),
+      'T3-④ chart page carries the "How to cite this table" block',
+    );
+    check(
+      bodyText.includes(`${SITE_ORIGIN}/glycemic-load-chart`),
+      "T3-④ the suggested citation spells out the page's absolute URL",
+    );
+    check(bodyText.includes("DiOGenes"), 'T3-④ chart page names the data source "DiOGenes"');
+    check(
+      bodyText.includes("category-level"),
+      'T3-④ chart page carries the provenance copy ("category-level" assignments)',
+    );
+    check(
+      bodyText.includes("not individually measured"),
+      'T3-④ chart page states values are "not individually measured"',
+    );
+
+    // Dataset JSON-LD detail (beyond the type-distribution check above).
+    if (nodes !== null) {
+      const dataset = nodes.find((node) => node["@type"] === "Dataset");
+      check(Boolean(dataset), "T3-⑧ chart page carries a Dataset JSON-LD node");
+      check((dataset?.name ?? "").length > 0, "T3-⑧ Dataset.name is non-empty");
+      check((dataset?.description ?? "").length > 0, "T3-⑧ Dataset.description is non-empty");
+      check(dataset?.url === expectedCanonical, "T3-⑧ Dataset.url = canonical");
+      check(
+        String(dataset?.isBasedOn ?? "").includes("DiOGenes"),
+        "T3-⑧ Dataset.isBasedOn names DiOGenes",
+      );
+      check(
+        dataset?.creator?.["@type"] === "Organization" && dataset?.creator?.name === BRAND,
+        `T3-⑧ Dataset.creator = Organization "${BRAND}"`,
+      );
+    }
   }
 
   // T3-⑨ (ticket 13 — /about positive assertions, completing the row whose
@@ -722,7 +858,8 @@ if (sitemapExists) {
     await readFile(join(process.cwd(), "src", "sitemap-lastmod.json"), "utf-8"),
   );
   const entries = [...sitemap.matchAll(/<url>\s*<loc>([^<]*)<\/loc>\s*<lastmod>([^<]*)<\/lastmod>\s*<\/url>/g)];
-  check(entries.length === 8, `sitemap has exactly 8 <url> entries (found ${entries.length})`);
+  // 9 since shareable-assets BL-04 added /glycemic-load-chart (8 nav + chart).
+  check(entries.length === 9, `sitemap has exactly 9 <url> entries (found ${entries.length})`);
   const byLoc = new Map(entries.map(([, loc, lastmod]) => [loc, lastmod]));
   for (const route of ROUTES) {
     const loc = canonicalFor(route);

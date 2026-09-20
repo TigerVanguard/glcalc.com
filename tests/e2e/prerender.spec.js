@@ -9,6 +9,7 @@ const BRAND = process.env.VITE_BRAND ?? "GlucoMath";
 const ROUTES = [
   { path: "/", h1: "Free Blood Sugar & Glycemic Calculators" },
   { path: "/glycemic-load-calculator", h1: "Glycemic Load Calculator" },
+  { path: "/glycemic-load-chart", h1: "Glycemic Load Chart: 27 Common Foods" },
   { path: "/glycemic-index-calculator", h1: "Glycemic Index Calculator" },
   { path: "/gmi-calculator", h1: "GMI Calculator (Glucose Management Indicator)" },
   { path: "/a1c-to-eag-calculator", h1: "A1C to eAG Calculator" },
@@ -31,7 +32,9 @@ for (const { path, h1 } of ROUTES) {
 
 // Ticket 06 (Spec §8 T4-3): starting from the home page, every other page is
 // reachable by clicking a REAL link — tool pages via their home cards, /about
-// via the header nav. JavaScript is disabled (file-level test.use above), so
+// via the header nav, and /glycemic-load-chart (shareable-assets BL-04, not
+// in nav or cards per D4) via its in-body link in the home "What these tools
+// help with" section. JavaScript is disabled (file-level test.use above), so
 // these are native <a href> navigations against the prerendered dist/.
 for (const { path, h1 } of ROUTES.filter((route) => route.path !== "/")) {
   test(`home reaches ${path} by clicking a real link`, async ({ page }) => {
@@ -39,7 +42,9 @@ for (const { path, h1 } of ROUTES.filter((route) => route.path !== "/")) {
     const selector =
       path === "/about"
         ? `.site-nav a[href="${path}"]`
-        : `.tool-cards a[href="${path}"]`;
+        : path === "/glycemic-load-chart"
+          ? `.seo-panel a[href="${path}"]`
+          : `.tool-cards a[href="${path}"]`;
     await page.locator(selector).click();
     await expect(page).toHaveURL(path);
     await expect(page.locator("h1")).toHaveText(h1);
@@ -47,8 +52,8 @@ for (const { path, h1 } of ROUTES.filter((route) => route.path !== "/")) {
 }
 
 // Ticket 06 (Spec §7 / §8 T3-⑦ runtime mirror): the unified 5-item footer is
-// present on all 8 pages.
-test("all 8 pages render the unified disclaimer footer", async ({ page }) => {
+// present on all pages (9 since shareable-assets BL-04 added the chart page).
+test("all 9 pages render the unified disclaimer footer", async ({ page }) => {
   for (const { path } of ROUTES) {
     await page.goto(path);
     const footer = page.locator(".tool-footer");
@@ -278,6 +283,38 @@ test("about page shows data provenance, formula sources, MIT attribution, and co
     "This tool has not been reviewed by a medical professional.",
   );
   await expect(main).toContainText("NGSP-certified");
+});
+
+// Shareable-assets BL-04 (Spec §4 BL-04 / red line 5): the chart page's
+// citable content — the 27-row three-tier GL table, the tier column headers,
+// the band copy, the "How to cite this table" block, and the honest DiOGenes
+// provenance — is all plain prerendered HTML, fully readable with JavaScript
+// disabled (only the CSV download button needs JS; it is tested in the app
+// project, tests/e2e/gl-chart-app.spec.js).
+test("chart page shows the 27-row three-tier GL table and cite block without JavaScript", async ({
+  page,
+}) => {
+  await page.goto("/glycemic-load-chart");
+  await expect(page.locator("h1")).toHaveText("Glycemic Load Chart: 27 Common Foods");
+
+  const rows = page.locator(".gl-chart-table tbody tr");
+  await expect(rows).toHaveCount(27);
+
+  const headerRow = page.locator(".gl-chart-table thead tr");
+  await expect(headerRow).toContainText("GL (50 g)");
+  await expect(headerRow).toContainText("GL (100 g)");
+  await expect(headerRow).toContainText("GL (typical serving)");
+
+  const table = page.locator(".gl-chart-table");
+  await expect(table).toContainText("Rye bread");
+  await expect(table).toContainText("20.9 (High)");
+  await expect(table).toContainText("12.5 (Medium)");
+  expect(await table.textContent()).not.toContain("N/A");
+
+  const body = page.locator("body");
+  await expect(body).toContainText("How to cite this table");
+  await expect(body).toContainText("DiOGenes");
+  await expect(body).toContainText("category-level");
 });
 
 test("unknown path returns HTTP 404, not a soft-404 shell", async ({ request }) => {
