@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
+import PrintButton from "../features/common/PrintButton.jsx";
 import { GL_CHART_TABLE, glChartCsv } from "../data/glChartTable.js";
 import { GI_DATA_SOURCE } from "../lib/giData.js";
 import { BRAND, SITE_ORIGIN } from "../site.config.js";
@@ -17,8 +18,8 @@ import { BRAND, SITE_ORIGIN } from "../site.config.js";
 // JavaScript disabled). Not in SiteNav (D4) — reached via the home page, the
 // GL calculator's table section, and the GL/GI related-tools blocks.
 //
-// The print button is deliberately absent here: it ships with the shared
-// @media print rules in ticket BL-05 (SA-06).
+// The print button (BL-05 / SA-06, D2) sits beside the CSV button and relies
+// on the shared @media print rules in src/styles/app.css.
 
 const CSV_FILENAME = "glucomath-gl-chart.csv";
 const CHART_PATH = "/glycemic-load-chart";
@@ -179,7 +180,8 @@ export default function GlChartPage() {
         <p>
           <button type="button" className="secondary-button" onClick={downloadCsv}>
             Download CSV
-          </button>
+          </button>{" "}
+          <PrintButton label="Print this chart" />
         </p>
       </section>
     </ToolPageLayout>

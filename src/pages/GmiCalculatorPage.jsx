@@ -5,6 +5,7 @@ import NumberField from "../features/common/NumberField.jsx";
 import UnitToggle from "../features/common/UnitToggle.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
 import ShareCardButton from "../features/common/ShareCardButton.jsx";
+import PrintButton from "../features/common/PrintButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { gmi, mgdlToMmol, mmolToMgdl } from "../lib/formulas.js";
 import {
@@ -185,21 +186,26 @@ export default function GmiCalculatorPage() {
           // existing citation wording ("Bergenstal et al., Diabetes Care
           // 2018" in the formula section below). Rendered only when a valid
           // result is visible, so the prerendered (empty-input) panel never
-          // contains the button.
-          <ShareCardButton
-            cardSpec={{
-              title: "GMI Result",
-              rows: [
-                {
-                  label: "Average glucose",
-                  value: `${text.trim()} ${unit === "mmol" ? "mmol/L" : "mg/dL"}`,
-                },
-                { label: "GMI", value: gmiValue },
-              ],
-              footnote: "Formula: Bergenstal et al., Diabetes Care 2018",
-            }}
-            filename="glucomath-gmi-result.png"
-          />
+          // contains the buttons. The print report (BL-05, D2) follows the
+          // same visibility contract; the {" "} keeps the two inline-block
+          // buttons from touching on screen.
+          <>
+            <ShareCardButton
+              cardSpec={{
+                title: "GMI Result",
+                rows: [
+                  {
+                    label: "Average glucose",
+                    value: `${text.trim()} ${unit === "mmol" ? "mmol/L" : "mg/dL"}`,
+                  },
+                  { label: "GMI", value: gmiValue },
+                ],
+                footnote: "Formula: Bergenstal et al., Diabetes Care 2018",
+              }}
+              filename="glucomath-gmi-result.png"
+            />{" "}
+            <PrintButton label="Print report" />
+          </>
         ) : null}
       </section>
 

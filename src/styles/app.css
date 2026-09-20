@@ -1286,3 +1286,36 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Print report (shareable-assets BL-05 / SA-06, Spec D2): the "PDF report" is
+   the browser's native print-to-PDF — these rules ARE the report layout.
+   Screen styles stay untouched: the only rule outside @media print keeps the
+   paper-only brand line (rendered by ToolPageLayout) hidden on screen. */
+
+.print-brand {
+  display: none;
+}
+
+@media print {
+  /* Hidden on paper: site navigation, the site footer, cross-page link
+     blocks, form/input areas (field + unit toggle + invalid-input notice),
+     and every button — including the print/share/CSV buttons themselves. */
+  .site-header,
+  .tool-footer,
+  .related-tools,
+  .field,
+  .unit-toggle,
+  .notice--error,
+  button {
+    display: none !important;
+  }
+
+  /* Kept on paper (untouched by the rules above): the H1, result cards,
+     tables, formula citations, and the in-page disclaimer prose. The brand
+     line replaces the hidden site header at the top of the sheet. */
+  .print-brand {
+    display: block;
+    margin: 0 0 1rem;
+    font-weight: 800;
+  }
+}

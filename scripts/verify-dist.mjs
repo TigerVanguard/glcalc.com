@@ -918,6 +918,24 @@ if (vercelExists) {
   );
 }
 
+// Print report (shareable-assets BL-05 / SA-06, Spec D2): the print styles
+// must survive the build — some bundled CSS asset has to carry the @media
+// print block and the paper-only brand-line rule. String check on the raw
+// dist/assets CSS (the app e2e project runs on the dev server, where CSS is
+// unbundled, so the built artifact is asserted here instead).
+console.log("[verify-dist] built CSS print rules (BL-05)");
+const assetsDir = join(DIST, "assets");
+let printCss = "";
+if (existsSync(assetsDir)) {
+  for (const entry of await readdir(assetsDir)) {
+    if (entry.endsWith(".css")) {
+      printCss += await readFile(join(assetsDir, entry), "utf-8");
+    }
+  }
+}
+check(printCss.includes("@media print"), "a built CSS asset contains an @media print block");
+check(printCss.includes(".print-brand"), "the built CSS carries the .print-brand rule");
+
 if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);

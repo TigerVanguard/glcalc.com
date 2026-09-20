@@ -94,7 +94,7 @@
 - [x] SA-03 A1C→eAG + estimator 页分享卡 ｜ticket: issues/03 ｜开始: 2026-09-20 07:27 ｜完成: 2026-09-20 07:42 ｜证据: 循环 1 次过。两页接线 + share-a1c.spec.js/share-estimator.spec.js（5 条新 e2e）。独立验收 ACCEPT：check 全绿（unit 80/e2e 97=92+5/verify-dist PASS）；D5 红线经 data-share-range 与页面区间逐字相等断言实证；受保护文件零 diff（.scratch/sa03-verify.log）
 - [x] SA-04 换算页速查卡 ｜ticket: issues/04 ｜开始: 2026-09-20 07:44 ｜完成: 2026-09-20 07:58 ｜证据: 循环 1 次过。BloodSugarConverterPage +23 行纯增量接线 + share-converter.spec.js（2 条）。独立验收 ACCEPT：check 全绿（unit 80/e2e 99=97+2/verify-dist PASS）；值直取双向绑定显示串零重算、规则行与页面公式框逐字一致；受保护文件零 diff（.scratch/sa04-verify.log）
 - [x] SA-05 /glycemic-load-chart 可引用速查页 ｜ticket: issues/05 ｜开始: 2026-09-20 08:00 ｜完成: 2026-09-20 08:25 ｜证据: 循环 1 次过。第 9 预渲染路由：glChartTable.js（模块加载时 formulas.gl 算三档零硬编码）+ GlChartPage（27 行三档表/cite 块/CSV 下载）+ Dataset JSON-LD + 三处内链 + verify-dist/prerender.spec/seo.spec 扩展。独立验收 ACCEPT 7/7：check 全绿（unit 85=80+5/e2e 104=99+5/verify-dist PASS 含 nav 仍 8 项与 chart-不在-nav 负向断言）；既有断言无删无弱化；sitemap 9 URL（.scratch/sa05-verify.log）
-- [ ] SA-06 打印报告（GMI+chart 打印按钮 + @media print，chart 打印按钮自 Spec BL-04 挪入）｜ticket: issues/06 ｜Blocked by: SA-05
+- [x] SA-06 打印报告（GMI+chart 打印按钮 + @media print）｜ticket: issues/06 ｜开始: 2026-09-20 08:27 ｜完成: 2026-09-20 08:45 ｜证据: 循环 1 次过。PrintButton.jsx 共用组件 + 两页接线 + @media print 写入实际生效的 src/styles/app.css（执行方发现 src/index.css 系零引用死文件并正确纠偏，验收方核实属实）+ ToolPageLayout 打印品牌行（屏幕 display:none）+ print-app.spec.js 3 条。独立验收 ACCEPT 7/7：check 全绿（unit 85/e2e 107=104+3/verify-dist 含新 print 断言全 PASS）；零 PDF 库；屏幕样式零变化（.scratch/sa06-verify.log）。打印视觉待站长人工抽查
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
