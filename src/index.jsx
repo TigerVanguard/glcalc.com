@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import "./styles/fonts.css";
 import "./styles/app.css";
 import HomePage from "./pages/HomePage.jsx";
 import GlCalculatorPage from "./pages/GlCalculatorPage.jsx";

@@ -75,7 +75,7 @@ async function main() {
 
   const browser = await chromium.launch();
   const context = await browser.newContext();
-  // Keep prerender hermetic and fast: block external requests (fonts, gtag).
+  // Keep prerender hermetic and fast: block external requests (gtag, Cloudflare beacon).
   await context.route("**/*", (route) => {
     const url = new URL(route.request().url());
     if (url.hostname !== "127.0.0.1") {

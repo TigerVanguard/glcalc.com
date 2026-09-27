@@ -936,6 +936,123 @@ if (existsSync(assetsDir)) {
 check(printCss.includes("@media print"), "a built CSS asset contains an @media print block");
 check(printCss.includes(".print-brand"), "the built CSS carries the .print-brand rule");
 
+// Self-hosted fonts (perf spec PF-01, D1~D4), asserted on the built artifact:
+// ① no Google Fonts host anywhere in dist/ — the spec floor is .html + .css,
+// but D4 bans the hosts from the whole build output, so every file is scanned
+// (as T3-⑩ does); ② Fraunces + Manrope @font-face, all font-display: swap;
+// ③ every @font-face src URL is a real woff2 file in dist/; ④ each
+// prerendered page preloads 1~2 fonts with crossorigin, and every preload
+// href is identical to an @font-face src of the stylesheet that page links
+// (D3: any mismatch makes the browser download the font twice).
+console.log("[verify-dist] self-hosted fonts (PF-01)");
+const GOOGLE_FONT_HOSTS = ["fonts.googleapis.com", "fonts.gstatic.com"];
+
+async function listFiles(dir) {
+  const files = [];
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    files.push(...(entry.isDirectory() ? await listFiles(full) : [full]));
+  }
+  return files;
+}
+
+// Minifier-agnostic: esbuild unquotes family names and url()s, source CSS
+// keeps the quotes.
+function fontFaces(css) {
+  return [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)].map(([, body]) => {
+    const src = /(?:^|;)\s*src\s*:\s*([^;]+)/.exec(body)?.[1] ?? "";
+    return {
+      family: (/font-family\s*:\s*([^;]+)/.exec(body)?.[1] ?? "").trim().replace(/^["']|["']$/g, ""),
+      display: (/font-display\s*:\s*([^;]+)/.exec(body)?.[1] ?? "").trim(),
+      srcUrls: [...src.matchAll(/url\(\s*(["']?)([^"')]+)\1\s*\)/g)].map((match) => match[2]),
+    };
+  });
+}
+
+function distPathFor(url) {
+  return url.startsWith("/") && !url.startsWith("//") ? join(DIST, url.split(/[?#]/)[0].slice(1)) : null;
+}
+
+const distFiles = existsSync(DIST) ? await listFiles(DIST) : [];
+const htmlFiles = distFiles.filter((file) => file.endsWith(".html"));
+const cssFiles = distFiles.filter((file) => file.endsWith(".css"));
+check(
+  htmlFiles.length >= PAGES.length && cssFiles.length >= 1,
+  `PF-01 ① scan covers the built HTML + CSS (${htmlFiles.length} .html, ${cssFiles.length} .css, ${distFiles.length} files in total)`,
+);
+const googleFontHits = [];
+for (const file of distFiles) {
+  const content = await readFile(file);
+  if (GOOGLE_FONT_HOSTS.some((host) => content.includes(host))) {
+    googleFontHits.push(relative(DIST, file));
+  }
+}
+check(
+  googleFontHits.length === 0,
+  `PF-01 ① no fonts.googleapis.com / fonts.gstatic.com in any dist/ file${
+    googleFontHits.length ? ` (hits: ${googleFontHits.join(", ")})` : ""
+  }`,
+);
+
+const builtFaces = [];
+for (const file of cssFiles) {
+  builtFaces.push(...fontFaces(await readFile(file, "utf-8")));
+}
+for (const family of ["Fraunces", "Manrope"]) {
+  const faces = builtFaces.filter((face) => face.family === family);
+  check(faces.length >= 1, `PF-01 ② built CSS has @font-face rules for ${family} (found ${faces.length})`);
+  check(
+    faces.length >= 1 && faces.every((face) => face.display === "swap"),
+    `PF-01 ② every ${family} @font-face has font-display: swap`,
+  );
+}
+
+check(
+  builtFaces.length >= 1 && builtFaces.every((face) => face.srcUrls.length >= 1),
+  `PF-01 ③ every built @font-face src carries a url() (${builtFaces.length} rules)`,
+);
+for (const url of new Set(builtFaces.flatMap((face) => face.srcUrls))) {
+  const file = distPathFor(url);
+  const isWoff2 =
+    file !== null && existsSync(file) && (await readFile(file)).subarray(0, 4).toString("latin1") === "wOF2";
+  check(isWoff2, `PF-01 ③ @font-face src ${url} is a woff2 file in dist/`);
+}
+
+for (const { route } of PAGES) {
+  const file = routeFile(route);
+  if (!existsSync(file)) continue; // already reported by the per-page loop
+  const root = parse(await readFile(file, "utf-8"));
+  const preloads = root.querySelectorAll('link[rel="preload"][as="font"]');
+  check(
+    preloads.length >= 1 && preloads.length <= 2,
+    `PF-01 ④ ${route}: 1~2 font preloads (found ${preloads.length})`,
+  );
+  check(
+    preloads.every(
+      (link) =>
+        ["", "anonymous"].includes(link.getAttribute("crossorigin")) &&
+        link.getAttribute("type") === "font/woff2",
+    ),
+    `PF-01 ④ ${route}: every font preload has crossorigin (anonymous) + type="font/woff2"`,
+  );
+  const pageSrcUrls = new Set();
+  for (const link of root.querySelectorAll('link[rel="stylesheet"][href]')) {
+    const cssFile = distPathFor(link.getAttribute("href"));
+    if (cssFile !== null && existsSync(cssFile)) {
+      for (const face of fontFaces(await readFile(cssFile, "utf-8"))) {
+        face.srcUrls.forEach((url) => pageSrcUrls.add(url));
+      }
+    }
+  }
+  for (const link of preloads) {
+    const href = link.getAttribute("href");
+    check(
+      pageSrcUrls.has(href),
+      `PF-01 ④ ${route}: preload ${href} is identical to an @font-face src in the page's stylesheet`,
+    );
+  }
+}
+
 if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);
