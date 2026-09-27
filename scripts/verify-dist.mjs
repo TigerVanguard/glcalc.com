@@ -1053,6 +1053,130 @@ for (const { route } of PAGES) {
   }
 }
 
+// Route-split entry chunk (perf spec PF-02, D5/D8), asserted on the built
+// artifact: ① every prerendered page loads the SAME single entry script
+// (<script type="module" src="/assets/index-*.js">) and it is ≤ 260 KB, with
+// KB = 1024 B — the unit behind the spec's "currently ~515 KB" (527,020 B);
+// ② the gi.json dataset is not in it: "carbs_per_100g" (one per food, 4893
+// foods) appears at most 5 times; ③ the dataset lives in exactly one other
+// chunk under dist/assets, where the key appears ≥ 4000 times.
+console.log("[verify-dist] route-split entry chunk (PF-02)");
+const ENTRY_JS_MAX_BYTES = 260 * 1024;
+const DATA_KEY = "carbs_per_100g";
+const countOccurrences = (text, needle) => text.split(needle).length - 1;
+
+const entrySrcs = new Set();
+for (const { route } of PAGES) {
+  const file = routeFile(route);
+  if (!existsSync(file)) continue; // already reported by the per-page loop
+  const root = parse(await readFile(file, "utf-8"));
+  const entryScripts = root
+    .querySelectorAll('script[type="module"][src]')
+    .map((script) => script.getAttribute("src"))
+    .filter((src) => /^\/assets\/index-[\w-]+\.js$/.test(src));
+  check(
+    entryScripts.length === 1,
+    `PF-02 ① ${route}: exactly one entry script /assets/index-*.js (found ${entryScripts.length})`,
+  );
+  entryScripts.forEach((src) => entrySrcs.add(src));
+}
+check(
+  entrySrcs.size === 1,
+  `PF-02 ① all pages reference the same entry script (${[...entrySrcs].join(", ") || "none"})`,
+);
+
+const entryFile = entrySrcs.size === 1 ? distPathFor([...entrySrcs][0]) : null;
+const entryExists = entryFile !== null && existsSync(entryFile);
+check(entryExists, `PF-02 ① the entry script exists in dist/ (${entryFile ?? "unresolved"})`);
+if (entryExists) {
+  const entryJs = await readFile(entryFile);
+  check(
+    entryJs.length <= ENTRY_JS_MAX_BYTES,
+    `PF-02 ① entry script is ≤ 260 KB (${entryJs.length} B = ${(entryJs.length / 1024).toFixed(1)} KB)`,
+  );
+  const entryKeyCount = countOccurrences(entryJs.toString("utf-8"), DATA_KEY);
+  check(
+    entryKeyCount <= 5,
+    `PF-02 ② entry script carries no gi.json data ("${DATA_KEY}" ×${entryKeyCount}, max 5)`,
+  );
+
+  const dataChunks = [];
+  for (const name of existsSync(assetsDir) ? await readdir(assetsDir) : []) {
+    const file = join(assetsDir, name);
+    if (!name.endsWith(".js") || file === entryFile) continue;
+    const keyCount = countOccurrences(await readFile(file, "utf-8"), DATA_KEY);
+    if (keyCount >= 4000) dataChunks.push(`${name} ×${keyCount}`);
+  }
+  check(
+    dataChunks.length === 1,
+    `PF-02 ③ exactly one separate chunk carries the gi.json dataset ("${DATA_KEY}" ≥ 4000×): ${
+      dataChunks.join(", ") || "none"
+    }`,
+  );
+}
+
+// D11 (perf spec, added during PF-02): asset URLs are public, so no file name
+// in dist/ and no asset path referenced from built HTML/JS may match
+// /glcalc/i (main Spec red line: no glcalc variants). Scope is names and
+// paths only — string contents such as the MIT attribution link are not
+// covered here. HTML references are absolute (/assets/…); chunks reference
+// each other as ./x.js and list preload deps as assets/x.js.
+console.log("[verify-dist] asset names (D11)");
+const GLCALC = /glcalc/i;
+const badFileNames = distFiles.map((file) => relative(DIST, file)).filter((name) => GLCALC.test(name));
+check(
+  distFiles.length > 0 && badFileNames.length === 0,
+  `D11 no dist/ file name matches /glcalc/i (${distFiles.length} files${
+    badFileNames.length ? `; hits: ${badFileNames.join(", ")}` : ""
+  })`,
+);
+const assetRefs = new Set();
+for (const file of distFiles) {
+  if (file.endsWith(".html")) {
+    for (const [ref] of (await readFile(file, "utf-8")).matchAll(/\/assets\/[^"'\s>)]+/g)) {
+      assetRefs.add(ref);
+    }
+  } else if (file.endsWith(".js")) {
+    for (const [ref] of (await readFile(file, "utf-8")).matchAll(/(?:\/?assets\/|\.\/)[\w.-]+\.(?:js|css)/g)) {
+      assetRefs.add(ref);
+    }
+  }
+}
+const badRefs = [...assetRefs].filter((ref) => GLCALC.test(ref));
+check(
+  assetRefs.size > 0 && badRefs.length === 0,
+  `D11 no asset path referenced from built HTML/JS matches /glcalc/i (${assetRefs.size} distinct paths${
+    badRefs.length ? `; hits: ${badRefs.join(", ")}` : ""
+  })`,
+);
+
+// D10 (perf spec, added during PF-02): the Cloudflare Web Analytics beacon is
+// an async module script — a non-async module script placed before the entry
+// would hold the app's execution until the third-party file downloads. The
+// token is hardcoded here, independent of index.html.
+console.log("[verify-dist] Cloudflare beacon async (D10)");
+const CF_BEACON_SRC = "https://static.cloudflareinsights.com/beacon.min.js";
+const CF_BEACON_TOKEN = "2c05a228f62c487ca3f96597b09174dc";
+for (const { route } of PAGES) {
+  const file = routeFile(route);
+  if (!existsSync(file)) continue; // already reported by the per-page loop
+  const root = parse(await readFile(file, "utf-8"));
+  const beacons = root.querySelectorAll(`script[src="${CF_BEACON_SRC}"]`);
+  check(beacons.length === 1, `D10 ${route}: exactly one Cloudflare beacon script (found ${beacons.length})`);
+  const beacon = beacons[0];
+  check(
+    beacon?.getAttribute("type") === "module" && beacon.hasAttribute("async"),
+    `D10 ${route}: beacon is type="module" with async`,
+  );
+  let token = null;
+  try {
+    token = JSON.parse(beacon?.getAttribute("data-cf-beacon") ?? "null")?.token ?? null;
+  } catch {
+    token = null;
+  }
+  check(token === CF_BEACON_TOKEN, `D10 ${route}: data-cf-beacon token = ${CF_BEACON_TOKEN} (got ${token})`);
+}
+
 if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);

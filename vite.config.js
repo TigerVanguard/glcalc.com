@@ -74,7 +74,24 @@ export default defineConfig({
       new Date().toISOString().slice(0, 10),
     ),
   },
+  // JSON modules ship as JSON.parse("…"), which parses far faster than the
+  // equivalent object literal (gi.json is ~280 KB). Named imports from JSON
+  // stop working under this flag — default imports only (perf spec PF-02, D8).
+  json: {
+    stringify: true,
+  },
   build: {
     outDir: resolve(__dirname, "dist"),
+    rollupOptions: {
+      output: {
+        // Asset URLs are public: no chunk name may contain "glcalc" in any
+        // case (perf spec D11), which Rollup's default [name] would produce
+        // for GlCalculatorPage. The entry keeps its index-[hash].js name.
+        chunkFileNames: (chunk) =>
+          chunk.name === "GlCalculatorPage"
+            ? "assets/gl-calculator-[hash].js"
+            : "assets/[name]-[hash].js",
+      },
+    },
   },
 });

@@ -100,8 +100,10 @@
 
 - [x] 撰写性能优化执行 Spec + ticket（字体站内托管 + GL/GI 页 JS 拆分；站长 2026-09-27 选定）｜开始: 2026-09-27 06:10 ｜完成: 2026-09-27 06:35 ｜证据: docs/2026-09-27-perf-spec-v1.md（§0 线上基线、§1 已核实根因含「只修字体会让 JS 长任务落入 TBT」的交互风险、9 条锁定决策、§6 应急方案）+ .scratch/perf/issues/01~03（均含执行要点与 test plan）。已核实：gi.json 279KB 全量打入 515KB 入口包；仅 GL/GI/速查三页依赖；index.jsx 为 ReactDOM.render（首渲染须先 await 模块防闪屏）；semantic-ui-react 零引用
 - [x] PF-01 字体站内托管 ｜ticket: .scratch/perf/issues/01 ｜开始: 2026-09-27 06:36 ｜完成: 2026-09-27 07:20 ｜证据: 循环 1 次过。public/fonts/ 4 个 woff2（fraunces-latin 65.7KB、-latin-ext 58.0KB、manrope-latin 24.3KB、-latin-ext 14.8KB）+ 2 份 OFL 1.1；src/styles/fonts.css 10 条 @font-face 除 src 外与 Google 原始响应逐字节一致；index.html 删 Google Fonts 3 行、加 2 个 crossorigin 字体 preload。独立验收 ACCEPT 9/9：npm run check 全绿（unit 85、verify-dist 640 PASS = 原 593 + 新 47、e2e 108 = 107+1）；验收方重拉 Google CSS 逐块比对一致、4 个文件 SHA-256 与 Google 当前文件相同；旧版（Google Fonts）与新版 9 页 × 桌面/移动 18 张截图逐字节相同（视觉零变化实证）；dist 全部文件 Google 域名零命中；package 文件零 diff（.scratch/pf01-verify.log）
-- [~] PF-02 拆分 gi.json 页面 + JSON.parse ｜ticket: .scratch/perf/issues/02 ｜开始: 2026-09-27 07:22
-- [ ] PF-03 线上 PSI 验收（编排者）｜ticket: .scratch/perf/issues/03 ｜Blocked by: PF-01、PF-02 部署
+- [x] PF-02 拆分 gi.json 页面 + JSON.parse ｜ticket: .scratch/perf/issues/02 ｜开始: 2026-09-27 07:22 ｜完成: 2026-09-27 08:30 ｜证据: 循环 2 次过（第 2 轮为编排者追加 D10 beacon async、D11 chunk 名不含 glcalc；执行方同轮发现并修复「百分号编码网址 + chunk 永久失败」会无限重载的边缘情况）。入口 JS 527,020 B → 215,070 B（gzip 145 → 69 kB），gi.json 独立为 giData chunk（4899 次 carbs_per_100g，JSON.parse 形式）；三页首次加载先 await 模块再 render，客户端导航用 lazy + Suspense（fallback 含 SiteNav）。独立验收 ACCEPT 8/8：npm run check 全绿（unit 85、verify-dist 683 PASS = 640 + 43、e2e 118 = 108 + 10）；与 56ae882 构建对比，预渲染 HTML 归一化后逐字节一致，9 页 × 桌面/移动 18 张截图像素级相同；直开三页全程有 h1、无 fallback；GL/GI 搜索、?food= 深链、站内导航、chunk 失败最多重载 1 次均独立实测通过（.scratch/pf02-verify.log）
+- [~] PF-03 线上 PSI 验收（编排者）｜ticket: .scratch/perf/issues/03 ｜开始: 2026-09-27 08:32
+- [ ] 待办（低优先）：非规范网址（如 /glycemic%2Dload-calculator）首次渲染会闪 fallback——启动匹配用原始 pathname，而 <Routes> 先做百分号解码；正常链接不受影响（PF-02 验收发现）
+- [ ] 待办：手机 390px 视口下 GL/GI/速查三页横向溢出（页宽 597/420/728px，改动前即存在，疑为宽表格）（PF-02 验收发现）
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
