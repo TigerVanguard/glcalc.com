@@ -112,6 +112,16 @@
 - [x] GC-02 部署与线上核对（编排者）｜开始: 2026-09-29 07:37 ｜完成: 2026-09-29 07:45 ｜证据: commit 207a99b 部署后线上 /gmi-calculator：#gmi-chart 存在、30 个行表头、intro 跳转链接、golden 行 6.5% → 133 / 7.4；FAQPage JSON-LD 共 8 个问题且含 4 个新问题；sitemap /gmi-calculator lastmod 2026-09-29；title 未变。GSC 重新请求编入索引待站长决定（额度可能与其他站点共用）
 - [x] GSC 请求编入索引 https://glucomath.com/gmi-calculator（内容更新后加速重抓）｜开始: 2026-09-29 07:50 ｜完成: 2026-09-29 07:55 ｜站长授权: 2026-09-29 选定「reindex」｜证据: 请求前状态「URL is on Google / Page is indexed」（旧版内容）；实时测试通过，GSC 返回「Indexing requested — URL was added to a priority crawl queue」
 
+## 内容与体验批次（站长 2026-09-29 选定 5 项）
+
+- [x] 撰写批次 Spec + ticket（测试屏蔽统计 / 换算页对照表 / 估算页区间表 / 手机横向溢出 / AGENTS.md 更新与去重）｜开始: 2026-09-29 07:45 ｜完成: 2026-09-29 08:05 ｜证据: docs/2026-09-29-content-ux-batch-spec-v1.md + .scratch/content-ux-batch/issues/01~06。已核实：主 Spec 未禁止估算页区间表（页面注释禁的是分档表），限定 70~240 mg/dL 不外推；现有 e2e 无控制台报错断言，可用 --host-resolver-rules 在配置层屏蔽；三张表 golden 值经 Node 独立验算
+- [~] CU-01 测试时屏蔽 GA4 / Cloudflare 统计 ｜ticket: .scratch/content-ux-batch/issues/01 ｜开始: 2026-09-29 08:06
+- [ ] CU-02 换算页对照表扩充 ｜Blocked by: CU-01
+- [ ] CU-03 估算页区间参考表 ｜Blocked by: CU-02
+- [ ] CU-04 手机横向溢出修复 ｜Blocked by: CU-03
+- [ ] CU-05 AGENTS.md 更新 + 删除重复 gi.json 与死文件 index.css ｜Blocked by: CU-04
+- [ ] CU-06 部署与线上核对（编排者）｜Blocked by: CU-01~05
+
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
 - [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 2026-09-15 解除阻塞（P5 关闭，ticket 17 启动）；首次导出建议 2026-09-22 起（GSC 数据延迟约 2 天）
