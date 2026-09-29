@@ -6,6 +6,7 @@ import UnitToggle from "../features/common/UnitToggle.jsx";
 import ResultCard from "../features/common/ResultCard.jsx";
 import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
+import TableScroll from "../features/common/TableScroll.jsx";
 import { a1cRange, mmolToMgdl } from "../lib/formulas.js";
 import { formatA1cRange, parsePositiveNumber } from "../lib/display.js";
 import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
@@ -223,24 +224,26 @@ export default function GlucoseToA1cPage() {
           to 240 mg/dL in steps of 10, all inside the stretch of average
           glucose the ADAG data reliably covers, so no row is extrapolated.
         </p>
-        <table className="conversion-table">
-          <thead>
-            <tr>
-              <th scope="col">Average glucose (mg/dL)</th>
-              <th scope="col">Average glucose (mmol/L)</th>
-              <th scope="col">Estimated A1C range</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ESTIMATOR_CHART.map((row) => (
-              <tr key={row.mgdlDisplay}>
-                <th scope="row">{row.mgdlDisplay}</th>
-                <td>{row.mmolDisplay}</td>
-                <td>{row.rangeDisplay}</td>
+        <TableScroll label="Estimated A1C range chart">
+          <table className="conversion-table">
+            <thead>
+              <tr>
+                <th scope="col">Average glucose (mg/dL)</th>
+                <th scope="col">Average glucose (mmol/L)</th>
+                <th scope="col">Estimated A1C range</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {ESTIMATOR_CHART.map((row) => (
+                <tr key={row.mgdlDisplay}>
+                  <th scope="row">{row.mgdlDisplay}</th>
+                  <td>{row.mmolDisplay}</td>
+                  <td>{row.rangeDisplay}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
         <p className="muted">
           Like the estimator, the chart offers orientation, not a measurement,
           and it does not grade any value. For a real A1C you need an

@@ -1198,6 +1198,35 @@ h3 {
   font-weight: 800;
 }
 
+/* ── CU-04 (content-ux batch): on phones, wide tables scroll inside their own
+   frame (TableScroll) instead of widening the page. ── */
+
+.table-scroll {
+  /* width 0 + min-width 100%: the frame still fills its panel but adds
+     nothing to any ancestor's min-content width. The GL calculator nests the
+     panel in the .seo-guide grid, whose track the grid spec sizes from the
+     panel's min-content width — the full table width, unless the frame
+     contributes zero. Chromium skips scroll containers in that step, so
+     Chromium-only tests still pass without this rule. */
+  width: 0;
+  min-width: 100%;
+  overflow-x: auto;
+}
+
+.table-scroll:focus-visible {
+  outline: 3px solid rgba(13, 111, 115, 0.24);
+  outline-offset: 3px;
+}
+
+/* Single words wider than a phone screen: the chart page's citation URL and
+   the longest food names in the GL result heading. "anywhere" (unlike
+   break-word) also lowers their min-content width, which is what sizes the
+   grid tracks around them. */
+.gl-chart-citation,
+.panel--results h2 {
+  overflow-wrap: anywhere;
+}
+
 @media (min-width: 640px) {
   .tool-cards {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1285,6 +1314,13 @@ h3 {
   .barcode-product {
     grid-template-columns: 1fr;
   }
+
+  /* CU-04: same emergency break as .panel--results h2, only once the card
+     stacks. Above 720 px the heading shares a row with the clear button,
+     and a lower min-content width would let the button squeeze it. */
+  .selected-food-summary h2 {
+    overflow-wrap: anywhere;
+  }
 }
 
 /* Print report (shareable-assets BL-05 / SA-06, Spec D2): the "PDF report" is
@@ -1317,5 +1353,13 @@ h3 {
     display: block;
     margin: 0 0 1rem;
     font-weight: 800;
+  }
+
+  /* Paper cannot scroll: the CU-04 table frame reverts to a plain block, so a
+     wide table prints whole instead of clipped at the frame edge. */
+  .table-scroll {
+    width: auto;
+    min-width: auto;
+    overflow: visible;
   }
 }

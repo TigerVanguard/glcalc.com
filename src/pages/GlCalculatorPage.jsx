@@ -5,6 +5,7 @@ import glycemicIndex from "../data/gi.json";
 import SiteNav from "../features/common/SiteNav.jsx";
 import ToolFooter from "../features/common/ToolFooter.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
+import TableScroll from "../features/common/TableScroll.jsx";
 import { GL_STATIC_TABLE } from "../data/glStaticTable.js";
 import { GI_DATA_SOURCE } from "../lib/giData.js";
 
@@ -101,30 +102,32 @@ function GlReferenceContent() {
           slice, fruit by the piece, vegetables at 80 g); entries stored as
           dry weight in the dataset are marked accordingly.
         </p>
-        <table className="conversion-table gl-static-table">
-          <thead>
-            <tr>
-              <th scope="col">Food</th>
-              <th scope="col">GI</th>
-              <th scope="col">Carbs per 100 g</th>
-              <th scope="col">Typical serving</th>
-              <th scope="col">GL</th>
-              <th scope="col">Band</th>
-            </tr>
-          </thead>
-          <tbody>
-            {GL_STATIC_TABLE.map((row) => (
-              <tr key={row.name}>
-                <th scope="row">{row.name}</th>
-                <td>{row.gi}</td>
-                <td>{row.carbs_per_100g}</td>
-                <td>{row.servingLabel}</td>
-                <td>{row.glDisplay}</td>
-                <td>{row.glBand}</td>
+        <TableScroll label="GL reference table">
+          <table className="conversion-table gl-static-table">
+            <thead>
+              <tr>
+                <th scope="col">Food</th>
+                <th scope="col">GI</th>
+                <th scope="col">Carbs per 100 g</th>
+                <th scope="col">Typical serving</th>
+                <th scope="col">GL</th>
+                <th scope="col">Band</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {GL_STATIC_TABLE.map((row) => (
+                <tr key={row.name}>
+                  <th scope="row">{row.name}</th>
+                  <td>{row.gi}</td>
+                  <td>{row.carbs_per_100g}</td>
+                  <td>{row.servingLabel}</td>
+                  <td>{row.glDisplay}</td>
+                  <td>{row.glBand}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
         <p className="muted">
           GI values are category-level assignments from the {GI_DATA_SOURCE}{" "}
           database — reference numbers shared across similar foods, not

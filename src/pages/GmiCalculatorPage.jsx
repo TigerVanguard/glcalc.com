@@ -8,6 +8,7 @@ import ResultCard from "../features/common/ResultCard.jsx";
 import ShareCardButton from "../features/common/ShareCardButton.jsx";
 import PrintButton from "../features/common/PrintButton.jsx";
 import ErrorNotice from "../features/common/ErrorNotice.jsx";
+import TableScroll from "../features/common/TableScroll.jsx";
 import { gmi, mgdlToMmol, mmolToMgdl } from "../lib/formulas.js";
 import {
   formatGmi,
@@ -242,24 +243,26 @@ export default function GmiCalculatorPage() {
           — with mg/dL rounded to a whole number and mmol/L to one decimal.
           The chart only converts numbers; it does not grade any value.
         </p>
-        <table className="conversion-table">
-          <thead>
-            <tr>
-              <th scope="col">GMI</th>
-              <th scope="col">CGM mean glucose (mg/dL)</th>
-              <th scope="col">CGM mean glucose (mmol/L)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {GMI_CHART.map((row) => (
-              <tr key={row.gmiDisplay}>
-                <th scope="row">{row.gmiDisplay}</th>
-                <td>{row.mgdlDisplay}</td>
-                <td>{row.mmolDisplay}</td>
+        <TableScroll label="GMI chart">
+          <table className="conversion-table">
+            <thead>
+              <tr>
+                <th scope="col">GMI</th>
+                <th scope="col">CGM mean glucose (mg/dL)</th>
+                <th scope="col">CGM mean glucose (mmol/L)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {GMI_CHART.map((row) => (
+                <tr key={row.gmiDisplay}>
+                  <th scope="row">{row.gmiDisplay}</th>
+                  <td>{row.mgdlDisplay}</td>
+                  <td>{row.mmolDisplay}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
         <p className="muted">
           This chart is for GMI values only. A same-period laboratory A1C
           commonly differs from GMI by around half a percentage point in

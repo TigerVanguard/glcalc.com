@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
+import TableScroll from "../features/common/TableScroll.jsx";
 import FoodSearch from "../features/search/FoodSearch.jsx";
 import giData from "../data/gi.json";
 import {
@@ -244,26 +245,28 @@ export default function GiLookupPage() {
             GI reference table: {STATIC_TABLE.length} everyday foods
           </h2>
         </div>
-        <table className="conversion-table gi-static-table">
-          <thead>
-            <tr>
-              <th scope="col">Food</th>
-              <th scope="col">GI</th>
-              <th scope="col">Band</th>
-              <th scope="col">Carbs per 100 g</th>
-            </tr>
-          </thead>
-          <tbody>
-            {STATIC_TABLE.map((row) => (
-              <tr key={row.name}>
-                <th scope="row">{row.name}</th>
-                <td>{row.gi}</td>
-                <td>{row.giBand}</td>
-                <td>{row.carbs_per_100g}</td>
+        <TableScroll label="GI reference table">
+          <table className="conversion-table gi-static-table">
+            <thead>
+              <tr>
+                <th scope="col">Food</th>
+                <th scope="col">GI</th>
+                <th scope="col">Band</th>
+                <th scope="col">Carbs per 100 g</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {STATIC_TABLE.map((row) => (
+                <tr key={row.name}>
+                  <th scope="row">{row.name}</th>
+                  <td>{row.gi}</td>
+                  <td>{row.giBand}</td>
+                  <td>{row.carbs_per_100g}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableScroll>
         <p className="muted">
           These GI values are category-level assignments from the{" "}
           {GI_DATA_SOURCE} database — reference numbers shared across similar
