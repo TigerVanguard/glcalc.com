@@ -9,6 +9,7 @@ import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { a1cRange, mmolToMgdl } from "../lib/formulas.js";
 import { formatA1cRange, parsePositiveNumber } from "../lib/display.js";
 import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
+import { ESTIMATOR_CHART } from "../data/estimatorChart.js";
 
 // RED LINES for this page (Spec §1 D4 / §5 estimator row / §9):
 // - The result is ALWAYS a range "≈ X.X% – Y.Y%" (formulas.a1cRange: center
@@ -22,6 +23,13 @@ import { GLUCOSE_TO_A1C_FAQS } from "../data/glucoseToA1cFaq.js";
 // - No diagnostic verdicts, and unlike the a1c-to-eag page not even an
 //   educational band table: the FAQ explains the limits in prose instead.
 //   verify-dist scans .estimator-panel for normal/prediabetes/diabetes.
+// - The estimated A1C range chart (#estimator-chart, content-ux CU-03) is a
+//   range lookup table, NOT a band table, so the line above still holds: each
+//   row is one average glucose value and the estimator's own
+//   formatA1cRange(a1cRange(x)) interval for it (src/data/estimatorChart.js),
+//   with no category, color, highlight, or match against the user's input.
+//   It sits outside .estimator-panel and covers only 70–240 mg/dL, inside
+//   the ADAG window, so no row is extrapolated.
 export default function GlucoseToA1cPage() {
   // Realtime single-field tool (Spec §5A.1-4): raw text + unit are the source
   // of truth; mmol/L input is converted through formulas.mmolToMgdl BEFORE
@@ -49,12 +57,19 @@ export default function GlucoseToA1cPage() {
     <ToolPageLayout
       h1="Average Glucose to A1C Estimator"
       intro={
-        <p>
-          Estimate the A1C range that corresponds to your average blood
-          glucose, from a meter or CGM average in mg/dL or mmol/L. The answer
-          is deliberately a range, not a single percentage — this direction of
-          the calculation has built-in uncertainty that one number would hide.
-        </p>
+        <>
+          <p>
+            Estimate the A1C range that corresponds to your average blood
+            glucose, from a meter or CGM average in mg/dL or mmol/L. The answer
+            is deliberately a range, not a single percentage — this direction of
+            the calculation has built-in uncertainty that one number would hide.
+          </p>
+          <p>
+            Looking up a common average?{" "}
+            <a href="#estimator-chart">Jump to the estimated A1C range chart</a>{" "}
+            for average glucose from 70 to 240 mg/dL.
+          </p>
+        </>
       }
       related={
         <RelatedTools
@@ -181,6 +196,56 @@ export default function GlucoseToA1cPage() {
             />
           </div>
         ) : null}
+      </section>
+
+      <section
+        id="estimator-chart"
+        className="panel seo-panel"
+        aria-labelledby="estimator-chart-heading"
+      >
+        <div className="section-heading">
+          <p className="eyebrow">Look up</p>
+          <h2 id="estimator-chart-heading">
+            Estimated A1C ranges for common average glucose levels
+          </h2>
+        </div>
+        <p>
+          Find your average glucose in the first column. The mmol/L column is
+          that mg/dL value converted and rounded to one decimal, and each range
+          is calculated from the row&rsquo;s mg/dL value — the same result the
+          estimator above gives for that mg/dL input, so entering the rounded
+          mmol/L value instead can shift an end of the range slightly. That
+          calculation is an algebraic approximation built on ADAG study data:
+          it runs the ADAG regression backwards, not in the direction the
+          regression was published for, and it is not a measurement. Its
+          uncertainty is why each row shows a range instead of a single A1C
+          number. The chart runs from 70
+          to 240 mg/dL in steps of 10, all inside the stretch of average
+          glucose the ADAG data reliably covers, so no row is extrapolated.
+        </p>
+        <table className="conversion-table">
+          <thead>
+            <tr>
+              <th scope="col">Average glucose (mg/dL)</th>
+              <th scope="col">Average glucose (mmol/L)</th>
+              <th scope="col">Estimated A1C range</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ESTIMATOR_CHART.map((row) => (
+              <tr key={row.mgdlDisplay}>
+                <th scope="row">{row.mgdlDisplay}</th>
+                <td>{row.mmolDisplay}</td>
+                <td>{row.rangeDisplay}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="muted">
+          Like the estimator, the chart offers orientation, not a measurement,
+          and it does not grade any value. For a real A1C you need an
+          NGSP-certified laboratory test.
+        </p>
       </section>
 
       <section

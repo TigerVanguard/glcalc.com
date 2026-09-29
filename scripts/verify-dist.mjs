@@ -612,6 +612,210 @@ for (const page of PAGES) {
     );
   }
 
+  // CU-03 (content-ux batch spec v1 §2): the static estimated-A1C range chart.
+  // #estimator-chart is a <section> OUTSIDE .estimator-panel (after it, before
+  // the formula section) holding exactly one .conversion-table: the three spec
+  // column headers and 18 body rows, average glucose 70–240 mg/dL every 10
+  // (the expected column is built HERE from integers). Golden rows are
+  // hardcoded HERE, independent of src/data/estimatorChart.js,
+  // src/lib/formulas.js and src/lib/display.js, so a formula or rounding bug
+  // cannot self-certify. Range endpoints are the center (x + 46.7) ÷ 28.7
+  // ± 15.7 ÷ 28.7, i.e. (x + 31) ÷ 28.7 and (x + 62.4) ÷ 28.7, each rounded
+  // half-up to 0.1; mmol/L = x ÷ 18.018, half-up to 1 decimal:
+  //      70 →  3.8850 → "3.9"    3.5192 / 4.6132  → "≈ 3.5% – 4.6%"
+  //     100 →  5.5501 → "5.6"    4.5645 / 5.6585  → "≈ 4.6% – 5.7%"
+  //     150 →  8.3250 → "8.3"    6.3066 / 7.4007  → "≈ 6.3% – 7.4%"
+  //     160 →  8.8800 → "8.9"    6.6551 / 7.7491  → "≈ 6.7% – 7.7%"
+  //     200 → 11.1000 → "11.1"   8.0488 / 9.1429  → "≈ 8.0% – 9.1%"
+  //     240 → 13.3200 → "13.3"   9.4425 / 10.5366 → "≈ 9.4% – 10.5%"
+  // All 18 rows are also re-derived here in exact integer arithmetic (tenths:
+  // low = (100x + 3100) / 287, high = (100x + 6240) / 287, mmol = 10000x /
+  // 18018, half-up). Red lines (main Spec D4 / §9): every percentage in the
+  // section belongs to a "≈ X.X% – Y.Y%" range cell (no single-point A1C), the
+  // table is plain markup with no class / style / highlight on any row or
+  // cell, and neither the section nor the intro's jump paragraph carries band
+  // vocabulary, a value label, a comparison, or the "ADAG formula" label.
+  if (route === "/glucose-to-a1c-estimator") {
+    const charts = root.querySelectorAll('[id="estimator-chart"]');
+    check(charts.length === 1, `CU-03 exactly one element with id="estimator-chart" (found ${charts.length})`);
+    const chart = charts[0];
+    check(chart?.tagName === "SECTION", `CU-03 #estimator-chart is a <section> (got <${chart?.tagName ?? "none"}>)`);
+    check(
+      chart?.querySelector("h2")?.text.trim() === "Estimated A1C ranges for common average glucose levels",
+      'CU-03 #estimator-chart H2 is "Estimated A1C ranges for common average glucose levels"',
+    );
+
+    const chartTables = chart?.querySelectorAll("table") ?? [];
+    check(
+      chartTables.length === 1 && chartTables[0].classList.contains("conversion-table"),
+      `CU-03 #estimator-chart holds exactly one table, a .conversion-table (found ${chartTables.length})`,
+    );
+    const chartTable = chartTables[0];
+    const chartHeaders = (chartTable?.querySelectorAll("thead th") ?? []).map((th) => th.text.trim());
+    check(
+      JSON.stringify(chartHeaders) ===
+        JSON.stringify(["Average glucose (mg/dL)", "Average glucose (mmol/L)", "Estimated A1C range"]),
+      `CU-03 chart columns = Average glucose (mg/dL) | Average glucose (mmol/L) | Estimated A1C range (got ${chartHeaders.join(" | ")})`,
+    );
+    const chartRows = chartTable?.querySelectorAll("tbody tr") ?? [];
+    check(chartRows.length === 18, `CU-03 estimator chart has exactly 18 body rows (found ${chartRows.length})`);
+    const chartCells = chartRows.map((tr) => tr.querySelectorAll("th,td"));
+    check(
+      chartCells.length > 0 &&
+        chartCells.every(
+          (cells) =>
+            cells.length === 3 &&
+            cells[0].tagName === "TH" &&
+            cells[0].getAttribute("scope") === "row" &&
+            cells.slice(1).every((cell) => cell.tagName === "TD"),
+        ),
+      'CU-03 every chart row is <th scope="row">mg/dL</th> + two <td> cells',
+    );
+    const chartText = chartCells.map((cells) => cells.map((cell) => cell.text.trim()));
+    const expectedMgdlColumn = Array.from({ length: 18 }, (_, i) => String(70 + i * 10));
+    check(
+      JSON.stringify(chartText.map((cells) => cells[0])) === JSON.stringify(expectedMgdlColumn),
+      "CU-03 mg/dL column is exactly 70, 80, … 240 (18 spec values, in order)",
+    );
+    check(
+      chartText.length > 0 && chartText.every((cells) => /^\d+\.\d$/.test(cells[1] ?? "")),
+      "CU-03 mmol/L cells carry exactly one decimal",
+    );
+    const RANGE_CELL = /^≈ (\d+\.\d)% – (\d+\.\d)%$/;
+    check(
+      chartText.length > 0 &&
+        chartText.every((cells) => {
+          const match = RANGE_CELL.exec(cells[2] ?? "");
+          return match !== null && Number(match[1]) < Number(match[2]);
+        }),
+      'CU-03 every A1C cell is a genuine range "≈ X.X% – Y.Y%" (low < high), never a single value',
+    );
+    const goldenChartRows = [
+      ["70", "3.9", "≈ 3.5% – 4.6%"],
+      ["100", "5.6", "≈ 4.6% – 5.7%"],
+      ["150", "8.3", "≈ 6.3% – 7.4%"],
+      ["160", "8.9", "≈ 6.7% – 7.7%"],
+      ["200", "11.1", "≈ 8.0% – 9.1%"],
+      ["240", "13.3", "≈ 9.4% – 10.5%"],
+    ];
+    for (const expected of goldenChartRows) {
+      check(
+        chartText.some((cells) => expected.every((value, i) => cells[i] === value)),
+        `CU-03 estimator chart row: ${expected[0]} mg/dL → ${expected[1]} mmol/L → ${expected[2]}`,
+      );
+    }
+    const halfUp = (n, d) => Math.floor((2 * n + d) / (2 * d));
+    const tenths = (t) => `${Math.floor(t / 10)}.${t % 10}`;
+    const derivedRows = expectedMgdlColumn.map((mgdl) => {
+      const x = Number(mgdl);
+      return [
+        mgdl,
+        tenths(halfUp(10000 * x, 18018)),
+        `≈ ${tenths(halfUp(100 * x + 3100, 287))}% – ${tenths(halfUp(100 * x + 6240, 287))}%`,
+      ];
+    });
+    check(
+      JSON.stringify(chartText) === JSON.stringify(derivedRows),
+      "CU-03 all 18 rows equal the independent exact-integer derivation (mmol/L + both range endpoints)",
+    );
+
+    const RANGE_ANYWHERE = /≈ \d+\.\d% – \d+\.\d%/g;
+    const chartAllText = chart?.text ?? "";
+    const rangeStrings = chartAllText.match(RANGE_ANYWHERE) ?? [];
+    check(
+      rangeStrings.length === 18,
+      `CU-03 #estimator-chart shows exactly 18 range strings, one per row (found ${rangeStrings.length})`,
+    );
+    check(
+      Boolean(chart) && !chartAllText.replace(RANGE_ANYWHERE, "").includes("%"),
+      'CU-03 every percentage in #estimator-chart is part of a "≈ X.X% – Y.Y%" range (no single-point A1C in the table or its copy)',
+    );
+    const tableDescendants = chartTable?.querySelectorAll("*") ?? [];
+    check(
+      tableDescendants.length > 0 &&
+        tableDescendants.every(
+          (node) =>
+            ["THEAD", "TBODY", "TR", "TH", "TD"].includes(node.tagName) &&
+            Object.keys(node.attributes).every((name) => name === "scope"),
+        ),
+      "CU-03 D4: the chart table is plain thead/tbody/tr/th/td with no attribute but scope (no class, style, color, or highlight on any row or cell)",
+    );
+
+    const estimatorPanel = root.querySelector(".estimator-panel");
+    check(Boolean(chart) && !chart.closest(".estimator-panel"), "CU-03 #estimator-chart is not inside .estimator-panel");
+    check(
+      Boolean(estimatorPanel) && estimatorPanel.querySelectorAll("table, #estimator-chart").length === 0,
+      "CU-03 .estimator-panel contains no table and no #estimator-chart",
+    );
+    check(
+      Boolean(chart) && chart.querySelectorAll(".estimator-panel").length === 0,
+      "CU-03 #estimator-chart does not wrap .estimator-panel",
+    );
+    const mainSections = root.querySelectorAll("main section");
+    const formulaSection = root.querySelector('section[aria-labelledby="estimator-formula-heading"]');
+    const panelIndex = mainSections.indexOf(estimatorPanel);
+    const chartIndex = mainSections.indexOf(chart);
+    const formulaIndex = mainSections.indexOf(formulaSection);
+    check(
+      panelIndex >= 0 && panelIndex < chartIndex && chartIndex < formulaIndex,
+      `CU-03 #estimator-chart comes after .estimator-panel and before the formula section (indices ${panelIndex} / ${chartIndex} / ${formulaIndex})`,
+    );
+
+    const jumpLinks = root.querySelectorAll('a[href="#estimator-chart"]');
+    check(jumpLinks.length === 1, `CU-03 exactly one <a href="#estimator-chart"> (found ${jumpLinks.length})`);
+    check(
+      Boolean(jumpLinks[0]?.closest(".tool-page__header")) &&
+        jumpLinks[0].text.trim() === "Jump to the estimated A1C range chart",
+      'CU-03 the intro (.tool-page__header) carries <a href="#estimator-chart">Jump to the estimated A1C range chart</a>',
+    );
+    const jumpParagraph = jumpLinks[0]?.closest("p");
+    check(
+      (jumpParagraph?.text.trim() ?? "").startsWith("Looking up a common average?"),
+      'CU-03 the jump paragraph opens with "Looking up a common average?"',
+    );
+    check(
+      Boolean(jumpParagraph) && !jumpParagraph.text.includes("%"),
+      "CU-03 the jump paragraph contains no percentage",
+    );
+
+    // Each block (paragraph / heading / cell) is scanned on its own, so
+    // adjacent cells can never glue into or out of a word boundary.
+    const chartBlocks = chart?.querySelectorAll("h2, p, th, td") ?? [];
+    const squash = (text) => text.replace(/\s+/g, "");
+    check(
+      Boolean(chart) && squash(chartBlocks.map((node) => node.text).join("")) === squash(chart.text),
+      "CU-03 the red-line scan blocks (h2 / p / th / td) cover every character of #estimator-chart",
+    );
+    const LABEL_WORDS =
+      "good|bad|healthy|unhealthy|ideal|optimal|excellent|poor|safe|unsafe|dangerous|elevated|target|goal|aim|high|low|borderline|risk";
+    const cu03Rules = [
+      ["normal", /normal/i],
+      ["prediabet", /prediabet/i],
+      ["diabet", /diabet/i],
+      ['"ADAG formula" / "ADAG equation" label', /ADAG\s+(formula|equation)/i],
+      ["percent spelled out", /percent/i],
+      ["band / value label word", new RegExp(`\\b(${LABEL_WORDS})s?\\b`, "i")],
+      [
+        "comparative + number (below 7 / under 7 / less than 7 …)",
+        /\b(below|under|less than|lower than|above|over|greater than|higher than|more than|at or below|at or above|at most|at least|up to|no more than|no higher than)\s+(about\s+|around\s+|roughly\s+|approximately\s+)?\d/i,
+      ],
+      ["comparison symbol + number (< 7 …)", /[<>≤≥]\s*\d/],
+    ];
+    const cu03Blocks = [
+      ["jump paragraph", jumpParagraph?.text ?? ""],
+      ...chartBlocks.map((node) => ["#estimator-chart", node.text]),
+    ];
+    const cu03Violations = cu03Blocks.flatMap(([where, block]) =>
+      cu03Rules.filter(([, pattern]) => pattern.test(block)).map(([label]) => `${where}: ${label}`),
+    );
+    check(
+      cu03Violations.length === 0,
+      `CU-03 D4: no band vocabulary, value label, comparison, or "ADAG formula" in the chart section or the jump paragraph${
+        cu03Violations.length ? ` (hits: ${cu03Violations.join("; ")})` : ""
+      }`,
+    );
+  }
+
   // T3-④ (ticket 10 — GMI row): the Bergenstal 2018 formula (constant
   // 0.02392) and the mandated GMI-vs-A1C explainer (±0.5 percentage-point
   // difference is common / a mismatch is not a data error / GMI cannot
