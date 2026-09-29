@@ -105,6 +105,12 @@
 - [ ] 待办（低优先）：非规范网址（如 /glycemic%2Dload-calculator）首次渲染会闪 fallback——启动匹配用原始 pathname，而 <Routes> 先做百分号解码；正常链接不受影响（PF-02 验收发现）
 - [ ] 待办：手机 390px 视口下 GL/GI/速查三页横向溢出（页宽 597/420/728px，改动前即存在，疑为宽表格）（PF-02 验收发现）
 
+## 内容补强：GMI 页（周报 #1 显示 GMI 词簇离首页最近：gmi calculator 24.7、gmi 27.2）
+
+- [x] 撰写 GMI 页内容补强 Spec + ticket（GMI 对照表 + 查询意图对应的正文/FAQ；站长 2026-09-29「现在做」）｜开始: 2026-09-29 06:25 ｜完成: 2026-09-29 06:45 ｜证据: docs/2026-09-29-gmi-content-spec-v1.md（§0 按 42 个 GMI 查询词的 5 类意图对照页面缺口；D1~D8 锁定：精确反解纯函数、30 行对照表、4 条意图 FAQ、标题/H1/描述不动、不给目标数值）+ .scratch/gmi-content/issues/01；golden 值经 Node 独立验算一致
+- [~] GC-01 GMI 对照表 + 意图 FAQ ｜ticket: .scratch/gmi-content/issues/01 ｜开始: 2026-09-29 06:46
+- [ ] GC-02 部署与线上核对（编排者）｜Blocked by: GC-01
+
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
 - [ ] 每周导出 GSC 效果 CSV 存 `.gsc-export/`，与 docs/2026-09-09-gsc-baseline.md 对比 ｜备注: 2026-09-15 解除阻塞（P5 关闭，ticket 17 启动）；首次导出建议 2026-09-22 起（GSC 数据延迟约 2 天）
