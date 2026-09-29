@@ -104,3 +104,16 @@ export function a1cRange(mgdl) {
 export function gmi(mgdl) {
   return 3.31 + 0.02392 * Number(mgdl);
 }
+
+/**
+ * GMI (%) → CGM mean glucose (mg/dL): (GMI − 3.31) / 0.02392. Unrounded.
+ * GMI is DEFINED by the linear formula in gmi(), so this is its exact
+ * algebraic inverse: the CGM average that produces a given GMI. Unrelated to
+ * the A1C functions above: eag is the ADAG (Nathan 2008) forward formula,
+ * A1C → average glucose; a1cRange is an algebraic approximation of its
+ * reverse and outputs only a range (main Spec D4). This function derives
+ * nothing from an A1C result.
+ */
+export function meanGlucoseFromGmi(gmiPercent) {
+  return (Number(gmiPercent) - 3.31) / 0.02392;
+}

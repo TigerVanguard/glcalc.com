@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import ToolPageLayout from "../features/common/ToolPageLayout.jsx";
 import RelatedTools from "../features/common/RelatedTools.jsx";
 import NumberField from "../features/common/NumberField.jsx";
@@ -15,6 +16,7 @@ import {
   parsePositiveNumber,
 } from "../lib/display.js";
 import { GMI_FAQS } from "../data/gmiFaq.js";
+import { GMI_CHART } from "../data/gmiChart.js";
 
 // RED LINES for this page (Spec §1 D4 / §5 gmi row / §9; ticket 10):
 // - The formula is EXACTLY Bergenstal et al., Diabetes Care 2018:
@@ -29,6 +31,10 @@ import { GMI_FAQS } from "../data/gmiFaq.js";
 //   inside .gmi-panel (verify-dist scans it; "Diabetes Care" citations live
 //   in the static sections outside the panel), and no percentage may be
 //   prerendered in the panel (empty input → placeholder only).
+// - The GMI chart (#gmi-chart, GMI content spec GC-01) is static conversion
+//   content OUTSIDE .gmi-panel: every value comes from src/data/gmiChart.js
+//   (formulas + display at module load), and no row is ever graded,
+//   highlighted, or matched against the user's input.
 export default function GmiCalculatorPage() {
   // Realtime single-field tool (Spec §5A.1-4): raw text + unit are the source
   // of truth. Inputs are never written to the URL (§5A.1-5).
@@ -68,13 +74,20 @@ export default function GmiCalculatorPage() {
     <ToolPageLayout
       h1="GMI Calculator (Glucose Management Indicator)"
       intro={
-        <p>
-          Turn the average glucose from your CGM into a Glucose Management
-          Indicator (GMI) — the same figure your sensor report uses to
-          estimate where a laboratory A1C might land. Enter the mean glucose
-          from your CGM app in mg/dL or mmol/L and the GMI updates as you
-          type, with the formula and its source shown below.
-        </p>
+        <>
+          <p>
+            Turn the average glucose from your CGM into a Glucose Management
+            Indicator (GMI) — the same figure your sensor report uses to
+            estimate where a laboratory A1C might land. Enter the mean glucose
+            from your CGM app in mg/dL or mmol/L and the GMI updates as you
+            type, with the formula and its source shown below.
+          </p>
+          <p>
+            Already have a GMI from your CGM report?{" "}
+            <a href="#gmi-chart">Look it up in the GMI chart</a> to see the
+            CGM average glucose behind it, in mg/dL and mmol/L.
+          </p>
+        </>
       }
       related={
         <RelatedTools
@@ -207,6 +220,54 @@ export default function GmiCalculatorPage() {
             <PrintButton label="Print report" />
           </>
         ) : null}
+      </section>
+
+      <section
+        id="gmi-chart"
+        className="panel seo-panel"
+        aria-labelledby="gmi-chart-heading"
+      >
+        <div className="section-heading">
+          <p className="eyebrow">Look up</p>
+          <h2 id="gmi-chart-heading">
+            GMI chart: the CGM average behind each GMI value
+          </h2>
+        </div>
+        <p>
+          Find your GMI in the left column: the two columns to its right show
+          the CGM average glucose that produces it, in mg/dL and mmol/L. GMI
+          is reported on the same percentage scale as A1C. Each row runs the
+          same Bergenstal 2018 formula the calculator above uses, solved
+          exactly in reverse — mean glucose (mg/dL) = (GMI − 3.31) ÷ 0.02392
+          — with mg/dL rounded to a whole number and mmol/L to one decimal.
+          The chart only converts numbers; it does not grade any value.
+        </p>
+        <table className="conversion-table">
+          <thead>
+            <tr>
+              <th scope="col">GMI</th>
+              <th scope="col">CGM mean glucose (mg/dL)</th>
+              <th scope="col">CGM mean glucose (mmol/L)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {GMI_CHART.map((row) => (
+              <tr key={row.gmiDisplay}>
+                <th scope="row">{row.gmiDisplay}</th>
+                <td>{row.mgdlDisplay}</td>
+                <td>{row.mmolDisplay}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="muted">
+          This chart is for GMI values only. A same-period laboratory A1C
+          commonly differs from GMI by around half a percentage point in
+          either direction, so a lab A1C cannot simply be looked up here. To
+          turn a lab A1C into an estimated average glucose, use the{" "}
+          <Link to="/a1c-to-eag-calculator">A1C to eAG conversion</Link>{" "}
+          instead.
+        </p>
       </section>
 
       <section

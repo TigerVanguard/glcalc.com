@@ -164,7 +164,7 @@ test("gmi page shows formula, difference copy, and FAQ without JavaScript", asyn
   expect(panelText).not.toMatch(/\d(\.\d+)?\s*%/);
 
   const faqEntries = page.locator(".faq-list details");
-  await expect(faqEntries).toHaveCount(4);
+  await expect(faqEntries).toHaveCount(8);
   await faqEntries.first().locator("summary").click();
   await expect(faqEntries.first().locator("p")).toBeVisible();
 });

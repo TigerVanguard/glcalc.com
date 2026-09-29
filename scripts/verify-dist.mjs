@@ -521,6 +521,216 @@ for (const page of PAGES) {
     }
   }
 
+  // GC-01 (GMI content spec v1, D2~D5): the static GMI chart. #gmi-chart is a
+  // <section> holding exactly one table: the three spec column headers and 30
+  // body rows — GMI 5.5–8.0 in 0.1 steps plus 8.5 / 9.0 / 9.5 / 10.0, the
+  // expected labels built HERE from integer tenths — and seven golden rows
+  // hand-computed HERE from (GMI − 3.31) ÷ 0.02392 and ÷ 18.018 (independent
+  // of src/data/gmiChart.js and src/lib/display.js, so a formula or rounding
+  // bug cannot self-certify):
+  //    5.5% →  91.5552 → "92"  /  5.0813 → "5.1"
+  //    6.0% → 112.4582 → "112" /  6.2414 → "6.2"
+  //    6.5% → 133.3612 → "133" /  7.4016 → "7.4"
+  //    7.0% → 154.2642 → "154" /  8.5617 → "8.6"
+  //    7.5% → 175.1672 → "175" /  9.7218 → "9.7"
+  //    8.0% → 196.0702 → "196" / 10.8819 → "10.9"
+  //   10.0% → 279.6823 → "280" / 15.5224 → "15.5"
+  // The chart sits OUTSIDE .gmi-panel (after it, before the formula section),
+  // and the intro reaches it through a plain, JS-free <a href="#gmi-chart">.
+  // Red line 2 (spec §3) is scanned over every piece of GC-01 copy — the jump
+  // paragraph, the chart section, and the four new FAQ answers — and the four
+  // new questions must follow the original four in the FAQPage JSON-LD
+  // (verbatim visible text is already T3-⑧'s job above).
+  if (route === "/gmi-calculator") {
+    const charts = root.querySelectorAll('[id="gmi-chart"]');
+    check(charts.length === 1, `GC-01 exactly one element with id="gmi-chart" (found ${charts.length})`);
+    const chart = charts[0];
+    check(chart?.tagName === "SECTION", `GC-01 #gmi-chart is a <section> (got <${chart?.tagName ?? "none"}>)`);
+    check(
+      chart?.querySelector("h2")?.text.trim() === "GMI chart: the CGM average behind each GMI value",
+      'GC-01 #gmi-chart H2 is "GMI chart: the CGM average behind each GMI value"',
+    );
+
+    const chartTables = chart?.querySelectorAll("table") ?? [];
+    check(chartTables.length === 1, `GC-01 #gmi-chart holds exactly one table (found ${chartTables.length})`);
+    const chartTable = chartTables[0];
+    const chartHeaders = (chartTable?.querySelectorAll("thead th") ?? []).map((th) => th.text.trim());
+    check(
+      JSON.stringify(chartHeaders) ===
+        JSON.stringify(["GMI", "CGM mean glucose (mg/dL)", "CGM mean glucose (mmol/L)"]),
+      `GC-01 chart columns = GMI | CGM mean glucose (mg/dL) | CGM mean glucose (mmol/L) (got ${chartHeaders.join(" | ")})`,
+    );
+    const chartRows = chartTable?.querySelectorAll("tbody tr") ?? [];
+    check(chartRows.length === 30, `GC-01 GMI chart has exactly 30 body rows (found ${chartRows.length})`);
+    const chartCells = chartRows.map((tr) => tr.querySelectorAll("th,td"));
+    check(
+      chartCells.length > 0 &&
+        chartCells.every(
+          (cells) =>
+            cells.length === 3 &&
+            cells[0].tagName === "TH" &&
+            cells[0].getAttribute("scope") === "row" &&
+            cells.slice(1).every((cell) => cell.tagName === "TD"),
+        ),
+      'GC-01 every chart row is <th scope="row">GMI</th> + two <td> cells',
+    );
+    const chartText = chartCells.map((cells) => cells.map((cell) => cell.text.trim()));
+    const expectedGmiColumn = [...Array.from({ length: 26 }, (_, i) => 55 + i), 85, 90, 95, 100].map(
+      (tenths) => `${Math.floor(tenths / 10)}.${tenths % 10}%`,
+    );
+    check(
+      JSON.stringify(chartText.map((cells) => cells[0])) === JSON.stringify(expectedGmiColumn),
+      "GC-01 GMI column is 5.5%–8.0% in 0.1 steps, then 8.5% / 9.0% / 9.5% / 10.0%, in order",
+    );
+    check(
+      chartText.length > 0 &&
+        chartText.every((cells) => /^\d+$/.test(cells[1] ?? "") && /^\d+\.\d$/.test(cells[2] ?? "")),
+      "GC-01 mg/dL cells are whole numbers and mmol/L cells carry exactly one decimal",
+    );
+    check(
+      chartText.length > 0 &&
+        chartText.every((cells, i) => i === 0 || Number(cells[1]) > Number(chartText[i - 1][1])),
+      "GC-01 mg/dL column strictly increases down the chart",
+    );
+    const goldenChartRows = [
+      ["5.5%", "92", "5.1"],
+      ["6.0%", "112", "6.2"],
+      ["6.5%", "133", "7.4"],
+      ["7.0%", "154", "8.6"],
+      ["7.5%", "175", "9.7"],
+      ["8.0%", "196", "10.9"],
+      ["10.0%", "280", "15.5"],
+    ];
+    for (const expected of goldenChartRows) {
+      check(
+        chartText.some((cells) => expected.every((value, i) => cells[i] === value)),
+        `GC-01 GMI chart row: ${expected[0]} → ${expected[1]} mg/dL / ${expected[2]} mmol/L`,
+      );
+    }
+
+    const gmiPanel = root.querySelector(".gmi-panel");
+    check(Boolean(chart) && !chart.closest(".gmi-panel"), "GC-01 #gmi-chart is not inside .gmi-panel");
+    check(
+      Boolean(gmiPanel) && gmiPanel.querySelectorAll("table, #gmi-chart").length === 0,
+      "GC-01 .gmi-panel contains no table and no #gmi-chart",
+    );
+    check(
+      Boolean(chart) && chart.querySelectorAll(".gmi-panel").length === 0,
+      "GC-01 #gmi-chart does not wrap .gmi-panel",
+    );
+    const mainSections = root.querySelectorAll("main section");
+    const formulaSection = root.querySelector('section[aria-labelledby="gmi-formula-heading"]');
+    const panelIndex = mainSections.indexOf(gmiPanel);
+    const chartIndex = mainSections.indexOf(chart);
+    const formulaIndex = mainSections.indexOf(formulaSection);
+    check(
+      panelIndex >= 0 && panelIndex < chartIndex && chartIndex < formulaIndex,
+      `GC-01 #gmi-chart comes after .gmi-panel and before the formula section (indices ${panelIndex} / ${chartIndex} / ${formulaIndex})`,
+    );
+
+    const jumpLinks = root.querySelectorAll('a[href="#gmi-chart"]');
+    check(jumpLinks.length >= 1, `GC-01 page has an <a href="#gmi-chart"> jump link (found ${jumpLinks.length})`);
+    const introJump = jumpLinks.find((a) => a.closest(".tool-page__header"));
+    check(Boolean(introJump), 'GC-01 the intro (.tool-page__header) carries the <a href="#gmi-chart"> link');
+    const jumpParagraph = introJump?.closest("p");
+    check(
+      (jumpParagraph?.text.trim() ?? "").startsWith("Already have a GMI from your CGM report?"),
+      'GC-01 the jump paragraph opens with "Already have a GMI from your CGM report?"',
+    );
+
+    // Red line 2 rules: no diagnostic band vocabulary, no good/bad-style label
+    // bound to a value, no target number in any wording. Each block (paragraph
+    // / cell / answer) is checked whole and sentence by sentence; sentences
+    // split only on punctuation FOLLOWED by whitespace, so "6.5%" stays intact.
+    const LABEL_WORDS =
+      "good|bad|healthy|unhealthy|ideal|optimal|excellent|poor|safe|unsafe|dangerous|elevated|target|goal|aim";
+    const redLineRules = [
+      ["prediabet", /prediabet/i],
+      ["normal", /normal/i],
+      ["diabetic range", /diabetic range/i],
+      ["diabet (GC-01 copy avoids the word entirely)", /diabet/i],
+      [
+        "comparative + number (below 7 / under 7 / less than 7 …)",
+        /\b(below|under|less than|lower than|above|over|greater than|higher than|more than|at or below|at or above|at most|at least|up to|no more than|no higher than)\s+(about\s+|around\s+|roughly\s+|approximately\s+)?\d/i,
+      ],
+      ["comparison symbol + number (< 7 …)", /[<>≤≥]\s*\d/],
+      ["label word + GMI/A1C (good GMI …)", new RegExp(`\\b(${LABEL_WORDS})\\s+(gmi|a1c)\\b`, "i")],
+      ["too high / too low", /\btoo (high|low)\b/i],
+    ];
+    const labelWord = new RegExp(`\\b(${LABEL_WORDS})s?\\b`, "i");
+    const redLineHits = (block) => {
+      const hits = redLineRules.filter(([, pattern]) => pattern.test(block)).map(([label]) => label);
+      if (block.split(/(?<=[.?!;:])\s+/).some((sentence) => /\d/.test(sentence) && labelWord.test(sentence))) {
+        hits.push("label / target word in a sentence with a number");
+      }
+      return hits;
+    };
+
+    const newFaqQuestions = [
+      "What does GMI mean?",
+      "Can I convert my GMI to an A1C?",
+      "What average glucose does my GMI correspond to?",
+      'Is there a "good" GMI number?',
+    ];
+    const newFaqAnswers = newFaqQuestions.map((question) => {
+      const entry = root
+        .querySelectorAll(".faq-list details")
+        .find((details) => details.querySelector("summary")?.text.trim() === question);
+      return entry?.querySelector("p")?.text.trim() ?? null;
+    });
+    check(
+      newFaqAnswers.every((answer) => answer !== null && answer.length > 0),
+      "GC-01 all four new FAQ questions render as visible <details> with an answer",
+    );
+
+    const chartBlocks = chart?.querySelectorAll("h2, p, th, td") ?? [];
+    const squash = (text) => text.replace(/\s+/g, "");
+    check(
+      Boolean(chart) && squash(chartBlocks.map((node) => node.text).join("")) === squash(chart.text),
+      "GC-01 the red-line scan blocks (h2 / p / th / td) cover every character of #gmi-chart",
+    );
+    const scanBlocks = [
+      ["jump paragraph", jumpParagraph?.text ?? ""],
+      ...chartBlocks.map((node) => ["#gmi-chart", node.text]),
+      ...newFaqQuestions.map((question, i) => [`FAQ answer "${question}"`, newFaqAnswers[i] ?? ""]),
+    ];
+    const redLineViolations = scanBlocks.flatMap(([where, block]) =>
+      redLineHits(block).map((hit) => `${where}: ${hit}`),
+    );
+    check(
+      redLineViolations.length === 0,
+      `GC-01 red line 2: no band vocabulary, value label, or target number in GC-01 copy${
+        redLineViolations.length ? ` (hits: ${redLineViolations.join("; ")})` : ""
+      }`,
+    );
+    check(
+      newFaqAnswers[3] !== null && !/\d/.test(newFaqAnswers[3]),
+      'GC-01 the "good GMI" answer contains no number at all (no target value)',
+    );
+    check(
+      (newFaqAnswers[2] ?? "").includes("(GMI − 3.31) ÷ 0.02392") &&
+        (newFaqAnswers[2] ?? "").includes("a GMI of 6.5% corresponds to a CGM average of about 133 mg/dL (7.4 mmol/L)"),
+      "GC-01 the average-glucose answer shows the inverse formula and the 6.5% golden row (133 mg/dL / 7.4 mmol/L)",
+    );
+
+    if (nodes !== null) {
+      const faqNames = (nodes.find((node) => node["@type"] === "FAQPage")?.mainEntity ?? []).map(
+        (entry) => entry.name,
+      );
+      const expectedFaqNames = [
+        "Why is my GMI different from my lab A1C?",
+        "How many days of CGM data do I need for a reliable GMI?",
+        "Can GMI replace a lab A1C test?",
+        "Which number from my CGM app should I enter?",
+        ...newFaqQuestions,
+      ];
+      check(
+        JSON.stringify(faqNames) === JSON.stringify(expectedFaqNames),
+        `GC-01 FAQPage JSON-LD = the original 4 questions, then the 4 new ones, in order (got ${faqNames.length})`,
+      );
+    }
+  }
+
   // T3-④ (ticket 11 — GI lookup row): the static reference table must hold
   // EXACTLY the 27 fixed, eligibility-checked foods (Spec §6.2 via
   // giData.selectStaticTable — a shrunken table means the selector silently
