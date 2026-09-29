@@ -115,8 +115,8 @@
 ## 内容与体验批次（站长 2026-09-29 选定 5 项）
 
 - [x] 撰写批次 Spec + ticket（测试屏蔽统计 / 换算页对照表 / 估算页区间表 / 手机横向溢出 / AGENTS.md 更新与去重）｜开始: 2026-09-29 07:45 ｜完成: 2026-09-29 08:05 ｜证据: docs/2026-09-29-content-ux-batch-spec-v1.md + .scratch/content-ux-batch/issues/01~06。已核实：主 Spec 未禁止估算页区间表（页面注释禁的是分档表），限定 70~240 mg/dL 不外推；现有 e2e 无控制台报错断言，可用 --host-resolver-rules 在配置层屏蔽；三张表 golden 值经 Node 独立验算
-- [~] CU-01 测试时屏蔽 GA4 / Cloudflare 统计 ｜ticket: .scratch/content-ux-batch/issues/01 ｜开始: 2026-09-29 08:06
-- [ ] CU-02 换算页对照表扩充 ｜Blocked by: CU-01
+- [x] CU-01 测试时屏蔽 GA4 / Cloudflare 统计 ｜ticket: .scratch/content-ux-batch/issues/01 ｜开始: 2026-09-29 08:06 ｜完成: 2026-09-29 08:40 ｜证据: 循环 2 次过（第 2 轮为编排者追加忽略系统代理：--no-proxy-server + 执行方实测补充的 --no-system-proxy-config-service，因默认 chrome-headless-shell 不识别前者）。只改 playwright.config.js 顶层 use.launchOptions.args（--host-resolver-rules 把 9 个统计主机写法解析为 ~NOTFOUND）+ 新增 analytics-block-app / analytics-block-prerender 两个 e2e。独立验收 ACCEPT 7/7：npm run check 全绿（unit 99、verify-dist 721、e2e 124 = 122+2）；独立探针带参数时统计主机全部 ERR_NAME_NOT_RESOLVED、对照站 200，不带参数时可达；dist 9 页 GA4 与 beacon 标签不变；变异测试（改规则/去规则/显式代理）均使新测试变红（.scratch/cu01-verify.log）。未实测：真正开启 Windows 系统代理时的表现（按要求未改系统设置）
+- [~] CU-02 换算页对照表扩充 ｜开始: 2026-09-29 08:42
 - [ ] CU-03 估算页区间参考表 ｜Blocked by: CU-02
 - [ ] CU-04 手机横向溢出修复 ｜Blocked by: CU-03
 - [ ] CU-05 AGENTS.md 更新 + 删除重复 gi.json 与死文件 index.css ｜Blocked by: CU-04

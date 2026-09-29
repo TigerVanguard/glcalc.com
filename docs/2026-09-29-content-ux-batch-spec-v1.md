@@ -29,6 +29,7 @@
 ### CU-01 测试时屏蔽统计脚本
 
 - 只改 `playwright.config.js`：在顶层 `use.launchOptions.args` 加 Chromium 参数 `--host-resolver-rules`，把以下主机解析为 `~NOTFOUND`：`www.googletagmanager.com`、`googletagmanager.com`、`*.googletagmanager.com`、`www.google-analytics.com`、`google-analytics.com`、`*.google-analytics.com`、`static.cloudflareinsights.com`、`cloudflareinsights.com`、`*.cloudflareinsights.com`。两个项目都生效。
+- （2026-09-29 执行中追加，编排者决定）同时加 `--no-proxy-server`：`--host-resolver-rules` 只作用于 Chromium 自己的 DNS 解析，开启系统代理时会被绕过（执行方已用本机 7897 端口代理实测复现）。测试只访问本机服务器，不需要代理。另加 `--no-system-proxy-config-service`：默认的 `chrome-headless-shell` 不识别 `--no-proxy-server`，需靠它忽略系统代理（执行方已对两种二进制实测）。
 - **生产代码零改动**：`index.html` 里的 GA4 与 Cloudflare 片段保持无条件加载（verify-dist 既有断言要求 GA4 无 hostname 条件）。
 - 现有测试零修改。
 

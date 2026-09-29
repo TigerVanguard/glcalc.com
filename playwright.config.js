@@ -14,8 +14,45 @@ const staticPort = process.env.E2E_STATIC_PORT ?? "4184";
 const appBaseURL = `http://127.0.0.1:${appPort}/`;
 const staticBaseURL = `http://127.0.0.1:${staticPort}/`;
 
+// index.html loads GA4 (gtag.js) and the Cloudflare Web Analytics beacon
+// unconditionally, and must keep doing so; a test browser must never reach
+// them, or every local run shows up in both as visits to 127.0.0.1. Chromium's
+// resolver fails these hosts with net::ERR_NAME_NOT_RESOLVED while the markup
+// stays production-identical (analytics-block-*.spec.js asserts both halves).
+// "*.host" does not match the bare host, hence both forms. The rules only
+// override Chromium's own DNS, and a proxy resolves hosts itself, so the test
+// browser must also ignore the OS proxy settings (tests only talk to
+// 127.0.0.1). Each build knows only one of the two switches:
+// --no-proxy-server is full Chromium's (headed runs), and
+// --no-system-proxy-config-service is chrome-headless-shell's (the default
+// headless browser). An explicit proxy — Playwright's `proxy` option or a
+// --proxy-server arg — is not covered: in chrome-headless-shell it wins over
+// these switches and bypasses the rules.
+const ANALYTICS_BLOCK_RULES = [
+  "MAP www.googletagmanager.com ~NOTFOUND",
+  "MAP googletagmanager.com ~NOTFOUND",
+  "MAP *.googletagmanager.com ~NOTFOUND",
+  "MAP www.google-analytics.com ~NOTFOUND",
+  "MAP google-analytics.com ~NOTFOUND",
+  "MAP *.google-analytics.com ~NOTFOUND",
+  "MAP static.cloudflareinsights.com ~NOTFOUND",
+  "MAP cloudflareinsights.com ~NOTFOUND",
+  "MAP *.cloudflareinsights.com ~NOTFOUND",
+].join(", ");
+
 export default defineConfig({
   testDir: "tests/e2e",
+  // Merged into each project's `use` key by key: a project that sets its own
+  // launchOptions replaces this one and must repeat the args.
+  use: {
+    launchOptions: {
+      args: [
+        `--host-resolver-rules=${ANALYTICS_BLOCK_RULES}`,
+        "--no-proxy-server",
+        "--no-system-proxy-config-service",
+      ],
+    },
+  },
   projects: [
     {
       name: "static",
