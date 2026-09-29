@@ -361,9 +361,9 @@ for (const page of PAGES) {
   if (route === "/blood-sugar-converter") {
     check(html.includes("18.018"), 'T3-④ converter page contains formula string "18.018"');
     const tables = root.querySelectorAll(".conversion-table");
-    check(tables.length === 1, `T3-④ exactly one .conversion-table (found ${tables.length})`);
+    check(tables.length === 2, `T3-④ exactly two .conversion-table (found ${tables.length})`);
     const rows = tables[0]?.querySelectorAll("tbody tr") ?? [];
-    check(rows.length === 6, `T3-④ conversion table has 6 body rows (found ${rows.length})`);
+    check(rows.length === 29, `T3-④ conversion table has 29 body rows (found ${rows.length})`);
     const expectedPairs = [
       ["70", "3.9"],
       ["100", "5.6"],
@@ -381,6 +381,135 @@ for (const page of PAGES) {
         `T3-④ conversion table row: ${mgdl} mg/dL → ${mmol} mmol/L`,
       );
     }
+
+    // CU-02 (content-ux batch spec v1 §2): the forward table (tables[0],
+    // 29 rows, 40–600 mg/dL) and the reverse table (tables[1], 27 rows,
+    // 2.0–30.0 mmol/L), each under its own H3, reached from the intro through
+    // a plain JS-free <a href="#conversion-charts">. Value columns and golden
+    // rows are hardcoded HERE, independent of src/data/converterTables.js and
+    // src/lib/display.js:
+    //   mmol = mg/dL ÷ 18.018, half-up to 1 decimal:
+    //      40 →  2.2200 → "2.2"    60 →  3.3300 → "3.3"   126 →  6.9930 → "7.0"
+    //     250 → 13.8750 → "13.9"  300 → 16.6500 → "16.7"  600 → 33.2999 → "33.3"
+    //   mg/dL = mmol × 18.018, half-up to a whole number:
+    //     2.0 →  36.036 → "36"   4.0 →  72.072 → "72"   5.5 →  99.099 → "99"
+    //     7.0 → 126.126 → "126" 10.0 → 180.180 → "180" 11.0 → 198.198 → "198"
+    //    30.0 → 540.540 → "541"
+    const reverseRows = tables[1]?.querySelectorAll("tbody tr") ?? [];
+    check(
+      reverseRows.length === 27,
+      `CU-02 reverse conversion table has exactly 27 body rows (found ${reverseRows.length})`,
+    );
+    const headersOf = (table) =>
+      (table?.querySelectorAll("thead th") ?? []).map((th) => th.text.trim()).join(" | ");
+    check(headersOf(tables[0]) === "mg/dL | mmol/L", `CU-02 forward table columns = mg/dL | mmol/L (got ${headersOf(tables[0])})`);
+    check(headersOf(tables[1]) === "mmol/L | mg/dL", `CU-02 reverse table columns = mmol/L | mg/dL (got ${headersOf(tables[1])})`);
+
+    const cellsOf = (trs) => trs.map((tr) => tr.querySelectorAll("th,td"));
+    const forwardCells = cellsOf(rows);
+    const reverseCells = cellsOf(reverseRows);
+    const rowShapeOk = (cellRows) =>
+      cellRows.length > 0 &&
+      cellRows.every(
+        (cells) =>
+          cells.length === 2 &&
+          cells[0].tagName === "TH" &&
+          cells[0].getAttribute("scope") === "row" &&
+          cells[1].tagName === "TD",
+      );
+    check(rowShapeOk(forwardCells), 'CU-02 every forward row is <th scope="row"> + one <td>');
+    check(rowShapeOk(reverseCells), 'CU-02 every reverse row is <th scope="row"> + one <td>');
+    const forwardText = forwardCells.map((cells) => cells.map((cell) => cell.text.trim()));
+    const reverseText = reverseCells.map((cells) => cells.map((cell) => cell.text.trim()));
+
+    const expectedForwardMgdl = [
+      "40", "50", "60", "70", "80", "90", "100", "110", "120", "126", "130", "140", "150", "160", "170",
+      "180", "190", "200", "220", "240", "250", "270", "300", "350", "400", "450", "500", "550", "600",
+    ];
+    const expectedReverseMmol = [
+      "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5",
+      "9.0", "9.5", "10.0", "11.0", "12.0", "13.0", "14.0", "15.0", "16.0", "18.0", "20.0", "25.0", "30.0",
+    ];
+    check(
+      JSON.stringify(forwardText.map((cells) => cells[0])) === JSON.stringify(expectedForwardMgdl),
+      "CU-02 forward mg/dL column is exactly 40, 50, … 600 (29 spec values, in order)",
+    );
+    check(
+      JSON.stringify(reverseText.map((cells) => cells[0])) === JSON.stringify(expectedReverseMmol),
+      "CU-02 reverse mmol/L column is exactly 2.0, 2.5, … 30.0 (27 spec values, in order)",
+    );
+    check(
+      forwardText.length > 0 && forwardText.every((cells) => /^\d+\.\d$/.test(cells[1] ?? "")),
+      "CU-02 forward mmol/L cells carry exactly one decimal",
+    );
+    check(
+      reverseText.length > 0 && reverseText.every((cells) => /^\d+$/.test(cells[1] ?? "")),
+      "CU-02 reverse mg/dL cells are whole numbers",
+    );
+    const goldenForward = [
+      ["40", "2.2"],
+      ["60", "3.3"],
+      ["126", "7.0"],
+      ["250", "13.9"],
+      ["300", "16.7"],
+      ["600", "33.3"],
+    ];
+    for (const [mgdl, mmol] of goldenForward) {
+      check(
+        forwardText.some((cells) => cells[0] === mgdl && cells[1] === mmol),
+        `CU-02 forward table row: ${mgdl} mg/dL → ${mmol} mmol/L`,
+      );
+    }
+    const goldenReverse = [
+      ["2.0", "36"],
+      ["4.0", "72"],
+      ["5.5", "99"],
+      ["7.0", "126"],
+      ["10.0", "180"],
+      ["11.0", "198"],
+      ["30.0", "541"],
+    ];
+    for (const [mmol, mgdl] of goldenReverse) {
+      check(
+        reverseText.some((cells) => cells[0] === mmol && cells[1] === mgdl),
+        `CU-02 reverse table row: ${mmol} mmol/L → ${mgdl} mg/dL`,
+      );
+    }
+
+    // Layout: H3 (#conversion-charts) → forward table → H3 → reverse table →
+    // the existing muted note, as consecutive siblings, outside the calculator.
+    const targets = root.querySelectorAll('[id="conversion-charts"]');
+    check(targets.length === 1, `CU-02 exactly one element with id="conversion-charts" (found ${targets.length})`);
+    const target = targets[0];
+    check(
+      target?.tagName === "H3" && target.text.trim() === "Common blood sugar values: mg/dL to mmol/L",
+      'CU-02 #conversion-charts is the H3 "Common blood sugar values: mg/dL to mmol/L"',
+    );
+    const siblings = target?.parentNode?.childNodes.filter((node) => node.nodeType === 1) ?? [];
+    const at = siblings.indexOf(target);
+    const run = at >= 0 ? siblings.slice(at, at + 5) : [];
+    check(
+      run.length === 5 &&
+        run[1] === tables[0] &&
+        run[2].tagName === "H3" &&
+        run[2].text.trim() === "Common blood sugar values: mmol/L to mg/dL" &&
+        run[3] === tables[1] &&
+        run[4].tagName === "P" &&
+        run[4].text.includes("do not interpret or grade your own reading"),
+      'CU-02 order: #conversion-charts H3 → forward table → H3 "Common blood sugar values: mmol/L to mg/dL" → reverse table → the "do not interpret or grade" note',
+    );
+    check(
+      tables.length === 2 && tables.every((table) => !table.closest(".converter-panel")),
+      "CU-02 both conversion tables sit outside .converter-panel",
+    );
+
+    const jumpLinks = root.querySelectorAll('a[href="#conversion-charts"]');
+    check(jumpLinks.length === 1, `CU-02 exactly one <a href="#conversion-charts"> (found ${jumpLinks.length})`);
+    check(
+      Boolean(jumpLinks[0]?.closest(".tool-page__header")) &&
+        jumpLinks[0].text.trim() === "Jump to the conversion charts",
+      'CU-02 the intro (.tool-page__header) carries <a href="#conversion-charts">Jump to the conversion charts</a>',
+    );
   }
 
   // T3-④ (ticket 08 — a1c-to-eag row): formula strings + Nathan 2008 source +

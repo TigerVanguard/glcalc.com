@@ -79,10 +79,10 @@ test("converter page shows formula, reference table, and FAQ without JavaScript"
   await page.goto("/blood-sugar-converter");
   await expect(page.locator("main")).toContainText("18.018");
 
-  const rows = page.locator(".conversion-table tbody tr");
-  await expect(rows).toHaveCount(6);
-  await expect(rows.nth(2)).toContainText("126");
-  await expect(rows.nth(2)).toContainText("7.0");
+  const rows = page.locator(".conversion-table").first().locator("tbody tr");
+  await expect(rows).toHaveCount(29);
+  await expect(rows.nth(9)).toContainText("126");
+  await expect(rows.nth(9)).toContainText("7.0");
 
   const faqEntries = page.locator(".faq-list details");
   await expect(faqEntries).toHaveCount(3);

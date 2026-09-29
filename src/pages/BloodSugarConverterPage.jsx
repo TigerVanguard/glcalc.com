@@ -8,16 +8,12 @@ import ErrorNotice from "../features/common/ErrorNotice.jsx";
 import { mgdlToMmol, mmolToMgdl } from "../lib/formulas.js";
 import { formatMgdl, formatMmol, parsePositiveNumber } from "../lib/display.js";
 import { BLOOD_SUGAR_CONVERTER_FAQS } from "../data/bloodSugarConverterFaq.js";
-
-// Common-values reference table (Spec §5A.2 converter): fixed mg/dL anchors
-// with the mmol/L column DERIVED from formulas.js at module scope — the static
-// prerendered numbers can never drift from the conversion the interactive tool
-// uses. scripts/verify-dist.mjs re-hardcodes the expected pairs independently.
-const REFERENCE_MGDL = [70, 100, 126, 140, 180, 200];
-const REFERENCE_ROWS = REFERENCE_MGDL.map((mgdl) => ({
-  mgdl,
-  mmol: formatMmol(mgdlToMmol(mgdl)),
-}));
+// Common-values tables (Spec §5A.2 converter, content-ux CU-02): both
+// directions are DERIVED from formulas.js + display.js at module load in
+// src/data/converterTables.js, so the static prerendered numbers can never
+// drift from the conversion the interactive tool uses.
+// scripts/verify-dist.mjs re-hardcodes the expected rows independently.
+import { MGDL_TO_MMOL_TABLE, MMOL_TO_MGDL_TABLE } from "../data/converterTables.js";
 
 // ">1000 mg/dL (or the mmol equivalent)" warning threshold (Spec §5A.2):
 // warns without blocking the conversion.
@@ -60,12 +56,19 @@ export default function BloodSugarConverterPage() {
     <ToolPageLayout
       h1="Blood Sugar Converter (mg/dL ⇄ mmol/L)"
       intro={
-        <p>
-          Convert a blood glucose reading between mg/dL and mmol/L instantly,
-          in either direction. The two units are different ways of reporting
-          exactly the same measurement, so nothing about your reading changes —
-          only the number format does.
-        </p>
+        <>
+          <p>
+            Convert a blood glucose reading between mg/dL and mmol/L instantly,
+            in either direction. The two units are different ways of reporting
+            exactly the same measurement, so nothing about your reading changes —
+            only the number format does.
+          </p>
+          <p>
+            Looking up a common value?{" "}
+            <a href="#conversion-charts">Jump to the conversion charts</a> for
+            both directions, mg/dL to mmol/L and mmol/L to mg/dL.
+          </p>
+        </>
       }
       related={
         <RelatedTools
@@ -210,7 +213,7 @@ export default function BloodSugarConverterPage() {
           g/mol) combined with the deciliter-to-liter volume difference between
           the two units.
         </p>
-        <h3>Common blood sugar values in both units</h3>
+        <h3 id="conversion-charts">Common blood sugar values: mg/dL to mmol/L</h3>
         <table className="conversion-table">
           <thead>
             <tr>
@@ -219,18 +222,35 @@ export default function BloodSugarConverterPage() {
             </tr>
           </thead>
           <tbody>
-            {REFERENCE_ROWS.map((row) => (
-              <tr key={row.mgdl}>
-                <th scope="row">{row.mgdl}</th>
-                <td>{row.mmol}</td>
+            {MGDL_TO_MMOL_TABLE.map((row) => (
+              <tr key={row.mgdlDisplay}>
+                <th scope="row">{row.mgdlDisplay}</th>
+                <td>{row.mmolDisplay}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <h3>Common blood sugar values: mmol/L to mg/dL</h3>
+        <table className="conversion-table">
+          <thead>
+            <tr>
+              <th scope="col">mmol/L</th>
+              <th scope="col">mg/dL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MMOL_TO_MGDL_TABLE.map((row) => (
+              <tr key={row.mmolDisplay}>
+                <th scope="row">{row.mmolDisplay}</th>
+                <td>{row.mgdlDisplay}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <p className="muted">
-          Some of these values appear in clinical guidelines, but the table is
-          only here to help you read a number written in an unfamiliar unit —
-          it does not interpret or grade your own reading.
+          Some of these values appear in clinical guidelines, but the tables
+          are only here to help you read a number written in an unfamiliar
+          unit — they do not interpret or grade your own reading.
         </p>
       </section>
     </ToolPageLayout>

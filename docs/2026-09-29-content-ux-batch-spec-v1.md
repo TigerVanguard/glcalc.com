@@ -42,6 +42,7 @@
   - 表下现有说明段（「表只帮你读懂单位，不解读或评价读数」）保留，对两张表都适用。
   - 在 intro 或计算器之后加一个跳转锚点链接（如 `Jump to the conversion charts`），指向对照表所在区块的 id。
 - 标题、H1、meta description 不改；`src/sitemap-lastmod.json` 中 `/blood-sugar-converter` 改为执行当天日期。
+- （2026-09-29 执行中修订，编排者批准）以下 3 处既有精确断言与本需求冲突，允许且仅允许改为新的精确值：`scripts/verify-dist.mjs` 中 `.conversion-table` 数量 `=== 1` → `=== 2`、正向表行数 `=== 6` → `=== 29`（反向表 27 行作为新增断言）；`tests/e2e/prerender.spec.js` 中对照表断言改为只针对正向表、29 行，126 / 7.0 行按新位置（索引 9）精确定位。原有 6 个对照对的断言保持不动。文案定为：正向表 H3 `Common blood sugar values: mg/dL to mmol/L`，反向表 H3 `Common blood sugar values: mmol/L to mg/dL`，跳转链接 `Jump to the conversion charts` → `#conversion-charts`。
 - golden 值（已用独立脚本验算）：正向 40→2.2、60→3.3、126→7.0、250→13.9、300→16.7、600→33.3；反向 2.0→36、4.0→72、5.5→99、7.0→126、10.0→180、11.0→198、30.0→541。
 
 ### CU-03 估算页区间参考表
