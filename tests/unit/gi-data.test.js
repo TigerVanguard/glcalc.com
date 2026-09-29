@@ -1,7 +1,7 @@
-// Spec §8 T2: GI data quality tests against src/gi.json (full dataset).
+// Spec §8 T2: GI data quality tests against src/data/gi.json (full dataset).
 import { describe, expect, it } from "vitest";
 
-import giData from "../../src/gi.json";
+import giData from "../../src/data/gi.json";
 import {
   GI_NA_DISPLAY,
   GI_NA_FULL_LABEL,

@@ -1,5 +1,5 @@
 // GI data quality rules (Spec §6) — pure functions, no UI coupling.
-// Data source: src/gi.json ({name: {gi, carbs_per_100g}}, DiOGenes category
+// Data source: src/data/gi.json ({name: {gi, carbs_per_100g}}, DiOGenes category
 // assignments). Low-carb entries carry encoded (non-measured) GI values like
 // 45/70, producing directional errors such as "egg white GI 70". These rules
 // govern how entries are displayed and which entries qualify for the static
