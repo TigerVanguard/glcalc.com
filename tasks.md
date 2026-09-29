@@ -109,7 +109,7 @@
 
 - [x] 撰写 GMI 页内容补强 Spec + ticket（GMI 对照表 + 查询意图对应的正文/FAQ；站长 2026-09-29「现在做」）｜开始: 2026-09-29 06:25 ｜完成: 2026-09-29 06:45 ｜证据: docs/2026-09-29-gmi-content-spec-v1.md（§0 按 42 个 GMI 查询词的 5 类意图对照页面缺口；D1~D8 锁定：精确反解纯函数、30 行对照表、4 条意图 FAQ、标题/H1/描述不动、不给目标数值）+ .scratch/gmi-content/issues/01；golden 值经 Node 独立验算一致
 - [x] GC-01 GMI 对照表 + 意图 FAQ ｜ticket: .scratch/gmi-content/issues/01 ｜开始: 2026-09-29 06:46 ｜完成: 2026-09-29 07:35 ｜证据: 循环 2 次过（第 2 轮为验收方建议的两处医疗准确性修正：FAQ「only a lab test」→「only an A1C blood test」；formulas.js 注释把 eag（ADAG 正向）与 a1cRange（代数近似反解、只出区间）分开）。formulas.js 新增 meanGlucoseFromGmi（精确反解）；src/data/gmiChart.js 30 行（5.5~8.0% 每 0.1 + 8.5/9.0/9.5/10.0%）全部由 formulas + display 计算；页面新增 #gmi-chart 节（面板之后、公式节之前）+ intro 跳转；gmiFaq.js 追加 4 条（定义 / 换算 A1C / 对应平均血糖 / 「good」GMI，例子数字由公式计算、无目标数值）；标题/H1/描述/.gmi-panel 零变化；prerender.spec.js GMI FAQ 精确计数 4→8（编排者批准，spec §3 已记）。独立验收 ACCEPT 9/9 + 增量复核 ACCEPT：npm run check 全绿（unit 99 = 85+14、verify-dist 721 PASS = 683+38、e2e 122 = 118+4）；BigInt 独立计算 30 行与 dist 逐格 0 差异；其余 8 页除资源 hash 外逐字节不变；文案逐句审阅无分档/好坏/目标值/新统计；390 与 360 宽度无横向溢出；12 种变异全部被新断言捕获（.scratch/gc01-verify.log、gc01-verify-r2.log）
-- [~] GC-02 部署与线上核对（编排者）｜开始: 2026-09-29 07:37
+- [x] GC-02 部署与线上核对（编排者）｜开始: 2026-09-29 07:37 ｜完成: 2026-09-29 07:45 ｜证据: commit 207a99b 部署后线上 /gmi-calculator：#gmi-chart 存在、30 个行表头、intro 跳转链接、golden 行 6.5% → 133 / 7.4；FAQPage JSON-LD 共 8 个问题且含 4 个新问题；sitemap /gmi-calculator lastmod 2026-09-29；title 未变。GSC 重新请求编入索引待站长决定（额度可能与其他站点共用）
 
 ## T6 上线后验收（GSC，禁 site:；长期跟踪，Spec §8 T6）
 
