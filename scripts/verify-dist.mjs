@@ -1459,6 +1459,32 @@ if (vercelExists) {
     Boolean(hostRedirect),
     "host-conditional permanent redirect glcalc.vercel.app/(.*) → https://glucomath.com/$1 present",
   );
+  // Old-home redirect spec OR-01 (D1): the old root (the upstream GL
+  // calculator) 308s to /glycemic-load-calculator, not to the new home.
+  // Vercel applies the first matching redirect, so this rule must precede the
+  // catch-all above. Values hardcoded here.
+  const redirects = vercel.redirects ?? [];
+  const oldHomeRedirects = redirects.filter(
+    (r) =>
+      r.source === "/" &&
+      (r.has ?? []).some((c) => c.type === "host" && c.value === "glcalc.vercel.app"),
+  );
+  const oldHomeRedirect = oldHomeRedirects[0];
+  check(
+    oldHomeRedirects.length === 1 &&
+      oldHomeRedirect.destination === "https://glucomath.com/glycemic-load-calculator" &&
+      oldHomeRedirect.permanent === true,
+    `OR-01 exactly one host-conditional permanent redirect glcalc.vercel.app/ → https://glucomath.com/glycemic-load-calculator (found ${oldHomeRedirects.length}; got ${
+      oldHomeRedirect ? `${oldHomeRedirect.destination}, permanent ${oldHomeRedirect.permanent}` : "none"
+    })`,
+  );
+  const oldHomeIndex = redirects.indexOf(oldHomeRedirect);
+  const catchAllIndex = redirects.indexOf(hostRedirect);
+  check(
+    oldHomeIndex !== -1 && catchAllIndex !== -1 && oldHomeIndex < catchAllIndex,
+    `OR-01 glcalc.vercel.app/ redirect precedes the /(.*) catch-all (index ${oldHomeIndex} < ${catchAllIndex})`,
+  );
+  check(redirects.length === 2, `OR-01 redirects has exactly 2 entries (found ${redirects.length})`);
 }
 
 // Print report (shareable-assets BL-05 / SA-06, Spec D2): the print styles

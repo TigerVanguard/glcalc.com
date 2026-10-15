@@ -5,7 +5,7 @@
 ## 当前状态
 
 - 线上 https://glucomath.com ，托管在 Vercel：GitHub `TigerVanguard/glcalc.com` 的 `master` 推送后自动构建部署。本机工作副本中 remote `tiger` 指向该仓库，`origin` 指向上游 assafmo/glcalc.com（不要往 `origin` 推）。
-- 旧域 `glcalc.vercel.app` 全路径 308 到新域（`vercel.json` 中按 host 条件的 permanent redirect）。
+- 旧域 `glcalc.vercel.app` 根路径 308 到 `/glycemic-load-calculator`（旧首页即 GL 计算器），其余路径 308 到新域同名路径（`vercel.json` 中按 host 条件的 permanent redirect，根路径规则在前）。
 - 品牌 GlucoMath：`src/site.config.js` 的 `BRAND` / `SITE_ORIGIN`（可用 `VITE_BRAND` / `VITE_SITE_ORIGIN` 覆盖）。
 - 9 个预渲染路由（真源：`scripts/prerender.mjs` 的 `ROUTES`）：`/`、`/glycemic-load-calculator`、`/glycemic-load-chart`、`/glycemic-index-calculator`、`/gmi-calculator`、`/a1c-to-eag-calculator`、`/blood-sugar-converter`、`/glucose-to-a1c-estimator`、`/about`。预渲染同时生成 `dist/404.html`、`dist/sitemap.xml`、`dist/robots.txt`。
 - 页头导航 `SiteNav` 恰好 8 项，`/glycemic-load-chart` 故意不在导航里（verify-dist 断言每页 8 项）。
@@ -21,6 +21,7 @@
 | `docs/2026-09-27-perf-spec-v1.md`（字体自托管、拆分 gi.json 页面） | `.scratch/perf/issues/`（01~03） | 全部完成 |
 | `docs/2026-09-29-gmi-content-spec-v1.md`（GMI 对照表 + 意图 FAQ） | `.scratch/gmi-content/issues/`（01；GC-02 为编排者部署核对，无 ticket 文件） | GC-01、GC-02 完成 |
 | `docs/2026-09-29-content-ux-batch-spec-v1.md`（测试屏蔽统计、换算/估算表、手机溢出、本文件） | `.scratch/content-ux-batch/issues/`（01~06） | CU-01~04 完成；CU-05、CU-06 以 `tasks.md` 为准 |
+| `docs/2026-10-15-old-home-redirect-spec-v1.md`（旧域首页重定向修正） | `.scratch/old-home-redirect/issues/`（01~02） | 以 `tasks.md` 为准 |
 
 - 主 Spec §0A「仓库实况」记录的是 2026-09-12 开工前的状态，部分已过时（如 e2e 跑在 dev server、`App.js` 存在）；§1 锁定决策 D1~D6 与 §9 红线仍然有效。
 - shareable-assets 的 ticket 在 `tasks.md` 中记为 SA-01~06（按文件编号），与 Spec 里的 BL-01~06 不是一一同号；每个 ticket 文件头写明了对应的 BL 编号。

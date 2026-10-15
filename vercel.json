@@ -4,6 +4,12 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/",
+      "has": [{ "type": "host", "value": "glcalc.vercel.app" }],
+      "destination": "https://glucomath.com/glycemic-load-calculator",
+      "permanent": true
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "glcalc.vercel.app" }],
       "destination": "https://glucomath.com/$1",

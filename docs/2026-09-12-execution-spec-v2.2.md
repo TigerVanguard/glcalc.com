@@ -67,7 +67,7 @@
 ### P4 数据质量管道（见 §6）
 ### P5 域名切换（glucomath.com 购买后执行）
 1. Vercel 绑定 glucomath.com，设为 Production 域名；`VITE_SITE_ORIGIN=https://glucomath.com` 重新 build；
-2. glcalc.vercel.app → glucomath.com 全路径永久重定向（Vercel 域名 redirect 配置；**Vercel 实际返回 308，SEO 等效 301，验收断言 status ∈ {301, 308} 且 Location 正确**，不得把 308 误判为失败）；
+2. glcalc.vercel.app → glucomath.com 全路径永久重定向（Vercel 域名 redirect 配置；**Vercel 实际返回 308，SEO 等效 301，验收断言 status ∈ {301, 308} 且 Location 正确**，不得把 308 误判为失败）；**2026-10-15 修订**：旧域根路径 `/` 改为 308 到 `/glycemic-load-calculator`（旧首页即 GL 计算器），其余路径不变，见 `docs/2026-10-15-old-home-redirect-spec-v1.md`；
 3. 全站文案品牌名 GL Calc → GlucoMath：`BRAND` 常量切换 + manifest.webmanifest 的 name/short_name、application-name、og:site_name、schema name 同步；**`tests/e2e/pwa.spec.js` 的品牌名断言同步改为从 site.config 读取**（否则与「pwa.spec.js 全绿」互斥）；**重制 `public/og-cover.png`**（静态图内品牌名不吃环境变量切换）；
 4. GSC 新建 glucomath.com 域名级资源（DNS TXT），提交 sitemap；旧资源保留观察重定向生效；
 5. 验收：产物中 `grep -r "glcalc.vercel.app" dist/` 仅允许出现在重定向说明文档中（HTML/sitemap/robots 零命中）。
