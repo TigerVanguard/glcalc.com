@@ -124,7 +124,7 @@
 ## 旧域首页重定向修正（docs/2026-10-15-old-home-redirect-spec-v1.md；站长 2026-10-15 选定）
 
 - [x] OR-01 旧域根路径 308 改到 /glycemic-load-calculator（vercel.json 新增首条规则 + verify-dist 断言 + AGENTS.md）｜ticket: .scratch/old-home-redirect/issues/01-old-home-to-gl-calculator.md ｜开始: 2026-10-15 07:30 ｜完成: 2026-10-15 07:50 ｜证据: 循环 1 次过。执行方 npm run check 退出 0（unit 113、verify-dist 779→782 PASS / 0 FAIL、e2e 205），dist 前后 34 个文件 hash 一致，2 个必做变异（目标改错、顺序互换）各只挂对应断言（.scratch/or01-exec-check.log、or01-mutation.log）。独立验收 ACCEPT 8/8：自跑 npm run check 同样结果（.scratch/or01-verify.log），HEAD 版 verify-dist 对同一构建为 779，新增 3 条、无删减；另做 6 种变异全部被抓（.scratch/or01-verify-mutation.log）；src/public/api 与依赖零改动
-- [~] OR-02 部署与线上 curl 核对（编排者）｜ticket: .scratch/old-home-redirect/issues/02-deploy-check.md ｜开始: 2026-10-15 07:50
+- [x] OR-02 部署与线上 curl 核对（编排者）｜ticket: .scratch/old-home-redirect/issues/02-deploy-check.md ｜开始: 2026-10-15 07:50 ｜完成: 2026-10-15 07:55 ｜证据: 推送 19abd3b 后约 1 分钟生效（curl.exe -sI）：glcalc.vercel.app/ → 308 https://glucomath.com/glycemic-load-calculator；/about → 308 https://glucomath.com/about；/glycemic-load-calculator → 308 同名路径；/?food=apple → 308 https://glucomath.com/glycemic-load-calculator?food=apple（查询参数透传）；glucomath.com/ 与 /glycemic-load-calculator 均 200、无 Location。后续：Google 重抓旧首页后才会改认新目标，周报 #3 复查旧域词是否转到 GL 计算器页
 
 ## 站外推广调研（shareable-assets Spec §6 第 1 步）
 
