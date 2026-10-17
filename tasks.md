@@ -128,6 +128,10 @@
 
 - [!] OR 跟进：旧资源 GSC 请求编入索引 https://glcalc.vercel.app/，让 Google 尽快重抓并看到新跳转目标 ｜开始: 2026-10-16 05:45（约）｜站长授权: 2026-10-15 选定「reindex_old_home」｜受阻: 2026-10-16 05:50 实时测试后 GSC 返回「Quota Exceeded — exceeded your daily quota, try again tomorrow」，这是该资源第 3 次遇到配额已满（9/25、9/27、10/16）。请求前状态：URL is not on Google / Page with redirect（10/8 抓取）。不建议每天重试：10/8 那次 Google 是自行重抓的，下次例行抓取就会看到新目标；周报 #3 复查旧首页最后抓取日期
 
+## Bing 收录
+
+- [!] Bing Webmaster Tools 开通：从 GSC 导入 glucomath.com（含 sitemap），并提交 9 个路由 ｜开始: 2026-10-16 16:55 ｜站长授权: 2026-10-16 选定「builtin」（站长在 Cursor 内置浏览器登录，账号与授权由站长完成）｜受阻: 2026-10-16 17:05 内置浏览器的 Bing 标签页在站长界面上不可见（切前台、open_resource 均无效），改为站长在自己的浏览器里按步骤导入（步骤与 9 个网址已给出）；备选 IndexNow（需加密钥文件，走 Spec + 验收）
+
 ## 站外推广调研（shareable-assets Spec §6 第 1 步）
 
 - [!] 竞品外链调研（DataForSEO Backlinks API，试用额度内、上限 $1）：先用 SERP 确认核心词前 10 的对标站，再拉竞品外链概况与每域一条外链明细，产出可提交/可联系的渠道清单 ｜开始: 2026-10-10 18:20 ｜凭据: 本地 .env.local（已在 .gitignore）｜受阻: 2026-10-10 18:21 凭据有效（余额接口正常），但首个付费调用（1 次 SERP live）返回 40201「账户异常活动，已暂停访问」；按 DataForSEO 帮助中心，需站长本人经支持表单/聊天或 support@dataforseo.com 申请解封，且不要再注册新账号。花费 $0（余额仍 $1.00，记录见 `.scratch/competitor-backlinks/spend.json`）；解封后用 `.scratch/dfs.mjs`（本地脚本）续跑
