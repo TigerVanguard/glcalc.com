@@ -130,7 +130,7 @@
 
 ## Bing 收录
 
-- [!] Bing Webmaster Tools 开通：从 GSC 导入 glucomath.com（含 sitemap），并提交 9 个路由 ｜开始: 2026-10-16 16:55 ｜站长授权: 2026-10-16 选定「builtin」（站长在 Cursor 内置浏览器登录，账号与授权由站长完成）｜受阻: 2026-10-16 17:05 内置浏览器的 Bing 标签页在站长界面上不可见（切前台、open_resource 均无效），改为站长在自己的浏览器里按步骤导入（步骤与 9 个网址已给出）；备选 IndexNow（需加密钥文件，走 Spec + 验收）
+- [x] Bing Webmaster Tools 开通：从 GSC 导入 glucomath.com（含 sitemap），并提交 9 个路由 ｜开始: 2026-10-16 16:55 ｜站长授权: 2026-10-16 选定「builtin」（站长在 Cursor 内置浏览器登录，账号与授权由站长完成）｜中途受阻: 2026-10-16 17:05 内置浏览器的 Bing 标签页在站长界面上不可见，改为站长在自己的浏览器操作 ｜完成: 2026-10-17 07:36 ｜证据: 站长截图——Bing Webmaster Tools 已有 glucomath.com（同列 dcakit.com、glcalc.vercel.app，系此前从 GSC 导入）；Sitemaps：https://glucomath.com/sitemap.xml 于 10/17 提交、10/17 抓取，Success，0 错误 0 警告，发现 9 个网址。URL Inspection：/glycemic-load-calculator 为 Discovered but not crawled（9/17 发现）；编排者以 bingbot UA 请求该页 200、无 X-Robots-Tag 与 noindex、预渲染 HTML 完整、canonical 正确，robots.txt 全放行，非技术阻挡。逐页 Request indexing 为可选，站长未确认；周报 #3 复查 Bing 收录
 
 ## 站外推广调研（shareable-assets Spec §6 第 1 步）
 
