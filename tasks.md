@@ -128,6 +128,10 @@
 
 - [!] OR 跟进：旧资源 GSC 请求编入索引 https://glcalc.vercel.app/，让 Google 尽快重抓并看到新跳转目标 ｜开始: 2026-10-16 05:45（约）｜站长授权: 2026-10-15 选定「reindex_old_home」｜受阻: 2026-10-16 05:50 实时测试后 GSC 返回「Quota Exceeded — exceeded your daily quota, try again tomorrow」，这是该资源第 3 次遇到配额已满（9/25、9/27、10/16）。请求前状态：URL is not on Google / Page with redirect（10/8 抓取）。不建议每天重试：10/8 那次 Google 是自行重抓的，下次例行抓取就会看到新目标；周报 #3 复查旧首页最后抓取日期
 
+## AI 搜索收录
+
+- [x] 调研：让 ChatGPT 收录与引用 GlucoMath（哥飞知识库 + OpenAI 官方说明 + 本站对 OpenAI 爬虫的可达性检查），产出可执行清单 ｜开始: 2026-11-02 07:20 ｜完成: 2026-11-02 07:30 ｜证据: ① 哥飞知识库 knowledge_ask（2025-06 后）无 ChatGPT 收录 / GEO 专门内容，只返回通用建站与外链资料，未作引用（花 10 积分，余 93）；② OpenAI 官方（developers.openai.com/api/docs/bots、help.openai.com/en/articles/12627856）：ChatGPT 搜索无提交入口，需允许 OAI-SearchBot（GPTBot 只管训练），也会从第三方搜索服务取网址，引荐带 utm_source=chatgpt.com；③ 本站以 OAI-SearchBot / GPTBot / ChatGPT-User 三种 UA 请求 / 与 /glycemic-load-calculator 均 200、无 X-Robots-Tag，robots.txt 全放行，llms.txt 不存在（官方未要求）。结论：无技术阻挡，重点是让 Bing 等搜索引擎尽快抓取收录 + 外链与品牌提及；效果看 GA4 的 chatgpt.com 来源
+
 ## Bing 收录
 
 - [x] Bing Webmaster Tools 开通：从 GSC 导入 glucomath.com（含 sitemap），并提交 9 个路由 ｜开始: 2026-10-16 16:55 ｜站长授权: 2026-10-16 选定「builtin」（站长在 Cursor 内置浏览器登录，账号与授权由站长完成）｜中途受阻: 2026-10-16 17:05 内置浏览器的 Bing 标签页在站长界面上不可见，改为站长在自己的浏览器操作 ｜完成: 2026-10-17 07:36 ｜证据: 站长截图——Bing Webmaster Tools 已有 glucomath.com（同列 dcakit.com、glcalc.vercel.app，系此前从 GSC 导入）；Sitemaps：https://glucomath.com/sitemap.xml 于 10/17 提交、10/17 抓取，Success，0 错误 0 警告，发现 9 个网址。URL Inspection：/glycemic-load-calculator 为 Discovered but not crawled（9/17 发现）；编排者以 bingbot UA 请求该页 200、无 X-Robots-Tag 与 noindex、预渲染 HTML 完整、canonical 正确，robots.txt 全放行，非技术阻挡。逐页 Request indexing 为可选，站长未确认；周报 #3 复查 Bing 收录
