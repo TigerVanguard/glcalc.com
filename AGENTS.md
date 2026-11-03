@@ -22,6 +22,7 @@
 | `docs/2026-09-29-gmi-content-spec-v1.md`（GMI 对照表 + 意图 FAQ） | `.scratch/gmi-content/issues/`（01；GC-02 为编排者部署核对，无 ticket 文件） | GC-01、GC-02 完成 |
 | `docs/2026-09-29-content-ux-batch-spec-v1.md`（测试屏蔽统计、换算/估算表、手机溢出、本文件） | `.scratch/content-ux-batch/issues/`（01~06） | CU-01~04 完成；CU-05、CU-06 以 `tasks.md` 为准 |
 | `docs/2026-10-15-old-home-redirect-spec-v1.md`（旧域首页重定向修正） | `.scratch/old-home-redirect/issues/`（01~02） | 以 `tasks.md` 为准 |
+| `docs/2026-11-03-indexnow-spec-v1.md`（IndexNow 密钥文件 + 部署后手动推送脚本） | `.scratch/indexnow/issues/`（01~02） | 以 `tasks.md` 为准 |
 
 - 主 Spec §0A「仓库实况」记录的是 2026-09-12 开工前的状态，部分已过时（如 e2e 跑在 dev server、`App.js` 存在）；§1 锁定决策 D1~D6 与 §9 红线仍然有效。
 - shareable-assets 的 ticket 在 `tasks.md` 中记为 SA-01~06（按文件编号），与 Spec 里的 BL-01~06 不是一一同号；每个 ticket 文件头写明了对应的 BL 编号。
@@ -57,6 +58,7 @@ npm run verify-dist  # node scripts/verify-dist.mjs：对 dist/ 做 DOM 级断�
 npm run test:unit    # vitest run（tests/unit/**/*.test.js）
 npm run test:e2e     # playwright test（static 项目要求 dist/ 已构建）
 npm run check        # 统一验收门：test:unit → build → verify-dist → test:e2e
+npm run indexnow     # node scripts/indexnow-submit.mjs：部署后手动把线上 sitemap 网址推给 IndexNow（不在 check 内）；加 -- --dry-run 只打印不发送
 ```
 
 - 2026-09-29（CU-05）基线：unit 113、verify-dist 779 PASS、e2e 205，全绿。之后以 `tasks.md` 最近的记录为准。
@@ -88,6 +90,7 @@ npm run check        # 统一验收门：test:unit → build → verify-dist →
 - **Vercel 构建**：依赖 `vercel.json` 的 `installCommand`（先 `yum install` Chromium 所需系统库，再 `npm install` 与 `npx playwright install chromium --only-shell`；构建时预渲染要启动 Chromium，勿删）和 `.npmrc` 的 `legacy-peer-deps=true`；只用 npm（仓库里没有 yarn.lock）。`vercel.json` 另有 `cleanUrls`、`trailingSlash: false`，不加 catch-all rewrite（未知路由要返回真实 404）。
 - **统计**：GA4 与 Cloudflare Web Analytics beacon 写在 `index.html` 里无条件加载（verify-dist 断言 GA4 无 hostname 条件、beacon 为 async module）；屏蔽由预渲染（`prerender.mjs` 中止所有非 127.0.0.1 请求）与 e2e（见上节）负责，生产代码不做环境判断。
 - **反馈表单**：/about 用 Web3Forms 原生 POST（禁用 JS 也能提交）；其 access key 按设计公开，不是密钥。
+- **IndexNow**：`public/86029e40dc794a3b9a8fe1b14c762680.txt` 是公开的 IndexNow 密钥文件（按协议设计公开，不是秘密），内容必须与文件名中的密钥逐字一致（恰 32 字节，无换行、无 BOM），勿删勿改；由 verify-dist 与 `tests/e2e/indexnow-prerender.spec.js` 守护。`npm run indexnow` 不带 `--dry-run` 会真实推送，只由编排者在部署后运行；本地演练用 `node scripts/indexnow-submit.mjs --dry-run --sitemap dist/sitemap.xml`（完全不联网）。
 - **GSC**：周报原始数据存 `.gsc-export/<日期>-glucomath/`（如 `2026-09-25-glucomath/`）；`.gsc-export/coverage/`、`performance/` 是旧域 2026-09-09 的基线导出。GSC 需要资源所有者账号登录才能读取（由站长登录）；请求编入索引等操作需站长授权。验收禁用 `site:`。
 - **其他**：没有 Service Worker（PWA 只指 manifest），禁止写「离线可用」；`api/` 是真实的 Vercel 无服务器函数（条码、拍照识别），本地由 `vite.config.js` 中间件模拟；`package.json` 里的 `semantic-ui-react` / `semantic-ui-css` 零引用。
 
@@ -114,7 +117,7 @@ api/                      Vercel 无服务器函数：barcode.js、photo-identif
 data/                     上游 DiOGenes 原始压缩包与转换脚本（应用不读取）
 docs/                     各批 Spec、GSC 基线、2026-09-13 交付报告
 public/                   fonts/、icons/、manifest.webmanifest、og-cover.png 等静态资源
-scripts/                  prerender.mjs、verify-dist.mjs、serve-dist.mjs、generate-og-cover.mjs
+scripts/                  prerender.mjs、verify-dist.mjs、serve-dist.mjs、generate-og-cover.mjs、indexnow-submit.mjs
 src/index.jsx             入口：路由、三页拆分加载、ReactDOM.render
 src/App.jsx               GL 计算器主流程（由 pages/GlCalculatorPage.jsx 渲染）
 src/SearchWorker.js       食物搜索 Web Worker

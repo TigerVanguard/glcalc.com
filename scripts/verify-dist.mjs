@@ -1746,6 +1746,34 @@ for (const { route } of PAGES) {
   check(token === CF_BEACON_TOKEN, `D10 ${route}: data-cf-beacon token = ${CF_BEACON_TOKEN} (got ${token})`);
 }
 
+// IndexNow (IndexNow spec v1, D1/D2): public/<key>.txt is copied to the dist/
+// root and must hold exactly the key — 32 bytes, no newline, no BOM — and be
+// the only <32 hex>.txt file there. The key is hardcoded here, independent of
+// public/ and scripts/indexnow-submit.mjs.
+console.log("[verify-dist] IndexNow key file (IN-01)");
+const INDEXNOW_KEY = "86029e40dc794a3b9a8fe1b14c762680";
+const indexNowKeyFile = join(DIST, `${INDEXNOW_KEY}.txt`);
+const indexNowKeyExists = existsSync(indexNowKeyFile);
+check(indexNowKeyExists, `IN-01 key file exists: ${indexNowKeyFile}`);
+const indexNowKeyBytes = indexNowKeyExists ? await readFile(indexNowKeyFile) : null;
+check(
+  indexNowKeyBytes !== null && indexNowKeyBytes.equals(Buffer.from(INDEXNOW_KEY, "ascii")),
+  `IN-01 key file content is exactly "${INDEXNOW_KEY}"`,
+);
+check(
+  indexNowKeyBytes?.length === 32,
+  `IN-01 key file is exactly 32 bytes (got ${indexNowKeyBytes?.length ?? "none"})`,
+);
+const keyNamedFiles = (existsSync(DIST) ? await readdir(DIST, { withFileTypes: true }) : [])
+  .filter((entry) => entry.isFile() && /^[0-9a-f]{32}\.txt$/.test(entry.name))
+  .map((entry) => entry.name);
+check(
+  keyNamedFiles.length === 1,
+  `IN-01 dist/ root has exactly one file matching /^[0-9a-f]{32}\\.txt$/ (found ${keyNamedFiles.length}: ${
+    keyNamedFiles.join(", ") || "none"
+  })`,
+);
+
 if (failures > 0) {
   console.error(`[verify-dist] FAILED: ${failures} assertion(s) failed.`);
   process.exit(1);
