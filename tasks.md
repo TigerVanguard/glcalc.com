@@ -135,7 +135,7 @@
 ## IndexNow 接入（docs/2026-11-03-indexnow-spec-v1.md；站长 2026-11-02 选定）
 
 - [x] IN-01 IndexNow 密钥文件 + 手动推送脚本（public/86029e40dc794a3b9a8fe1b14c762680.txt、scripts/indexnow-submit.mjs、npm run indexnow、单测 / verify-dist / e2e、AGENTS.md）｜ticket: .scratch/indexnow/issues/01-key-file-and-submit-script.md ｜开始: 2026-11-03 05:25 ｜完成: 2026-11-03 06:05 ｜证据: 循环 1 次过。执行方 npm run check 退出 0（unit 113→128、verify-dist 782→786、e2e 205→206），dist 34→35（仅多密钥文件，原 34 个逐字节一致），演练模式在拦截网络的预加载下 0 次联网，11 种变异全被抓（.scratch/in01-exec-check.log、in01-dry-run.log、in01-mutation.log）。执行方在 Spec 之外加了更严格的保护（拒绝未知参数、识别 npm_config_dry_run、按原始字节比对密钥、成功时也打印响应体），编排者认可。独立验收 ACCEPT 9/9：自跑同样结果，HEAD 版 verify-dist 对同一构建 782（无断言丢失），自做换行变异被抓并已逐字节还原，未向 IndexNow 发任何请求（.scratch/in01-verify.log、in01-verify-mutation.log）
-- [~] IN-02 部署、线上核对与正式推送（编排者）｜ticket: .scratch/indexnow/issues/02-deploy-and-submit.md ｜开始: 2026-11-03 06:05
+- [x] IN-02 部署、线上核对与正式推送（编排者）｜ticket: .scratch/indexnow/issues/02-deploy-and-submit.md ｜开始: 2026-11-03 06:05 ｜完成: 2026-11-03 06:07 ｜证据: 推送 b6cce5c 约 70 秒后上线；https://glucomath.com/86029e40dc794a3b9a8fe1b14c762680.txt 返回 200、text/plain、32 字节且逐字等于密钥；npm run indexnow -- --dry-run 读线上 sitemap 列出 9 个网址；正式 npm run indexnow：key file OK，POST https://api.indexnow.org/indexnow → HTTP 202（已接收，密钥待验证），退出码 0（.scratch/in02-submit.log）。第④项（站长在 Bing Webmaster Tools 的 IndexNow 页面看到这 9 个网址）非硬性，待站长方便时截图
 
 ## Bing 收录
 
